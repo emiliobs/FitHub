@@ -1,6 +1,7 @@
 ﻿using FitHub.Web.Data;
 using FitHub.Web.Models.Domain;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 namespace FitHub.Web.Controllers
 {
     //Restrict access to Admins only for category management
+    // [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -58,7 +60,7 @@ namespace FitHub.Web.Controllers
                     await _context.SaveChangesAsync();
 
                     // Success message for the UI
-                    TempData["Success"] = "CAtegory created successfully!";
+                    TempData["Success"] = "Category created successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -103,6 +105,9 @@ namespace FitHub.Web.Controllers
                 {
                     _context.Update(category);
                     await _context.SaveChangesAsync();
+                    
+                    TempData["Success"] = "Category Updating successfully!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -115,7 +120,11 @@ namespace FitHub.Web.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch(Exception ex)
+                {
+                    TempData["Error"] = "An eror ocurred while updating.";
+                }
+                
             }
             return View(category);
         }
@@ -161,13 +170,25 @@ namespace FitHub.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            try
             {
-                _context.Categories.Remove(category);
+                var category = await _context.Categories.FindAsync(id);
+                if (category != null)
+                {
+                    _context.Categories.Remove(category);
+                    await _context.SaveChangesAsync();
+
+                    TempData["Success"] = "Category deleted successfully!";
+                }
+
+                
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"The category could not be deleted : {ex.Message}";
+               
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
