@@ -1,42 +1,46 @@
 ﻿@model IEnumerable<FitHub.Web.Models.Domain.Category>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2><i class="bi bi-list-stars"></i> Categories List</h2>
-        <a asp-action="Create" class="btn btn-primary">
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold">
+            <i class="bi bi-list-stars text-danger"></i> Categories List
+        </h2>
+        <a asp-action="Create" class="btn btn-fithub px-4">
             <i class="bi bi-plus-circle"></i> Create New
         </a>
     </div>
 
-    <div class="card shadow-sm p-3">
-        <table id="categoriesTable" class="table table-striped table-hover border">
-            <thead class="table-dark">
-                <tr>
-                    <th>Category Name</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.Name</td>
-                        <td class="text-center">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            
-                            <form asp-action="Delete" asp-route-id="@item.Id" id="form-@item.Id" class="d-inline">
-                                <button type="button" class="btn btn-danger btn-sm"
-                                        onclick="confirmDelete(() => document.getElementById('form-@item.Id').submit())">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </td>
+    <div class="card shadow-lg p-4 border-0">
+        <div class="table-responsive">
+            <table id="categoriesTable" class="table table-dark table-hover bg-transparent mb-0">
+                <thead>
+                    <tr class="border-danger">
+                        <th class="text-danger fw-black small">CATEGORY NAME</th>
+                        <th class="text-center text-danger fw-black small">ACTIONS</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="text-silver">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="border-secondary align-middle">
+                            <td class="fw-bold py-3">@item.Name</td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0 mx-1">
+                                    <i class="bi bi-pencil-square fs-5"></i>
+                                </a>
+                                
+                                <form asp-action="Delete" asp-route-id="@item.Id" id="form-@item.Id" class="d-inline">
+                                    <button type="button" class="btn btn-outline-danger btn-sm border-0 mx-1"
+                                            onclick="confirmDelete(() => document.getElementById('form-@item.Id').submit())">
+                                        <i class="bi bi-trash fs-5"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -44,8 +48,23 @@
     <script>
         $(document).ready(function () {
             $('#categoriesTable').DataTable({
-               "responsive": true
+                "responsive": true,
+                "pageLength": 7, 
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]], 
+                "language": {
+                    "search": "<span class='text-silver'>Search:</span>",
+                    "lengthMenu": "<span class='text-silver'>Show _MENU_ entries</span>",
+                    "info": "<span class='text-silver small'>Showing _START_ to _END_ of _TOTAL_ categories</span>",
+                    "paginate": {
+                        "next": "Next",
+                        "previous": "Prev"
+                    }
+                }
             });
+
+           
+            $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2');
+            $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2');
         });
     </script>
 }

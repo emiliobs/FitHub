@@ -4,45 +4,45 @@
     ViewData["Title"] = "Edit Category";
 }
 
-<div class="container mt-5">
+<div class="container mt-5" style="min-height: 70vh;">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
             
             <div class="d-flex align-items-center mb-4">
-                <i class="bi bi-pencil-square text-primary fs-2 me-3"></i>
+                <i class="bi bi-pencil-square text-danger fs-1 me-3"></i>
                 <div>
-                    <h2 class="fw-bold mb-0">Edit Category</h2>
-                    <p class="text-muted small">Update the name of your fitness category</p>
+                    <h2 class="text-white fw-bold mb-0">Edit Category</h2>
+                    <p class="text-silver small">Update the name of your fitness category</p>
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0 rounded-3">
-                <div class="card-body p-4">
-                    <form asp-action="Edit">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        <input type="hidden" asp-for="Id" />
+            <div class="card shadow-lg p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <input type="hidden" asp-for="Id" />
 
-                        <div class="form-group mb-4">
-                            <label asp-for="Name" class="form-label fw-bold small text-uppercase text-muted">Category Name</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">
-                                    <i class="bi bi-tag-fill text-muted"></i>
-                                </span>
-                                <input asp-for="Name" class="form-control border-start-0 ps-0" placeholder="Enter category name..." />
-                            </div>
-                            <span asp-validation-for="Name" class="text-danger small"></span>
+                    <div class="form-group mb-4">
+                        <label asp-for="Name" class="form-label text-silver fw-bold small text-uppercase">Category Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-danger border-end-0">
+                                <i class="bi bi-tag-fill text-danger"></i>
+                            </span>
+                            <input asp-for="Name" class="form-control fithub-input-sm border-start-0 ps-0"
+                                   placeholder="Update category name..." />
                         </div>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary fw-bold py-2">
-                                <i class="bi bi-check-circle-fill me-1"></i> SAVE CHANGES
-                            </button>
-                            <a asp-action="Index" class="btn btn-outline-secondary py-2">
-                                <i class="bi bi-arrow-left-circle me-1"></i> BACK TO LIST
-                            </a>
-                        </div>
-                    </form>
-                </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-fithub py-2">
+                            <i class="bi bi-check-circle-fill me-2"></i> SAVE CHANGES
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary border-0 text-silver mt-2">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+                </form>
             </div>
 
         </div>

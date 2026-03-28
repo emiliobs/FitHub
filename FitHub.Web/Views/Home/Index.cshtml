@@ -1,8 +1,75 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home - FitHub Energy";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero-wrap d-flex align-items-center mb-5">
+    <div class="container text-center text-white py-5">
+        <h1 class="display-2 fw-black text-uppercase animate__animated animate__fadeInDown">
+            Push Your <span class="text-energy">Limits</span>
+        </h1>
+        <p class="lead mb-4 text-silver animate__animated animate__fadeInUp">
+            Manage your fitness center, categories, and training routines in one place.
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center animate__animated animate__fadeInUp">
+            <a asp-controller="Categories" asp-action="Index" class="btn btn-fithub btn-lg px-5 fw-bold">
+                <i class="bi bi-play-fill"></i> GET STARTED
+            </a>
+            <button class="btn btn-outline-light btn-lg px-4 fw-bold border-2">LEARN MORE</button>
+        </div>
+    </div>
 </div>
+
+<div class="container mb-5">
+    <div class="row g-4 text-center">
+        @foreach (var stat in new[] { ("20+", "Categories"), ("500+", "Exercises"), ("150+", "Trainers"), ("1k+", "Members") })
+        {
+            <div class="col-6 col-lg-3">
+                <div class="p-3 border-start border-danger border-4 card shadow-lg bg-glass-dark">
+                    <h3 class="fw-bold mb-0 text-white">@stat.Item1</h3>
+                    <small class="text-danger text-uppercase fw-black letter-spacing-1">@stat.Item2</small>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container py-5">
+    <h2 class="text-center fw-bold mb-5 text-white">OUR CORE <span class="text-energy">SERVICES</span></h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 hover-up">
+                <div class="card-body text-center">
+                    <i class="bi bi-tags-fill text-danger fs-1 mb-3 d-block"></i>
+                    <h5 class="card-title fw-bold text-white">Category Management</h5>
+                    <p class="card-text text-silver">Organize your gym activities by types like Cardio, HIIT, or Yoga.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 hover-up">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-badge-fill text-danger fs-1 mb-3 d-block"></i>
+                    <h5 class="card-title fw-bold text-white">Trainer Access</h5>
+                    <p class="card-text text-silver">Dedicated dashboard for trainers to manage their class schedules.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 hover-up">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up-arrow text-danger fs-1 mb-3 d-block"></i>
+                    <h5 class="card-title fw-bold text-white">Progress Tracking</h5>
+                    <p class="card-text text-silver">Monitor members' growth and performance with detailed analytics.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-glass-dark {
+        background: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(10px);
+    }
+    .letter-spacing-1 { letter-spacing: 1px; }
+</style>

@@ -4,21 +4,21 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - FitHub.Web</title>
+    <title>@ViewData["Title"] - FitHub</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/FitHub.Web.styles.css" asp-append-version="true" />
-</head>
+    </head>
+    
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-heart-pulse-fill me-2 text-danger" style="font-size: 1.6rem;"></i>
-                    <span class="fw-bold">FITHUB</span>
+        <nav class="navbar navbar-expand-sm navbar-light navbar-modern sticky-top mb-3">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-heart-pulse-fill me-2 text-whi" style="font-size: 1.6rem;"></i>
+                    <span class="fw-bolder" style="letter-spacing: -0.5px;">FITHUB</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -51,14 +51,18 @@
         </main>
     </div>
 
-    <footer class="footer text-center m-0  text-muted">
-        <div class="container">
-            <span>
-                &copy; 2026 London - <i class="bi bi-cursor fs-6 m-0"></i> FitHub -
-                <i class="bi bi-code-slash"></i> By Emilio Barrera Built with
-                <i class="bi bi-heart-fill" style="color: #e74c3c;"></i>
-                        
-            </span>
+    <footer class="footer-modern py-4 mt-5">
+        <div class="container text-center">
+            <div class="footer-content">
+                <span class="text-silver small">
+                    &copy; 2026 London -
+                    <i class="bi bi-heart-pulse-fill text-danger mx-1"></i>
+                    <strong>FitHub</strong> -
+                    <i class="bi bi-code-slash mx-1 text-primary"></i>
+                    By Emilio Barrera & Mehakdeep Kaur
+                    <i class="bi bi-heart-fill ms-1 animate-pulse" style="color: #ff3b3b;"></i>
+                </span>
+            </div>
         </div>
     </footer>
     
@@ -78,6 +82,7 @@
     {
         <script>showError('@TempData["Error"]');</script>
     }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

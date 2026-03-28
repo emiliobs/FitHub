@@ -1,32 +1,221 @@
-html {
-    font-size: 14px;
+/* ============================================================
+   FITHUB ENERGY STYLE — V2 (Vibrant & High Performance)
+   ============================================================ */
+
+:root {
+    --red-main: #ff3b3b;
+    --red-glow: #ff5757;
+    --orange-energy: #ff8c42;
+    --pink-energy: #ff4ecd;
+    --blue-energy: #38bdf8;
+    --bg-dark: #0b1220;
+    --glass: rgba(255, 255, 255, 0.12);
+    --border-glow: rgba(255, 255, 255, 0.2);
+    --text-main: #ffffff;
+    --text-soft: #d1d5db;
 }
 
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
+/* GLOBAL BODY STYLES */
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* Animated background with radial gradients */
+    background: radial-gradient(circle at 20% 20%, rgba(255, 59, 59, 0.35), transparent 40%), radial-gradient(circle at 80% 30%, rgba(255, 78, 205, 0.25), transparent 40%), radial-gradient(circle at 50% 90%, rgba(56, 189, 248, 0.25), transparent 40%), linear-gradient(135deg, #020617, #0b1220, #111827);
+    background-attachment: fixed;
+}
+
+main {
+    flex: 1;
+}
+
+/* MODERN NAVBAR STYLES */
+.navbar-modern {
+    background: linear-gradient(90deg, rgba(255, 59, 59, 0.85), rgba(255, 140, 66, 0.85)) !important;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 5px 25px rgba(255, 59, 59, 0.4);
+    border: none !important;
+}
+
+.navbar-brand {
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: white !important;
+}
+
+.nav-link {
+    color: white !important;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+    .nav-link:hover {
+        transform: translateY(-2px);
+        text-shadow: 0 0 10px white;
+    }
+
+/* ENERGY BUTTONS */
+.btn-fithub {
+    background: linear-gradient(135deg, var(--red-main), var(--pink-energy), var(--orange-energy));
+    border: none;
+    color: white;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 10px 20px;
+    transition: 0.35s;
+    text-transform: uppercase;
+}
+
+    .btn-fithub:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 10px 30px rgba(255, 59, 59, 0.5), 0 0 25px rgba(255, 78, 205, 0.4);
+    }
+
+/* GLASSMORPHISM CARDS */
+.card {
+    background: var(--glass) !important;
+    backdrop-filter: blur(18px);
+    border-radius: 20px !important;
+    border: 1px solid var(--border-glow) !important;
+    transition: 0.4s ease;
+}
+
+    .card:hover {
+        transform: translateY(-8px);
+        border-color: var(--red-main) !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 59, 59, 0.3) !important;
+    }
+
+/* GRADIENT TEXT EFFECT */
+.text-energy {
+    background: linear-gradient(90deg, #ff3b3b, #ff8c42, #ff4ecd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+}
+
+/* HERO SECTION WITH BACKGROUND IMAGE */
+.hero-wrap {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(11, 18, 32, 0.9)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    min-height: 550px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    margin-top: -20px;
+}
+
+    .hero-wrap h1 {
+        font-size: 4rem;
+        text-shadow: 0 0 20px rgba(255, 59, 59, 0.6);
+    }
+
+/* FOOTER STYLES */
+.footer-modern {
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 59, 59, 0.2);
+    color: #cbd5e1;
+}
+
+.text-silver {
+    color: #cbd5e1 !important;
+    letter-spacing: 0.5px;
+}
+
+/* HEART PULSE ANIMATION */
+.animate-pulse {
+    display: inline-block;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
     }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* DATATABLES UI ADJUSTMENTS */
+.fw-black {
+    font-weight: 900;
 }
 
-html {
-    position: relative;
-    min-height: 100%;
+.fithub-input-sm {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 59, 59, 0.3) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 4px 10px !important;
 }
 
-body {
-    margin-bottom: 60px;
+/* DATATABLES PAGINATION */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: white !important;
+    border: none !important;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: var(--red-main) !important;
+        border-radius: 8px;
+        color: white !important;
+    }
+
+/* FIX FOR ENTRIES SELECTOR AND SEARCH VISIBILITY */
+.dataTables_length select {
+    background-color: #1a1a1a !important; /* Solid dark background */
+    color: #ffffff !important; /* Forced white text */
+    border: 1px solid var(--red-main) !important;
+    border-radius: 8px;
+    padding: 5px;
+    appearance: auto; /* Ensures browser default arrow */
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
+    .dataTables_length select option {
+        background-color: #0b1220 !important;
+        color: white !important;
+    }
+
+.dataTables_filter input {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--red-main) !important;
+    border-radius: 8px;
+    padding: 6px 12px;
 }
 
+/* Placeholder styling for all browsers */
+
+/* Chrome, Firefox, Opera, Safari 10.1+ */
+.fithub-input-sm::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-style: italic;
+    opacity: 1; /* Firefox requires this */
+}
+
+/* Internet Explorer 10-11 */
+.fithub-input-sm:-ms-input-placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Microsoft Edge */
+.fithub-input-sm::-ms-input-placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Extra: Make the text you type also white */
+.fithub-input-sm {
+    color: white !important;
+}
