@@ -10,6 +10,18 @@
 * **Responsive Layout:** Fully adaptive design for mobile and desktop.
 * **DataTables Integration:** Advanced tables with custom dark-mode styling and entry filtering.
 
+  ## 📸 Screenshots
+
+### 🏠 01. The Hero Dashboard
+*High-impact visuals with a custom hero section to drive user engagement.*
+><img width="2548" height="1351" alt="image" src="https://github.com/user-attachments/assets/77e28716-a8f2-44a0-bc9c-5152b23a8e80" />
+
+
+### 📊 02. Categories Management (Admin View)
+*Advanced DataTables integration with custom dark-mode filtering and pagination.*
+> <img width="2536" height="1356" alt="image" src="https://github.com/user-attachments/assets/efb68c53-2a8e-4d4d-b295-487d6dd8f536" />
+
+
 ### 🔐 Security & Identity
 * **ASP.NET Core Identity:** Fully integrated for user management.
 * **Role-Based Access Control (RBAC):** Roles defined for **Admin, Trainer, and Member**.
@@ -22,7 +34,8 @@
 * **User Feedback:** Integration with **SweetAlert2** for success and error notifications.
 
 ## 📸 Screenshots
-*(Coming soon - Uploading to /screenshots folder)*
+<img width="388" height="742" alt="image" src="https://github.com/user-attachments/assets/bba408c1-361f-4e8a-a957-d5f4a3f22c1a" />
+
 
 ---
 
