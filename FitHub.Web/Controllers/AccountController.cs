@@ -12,12 +12,14 @@ public class AccountController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
 
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public AccountController(UserManager<ApplicationUser> userManager,
-                             SignInManager<ApplicationUser> signInManager)
+    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
+        IWebHostEnvironment webHostEnvironment)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        this._webHostEnvironment = webHostEnvironment;
     }
 
     // GET: /Account/Login
@@ -75,4 +77,67 @@ public class AccountController : Controller
 
         return RedirectToAction("Index", "Home");
     }
+
+    // GET: /Account/Register
+    public IActionResult Register() => View();
+
+    // POST: /Account/Register
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                // Process the photo before creating the user
+                //var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel);
+
+                var user = new ApplicationUser
+                {
+                    UserName = registerViewModel.Email,
+                    Email = registerViewModel.Email,
+                    FirstName = registerViewModel.FirstName,
+                    LastName = registerViewModel.LastName,
+                    //Photo = uniqueFileNamePhoto,
+                    RegistrationDate = DateTime.UtcNow, // Auto-set registraction date
+                };
+
+                var result = await _userManager.CreateAsync(user, registerViewModel.Password);
+
+                if (result.Succeeded)
+                {
+                    // Assign a default role (Member)
+                    await _userManager.AddToRoleAsync(user, "Member");
+
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    TempData["Success"] = "Welcome to the FitHub Energy family!";
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                    TempData["Error"] = $"Error Register member: {error.Description}";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Error register member: {ex.Message}";
+        }
+
+        return View(registerViewModel);
+    }
+
+    //private string ProcessUploadedFile(RegisterViewModel registerViewModel)
+    //{
+    //    var uniqueFileNamePhoto = "default-user.png";
+
+    //    if (registerViewModel. PhotoFile != null)
+    //    {
+    //        var uploadFolder
+    //    };
+    //}
 }
