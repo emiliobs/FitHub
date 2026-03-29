@@ -91,7 +91,7 @@ public class AccountController : Controller
             if (ModelState.IsValid)
             {
                 // Process the photo before creating the user
-                //var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel);
+                var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel);
 
                 var user = new ApplicationUser
                 {
@@ -99,7 +99,7 @@ public class AccountController : Controller
                     Email = registerViewModel.Email,
                     FirstName = registerViewModel.FirstName,
                     LastName = registerViewModel.LastName,
-                    //Photo = uniqueFileNamePhoto,
+                    Photo = uniqueFileNamePhoto,
                     RegistrationDate = DateTime.UtcNow, // Auto-set registraction date
                 };
 
@@ -131,13 +131,31 @@ public class AccountController : Controller
         return View(registerViewModel);
     }
 
-    //private string ProcessUploadedFile(RegisterViewModel registerViewModel)
-    //{
-    //    var uniqueFileNamePhoto = "default-user.png";
+    private string ProcessUploadedFile(RegisterViewModel registerViewModel)
+    {
+        var uniqueFileNamePhoto = "default-user.png";
 
-    //    if (registerViewModel. PhotoFile != null)
-    //    {
-    //        var uploadFolder
-    //    };
-    //}
+        if (registerViewModel.PhotoFile != null)
+        {
+            // Define the patch: wwwroot/images/profiles
+            var uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Profiles");
+
+            // Ensure the directory exists
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+
+            // Generate a unique file name to prevent overwriting
+            uniqueFileNamePhoto = Guid.NewGuid().ToString() + "_" + registerViewModel.PhotoFile.FileName;
+            var filePath = Path.Combine(uploadFolder, uniqueFileNamePhoto);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                registerViewModel.PhotoFile.CopyTo(fileStream);
+            }
+        }
+
+        return uniqueFileNamePhoto;
+    }
 }
