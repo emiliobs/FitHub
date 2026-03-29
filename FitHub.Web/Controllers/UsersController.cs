@@ -43,4 +43,50 @@ public class UsersController : Controller
 
         return View(userList);
     }
+
+    // POST: /User/UpdateRole
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateRole(string userId, string newRole)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Safety check: Don't allow changing the role of the currently logged-in admin
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser?.Id == userId)
+            {
+                TempData["Error"] = "You cannot change your own role.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            // Remove user from all current roles and add to the new role
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            var resul = await _userManager.AddToRoleAsync(user, newRole);
+
+            if (resul.Succeeded)
+            {
+                TempData["Success"] = $"Role updated to  -:{newRole}:- successfully for {user.FullName}.";
+            }
+            else
+            {
+                TempData["Error"] = $"Erro: Failed to update role.";
+            }
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"An error occurred: {ex.Message}";
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }

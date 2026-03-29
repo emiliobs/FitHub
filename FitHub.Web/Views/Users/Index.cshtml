@@ -56,7 +56,7 @@
                                 <form asp-action="UpdateRole" method="post" class="d-flex justify-content-center align-items-center">
                                     <input type="hidden" name="userId" value="@item.Id" />
                                     
-                                    <select name="newRole" class="form-select fithub-input-sm bg-dark text-white border-danger w-auto me-2" style="font-size: 0.8rem;">
+                                    <select name="newRole" class="form-select fw-bold bg-dark text-white border-danger w-auto me-2" style="font-size: 0.8rem;">
                                         @if (item.AvailableRoles != null)
                                         {
                                             foreach (var role in item.AvailableRoles)
