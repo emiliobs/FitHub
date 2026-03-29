@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace FitHub.Web.Controllers
 {
     //Restrict access to Admins only for category management
-    // [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -105,7 +105,7 @@ namespace FitHub.Web.Controllers
                 {
                     _context.Update(category);
                     await _context.SaveChangesAsync();
-                    
+
                     TempData["Success"] = "Category Updating successfully!";
                     return RedirectToAction(nameof(Index));
                 }
@@ -120,11 +120,10 @@ namespace FitHub.Web.Controllers
                         throw;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     TempData["Error"] = "An eror ocurred while updating.";
                 }
-                
             }
             return View(category);
         }
@@ -180,13 +179,10 @@ namespace FitHub.Web.Controllers
 
                     TempData["Success"] = "Category deleted successfully!";
                 }
-
-                
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"The category could not be deleted : {ex.Message}";
-               
             }
 
             return RedirectToAction(nameof(Index));

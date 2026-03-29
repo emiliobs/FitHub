@@ -1,0 +1,42 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using FitHub.Web.Models.Identity
+@using Microsoft.AspNetCore.Http 
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IHttpContextAccessor HttpContextAccessor 
+
+@{
+    var currentUser = HttpContextAccessor.HttpContext?.User;
+}
+
+<ul class="navbar-nav align-items-center">
+    @if (currentUser != null && SignInManager.IsSignedIn(currentUser))
+    {
+        <li class="nav-item d-flex align-items-center me-3">
+            <i class="bi bi-person-circle text-danger fs-4 me-2 shadow-neon"></i>
+            <span class="text-white fw-bold small text-uppercase">
+                Hello, @UserManager.GetUserName(currentUser)!
+            </span>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-outline-danger btn-sm fw-bold border-2 px-3">
+                    <i class="bi bi-box-arrow-right"></i> LOGOUT
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item me-2">
+            <a class="nav-link text-silver fw-bold small" asp-controller="Account" asp-action="Register">REGISTER</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-fithub btn-sm px-4 fw-bold" asp-controller="Account" asp-action="Login">
+                <i class="bi bi-person-fill"></i> LOGIN
+            </a>
+        </li>
+    }
+</ul>
+

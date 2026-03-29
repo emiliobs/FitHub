@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitHub.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260328014042_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260328234400_InitialSetup")]
+    partial class InitialSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

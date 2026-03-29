@@ -26,7 +26,7 @@ public class DbInitializer
             }
 
             // 2. Seed Admin User
-            var adminEmail = "admin@fithub.com";
+            var adminEmail = "admin@yopmail.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
             if (adminUser == null)
@@ -41,7 +41,7 @@ public class DbInitializer
                     EmailConfirmed = true
                 };
 
-                await userManager.CreateAsync(user, "Admin123!");
+                await userManager.CreateAsync(user, "Eabs123");
                 await userManager.AddToRoleAsync(user, "Admin");
             }
 

@@ -24,10 +24,23 @@ catch (Exception ex)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     // Security requirement: usinque email and same as username
+    // Relaxed Password Hash Rules for Development
     options.User.RequireUniqueEmail = true;
+    //options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 3;
 }).AddEntityFrameworkStores<ApplicationDbContext>()
   .AddDefaultTokenProviders();
+
+// Configurar la ruta del Login (Importante para que [Authorize] sepa a dónde ir)
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
