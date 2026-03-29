@@ -1,0 +1,84 @@
+﻿@model FitHub.Web.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile - FitHub";
+}
+
+<div class="container mt-5 py-5 animate__animated animate__fadeIn" style="min-height: 70vh;">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-glass-dark border-0 shadow-lg p-4">
+                <div class="text-center mb-4 border-bottom border-danger pb-3">
+                    <h2 class="text-white fw-bold"><i class="bi bi-person-badge text-danger me-2"></i>MY PROFILE</h2>
+                    <p class="text-silver small">Manage your personal information and photo</p>
+                </div>
+
+                <form asp-action="MyProfile" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="ExistingPhoto" />
+
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4">
+                            <label class="text-danger fw-bold small d-block mb-2 text-uppercase">Profile Photo</label>
+                            <div class="position-relative d-inline-block">
+                                <img id="profile-preview" src="~/images/profiles/@(Model.ExistingPhoto ?? "default-user.png")"
+                                     class="rounded-circle border border-danger shadow-neon p-1"
+                                     style="width: 150px; height: 150px; object-fit: cover;" />
+                                <div class="mt-2">
+                                    <label for="PhotoFileInput" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-camera"></i> Change Photo
+                                    </label>
+                                    <input asp-for="PhotoFile" type="file" id="PhotoFileInput" class="d-none" accept="image/*" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="Email" class="text-silver small fw-bold">EMAIL ADDRESS</label>
+                                <input asp-for="Email" class="form-control fithub-input-sm bg-dark text-muted" disabled />
+                                <small class="text-white italic">Email cannot be changed for security reasons.</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="FirstName" class="text-silver small fw-bold">FIRST NAME</label>
+                                    <input asp-for="FirstName" class="form-control fithub-input-sm" />
+                                    <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="LastName" class="text-silver small fw-bold">LAST NAME</label>
+                                    <input asp-for="LastName" class="form-control fithub-input-sm" />
+                                    <span asp-validation-for="LastName" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-fithub fw-bold py-2 shadow-neon-sm">
+                                    <i class="bi bi-save me-1"></i> SAVE CHANGES
+                                </button>
+                                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary border-0 text-silver mt-2">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $("#PhotoFileInput").change(function() {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#profile-preview').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+    </script>
+}
