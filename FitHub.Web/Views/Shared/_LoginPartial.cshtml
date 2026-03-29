@@ -7,21 +7,28 @@
 @inject IHttpContextAccessor HttpContextAccessor 
 
 @{
-    var currentUser = HttpContextAccessor.HttpContext?.User;
+    // var currentUser = HttpContextAccessor.HttpContext?.User;
+    var user = await UserManager.GetUserAsync(ViewContext.HttpContext.User);
+    var photoPath = user?.Photo ?? "default-profile.png"; 
 }
 
 <ul class="navbar-nav align-items-center">
-    @if (currentUser != null && SignInManager.IsSignedIn(currentUser))
+    @if (SignInManager.IsSignedIn(ViewContext.HttpContext.User))
     {
         <li class="nav-item d-flex align-items-center me-3">
-            <i class="bi bi-person-circle text-danger fs-4 me-2 shadow-neon"></i>
+            <div class="me-2 position-relative">
+                <img src="~/Images/Profiles/@photoPath" alt="Profile" 
+                class="rounded-circle border-danger shadow-neon-sm" 
+                style="width: 35px; height: 35px; -o-object-fit: cover;"/>
+            </div>
+            @* <i class="bi bi-person-circle text-danger fs-4 me-2 shadow-neon"></i> *@
             <span class="text-white fw-bold small text-uppercase">
-                Hello, @UserManager.GetUserName(currentUser)!
+                Hello, @(user?.FirstName ?? "Warrior")!
             </span>
         </li>
         <li class="nav-item">
             <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
-                <button type="submit" class="btn btn-outline-danger btn-sm fw-bold border-2 px-3">
+                <button type="submit" class="btn btn-outline-danger text-white btn-sm fw-bold border-2 px-3">
                     <i class="bi bi-box-arrow-right"></i> LOGOUT
                 </button>
             </form>
@@ -33,7 +40,7 @@
             <a class="nav-link text-silver fw-bold small" asp-controller="Account" asp-action="Register">REGISTER</a>
         </li>
         <li class="nav-item">
-            <a class="btn btn-fithub btn-sm px-4 fw-bold" asp-controller="Account" asp-action="Login">
+            <a class="btn btn-fithub  btn-sm px-4 fw-bold" asp-controller="Account" asp-action="Login">
                 <i class="bi bi-person-fill"></i> LOGIN
             </a>
         </li>

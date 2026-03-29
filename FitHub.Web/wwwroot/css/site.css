@@ -219,3 +219,21 @@ main {
 .fithub-input-sm {
     color: white !important;
 }
+
+/* Neon glow for profile small images */
+.shadow-neon-sm {
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+}
+
+    .shadow-neon-sm:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    }
+
+/* Glassmorphism utility for navbar components */
+.bg-glass-dark {
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
