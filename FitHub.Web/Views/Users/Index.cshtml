@@ -1,0 +1,113 @@
+﻿@model IEnumerable<FitHub.Web.ViewModels.UserListViewModel>
+
+@{
+    ViewData["Title"] = "User Management - FitHub";
+}
+
+<div class="container mt-5" style="min-height: 70vh;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold">
+            <i class="bi bi-shield-lock text-danger"></i> User Management
+        </h2>
+        <div class="text-end">
+            <span class="badge bg-danger px-3 py-2 shadow-neon-sm">Total: @Model.Count() Warriors</span>
+        </div>
+    </div>
+
+    <div class="card shadow-lg p-4 border-0 bg-glass-dark">
+        <div class="table-responsive">
+            <table id="usersTable" class="table table-dark table-hover bg-transparent mb-0">
+                <thead>
+                    <tr class="border-danger">
+                        <th class="text-danger fw-black small">MEMBER info</th>
+                        <th class="text-danger fw-black small">EMAIL ADDRESS</th>
+                        <th class="text-center text-danger fw-black small">CURRENT ROLE</th>
+                        <th class="text-center text-danger fw-black small">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody class="text-silver">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="border-secondary align-middle">
+                            <td class="py-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/images/profiles/@item.Photo"
+                                         class="rounded-circle border border-danger me-3"
+                                         style="width: 42px; height: 42px; object-fit: cover;" />
+                                    <span class="fw-bold">@item.FullName</span>
+                                </div>
+                            </td>
+                            <td class="small">@item.Email</td>
+                            <td class="text-center">
+                                @{
+                                    var badgeClass = item.Role switch
+                                    {
+                                        "Admin" => "bg-danger",
+                                        "Manager" => "bg-warning text-dark",
+                                        "Instructor" => "bg-info text-dark",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @badgeClass fw-bold" style="font-size: 0.75rem;">
+                                    @item.Role.ToUpper()
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <form asp-action="UpdateRole" method="post" class="d-flex justify-content-center align-items-center">
+                                    <input type="hidden" name="userId" value="@item.Id" />
+                                    
+                                    <select name="newRole" class="form-select fithub-input-sm bg-dark text-white border-danger w-auto me-2" style="font-size: 0.8rem;">
+                                        @if (item.AvailableRoles != null)
+                                        {
+                                            foreach (var role in item.AvailableRoles)
+                                            {
+                                                @if (role == item.Role)
+                                                {
+                                                    <option value="@role" selected>@role</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@role">@role</option>
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                    
+                                    <button type="submit" class="btn btn-outline-danger btn-sm border-0">
+                                        <i class="bi bi-arrow-repeat fs-5"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialization using your Categories settings
+            $('#usersTable').DataTable({
+                "responsive": true,
+                "pageLength": 7,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                "language": {
+                    "search": "<span class='text-silver'>Search Warrior:</span>",
+                    "lengthMenu": "<span class='text-silver'>Show _MENU_ entries</span>",
+                    "info": "<span class='text-silver small'>Showing _START_ to _END_ of _TOTAL_ users</span>",
+                    "paginate": {
+                        "next": "Next",
+                        "previous": "Prev"
+                    }
+                }
+            });
+
+            // Apply your custom styles to DataTables search and length inputs
+            $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2');
+            $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2');
+        });
+    </script>
+}
