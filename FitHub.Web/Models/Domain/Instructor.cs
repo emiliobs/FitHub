@@ -9,20 +9,22 @@ public class Instructor
 
     [Required(ErrorMessage = "Instructor name is mandatory")]
     [StringLength(80)]
-    [RegularExpression(@"^[a-zA-ZÀ-ÿ\s'-]+$", ErrorMessage = "Invalid characters in name")]
+    [RegularExpression(@"^[a-zA-ZÀ-ÿ\s'-]+$", ErrorMessage = "Only letters are allowed")]
     public string Name { get; set; } = string.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Specialty is mandatory")]
     [StringLength(100)]
     public string Specialty { get; set; } = string.Empty;
 
-    [EmailAddress]
+    [EmailAddress(ErrorMessage = "Invalid email format")]
     public string? Email { get; set; }
 
-    [Phone]
+    [Phone(ErrorMessage = "Invalid phone format")]
     public string? Phone { get; set; }
 
-    // Navigation property: An instructor can be assigned to many classes
-    // Un instructor puede estar asignado a muchas clases
+    // NEW FIELD: Stores the filename of the instructor's photo
+    public string Photo { get; set; } = "default-user.png";
+
+    // Navigation property
     public virtual ICollection<FitnessClass> FitnessClasses { get; set; } = new List<FitnessClass>();
 }

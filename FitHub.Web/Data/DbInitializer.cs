@@ -41,7 +41,7 @@ public class DbInitializer
                     EmailConfirmed = true
                 };
 
-                await userManager.CreateAsync(user, "Eabs123");
+                await userManager.CreateAsync(user, "123");
                 await userManager.AddToRoleAsync(user, "Admin");
             }
 
@@ -73,6 +73,37 @@ public class DbInitializer
                 };
 
                 await context.Categories.AddRangeAsync(categories);
+                await context.SaveChangesAsync();
+            }
+
+            // 4. Seed Instructors - Coursework Requirement (20 records)
+            if (!context.Instructors.Any())
+            {
+                var instructors = new List<Instructor>
+    {
+        new Instructor { Name = "Marcus Thorne", Specialty = "CrossFit Expert", Email = "marcus@fithub.com", Phone = "07712345671", Photo = "default-user.png" },
+        new Instructor { Name = "Elena Rodriguez", Specialty = "Yoga & Pilates", Email = "elena@fithub.com", Phone = "07712345672", Photo = "default-user.png" },
+        new Instructor { Name = "Sarah Jenkins", Specialty = "Zumba Instructor", Email = "sarah@fithub.com", Phone = "07712345673", Photo = "default-user.png" },
+        new Instructor { Name = "David Beckham", Specialty = "Football Conditioning", Email = "david@fithub.com", Phone = "07712345674", Photo = "default-user.png" },
+        new Instructor { Name = "Chloe Smith", Specialty = "HIIT Specialist", Email = "chloe@fithub.com", Phone = "07712345675", Photo = "default-user.png" },
+        new Instructor { Name = "James Bond", Specialty = "Self Defense", Email = "007@fithub.com", Phone = "07712345676", Photo = "default-user.png" },
+        new Instructor { Name = "Maria Garcia", Specialty = "Spinning Pro", Email = "maria@fithub.com", Phone = "07712345677", Photo = "default-user.png" },
+        new Instructor { Name = "Robert Pattinson", Specialty = "Bodybuilding", Email = "robert@fithub.com", Phone = "07712345678", Photo = "default-user.png" },
+        new Instructor { Name = "Emma Watson", Specialty = "Flexibility Coach", Email = "emma@fithub.com", Phone = "07712345679", Photo = "default-user.png" },
+        new Instructor { Name = "Chris Evans", Specialty = "Strength & Core", Email = "chris@fithub.com", Phone = "07712345680", Photo = "default-user.png" },
+        new Instructor { Name = "Scarlett J.", Specialty = "Kickboxing", Email = "scarlett@fithub.com", Phone = "07712345681", Photo = "default-user.png" },
+        new Instructor { Name = "Tom Hardy", Specialty = "MMA Trainer", Email = "tom@fithub.com", Phone = "07712345682", Photo = "default-user.png" },
+        new Instructor { Name = "Gal Gadot", Specialty = "Functional Training", Email = "gal@fithub.com", Phone = "07712345683", Photo = "default-user.png" },
+        new Instructor { Name = "Henry Cavill", Specialty = "Heavy Lifting", Email = "henry@fithub.com", Phone = "07712345684", Photo = "default-user.png" },
+        new Instructor { Name = "Margot Robbie", Specialty = "Aerobics", Email = "margot@fithub.com", Phone = "07712345685", Photo = "default-user.png" },
+        new Instructor { Name = "Dwayne Johnson", Specialty = "Powerlifting", Email = "theock@fithub.com", Phone = "07712345686", Photo = "default-user.png" },
+        new Instructor { Name = "Jason Momoa", Specialty = "Swimming Fitness", Email = "jason@fithub.com", Phone = "07712345687", Photo = "default-user.png" },
+        new Instructor { Name = "Brie Larson", Specialty = "Cardio Dance", Email = "brie@fithub.com", Phone = "07712345688", Photo = "default-user.png" },
+        new Instructor { Name = "Tom Holland", Specialty = "Gymnastics", Email = "spider@fithub.com", Phone = "07712345689", Photo = "default-user.png" },
+        new Instructor { Name = "Zendaya Coleman", Specialty = "Contemporary Dance", Email = "zen@fithub.com", Phone = "07712345690", Photo = "default-user.png" }
+    };
+
+                await context.Instructors.AddRangeAsync(instructors);
                 await context.SaveChangesAsync();
             }
         }

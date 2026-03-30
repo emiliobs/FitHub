@@ -131,6 +131,10 @@ namespace FitHub.Web.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Photo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Specialty")
                         .IsRequired()
                         .HasMaxLength(100)

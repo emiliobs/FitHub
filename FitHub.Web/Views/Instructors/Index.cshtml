@@ -1,0 +1,83 @@
+﻿@model IEnumerable<FitHub.Web.Models.Domain.Instructor>
+
+@{
+    ViewData["Title"] = "Staff Management";
+}
+
+<div class="container mt-5" style="min-height: 70vh;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold">
+            <i class="bi bi-person-badge text-danger"></i> Staff Management
+        </h2>
+        <a asp-action="Create" class="btn btn-fithub px-4 shadow-neon-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Instructor
+        </a>
+    </div>
+
+    <div class="card shadow-lg p-4 border-0 bg-glass-dark">
+        <div class="table-responsive">
+            <table id="instructorsTable" class="table table-dark table-hover bg-transparent mb-0">
+                <thead>
+                    <tr class="border-danger">
+                        <th class="text-danger fw-black small">PHOTO</th>
+                        <th class="text-danger fw-black small">NAME</th>
+                        <th class="text-danger fw-black small text-center">SPECIALTY</th>
+                        <th class="text-danger fw-black small">CONTACT</th>
+                        <th class="text-center text-danger fw-black small">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody class="text-silver">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="border-secondary align-middle">
+                            <td class="py-3">
+                                <img src="~/images/profiles/@item.Photo"
+                                     alt="@item.Name"
+                                     class="rounded-circle border border-danger shadow-sm"
+                                     style="width: 50px; height: 50px; object-fit: cover;" />
+                            </td>
+                            <td class="fw-bold text-white">@item.Name</td>
+                            <td class="text-center">
+                                <span class="badge bg-outline-danger border border-danger">@item.Specialty</span>
+                            </td>
+                            <td class="small">
+                                <i class="bi bi-envelope text-danger"></i> @item.Email<br />
+                                <i class="bi bi-telephone text-danger"></i> @item.Phone
+                            </td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0">
+                                    <i class="bi bi-pencil-square fs-5"></i>
+                                </a>
+                                
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" id="delete-form-@item.Id" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="button" class="btn btn-outline-danger btn-sm border-0"
+                                            onclick="confirmDelete(() => document.getElementById('delete-form-@item.Id').submit())">
+                                        <i class="bi bi-trash fs-5"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#instructorsTable').DataTable({
+                "responsive": true,
+                "pageLength": 5,
+                "language": {
+                    "search": "<span class='text-silver'>Filter Staff:</span>",
+                    "lengthMenu": "<span class='text-silver'>Show _MENU_ entries</span>"
+                }
+            });
+            // Custom styling for the search input to match our dark theme
+            $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2');
+        });
+    </script>
+}

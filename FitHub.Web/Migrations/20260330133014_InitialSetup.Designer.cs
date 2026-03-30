@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitHub.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260328234400_InitialSetup")]
+    [Migration("20260330133014_InitialSetup")]
     partial class InitialSetup
     {
         /// <inheritdoc />
@@ -132,6 +132,10 @@ namespace FitHub.Web.Migrations
                         .HasColumnType("nvarchar(80)");
 
                     b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Photo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Specialty")
