@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitHub.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260331002950_UpdateEmailIntructorUnique")]
-    partial class UpdateEmailIntructorUnique
+    [Migration("20260331170909_InitailSetup")]
+    partial class InitailSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -123,7 +123,11 @@ namespace FitHub.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
@@ -132,6 +136,7 @@ namespace FitHub.Web.Migrations
                         .HasColumnType("nvarchar(80)");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Photo")
@@ -145,9 +150,10 @@ namespace FitHub.Web.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("Email")
-                        .IsUnique()
-                        .HasFilter("[Email] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Instructors");
                 });
@@ -404,6 +410,17 @@ namespace FitHub.Web.Migrations
                     b.Navigation("Instructor");
                 });
 
+            modelBuilder.Entity("FitHub.Web.Models.Domain.Instructor", b =>
+                {
+                    b.HasOne("FitHub.Web.Models.Domain.Category", "Category")
+                        .WithMany("Instructors")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -458,6 +475,8 @@ namespace FitHub.Web.Migrations
             modelBuilder.Entity("FitHub.Web.Models.Domain.Category", b =>
                 {
                     b.Navigation("FitnessClasses");
+
+                    b.Navigation("Instructors");
                 });
 
             modelBuilder.Entity("FitHub.Web.Models.Domain.FitnessClass", b =>

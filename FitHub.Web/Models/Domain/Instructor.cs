@@ -12,10 +12,6 @@ public class Instructor
     [RegularExpression(@"^[a-zA-ZÀ-ÿ\s'-]+$", ErrorMessage = "Only letters are allowed")]
     public string Name { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Specialty is mandatory")]
-    [StringLength(100)]
-    public string Specialty { get; set; } = string.Empty;
-
     [EmailAddress(ErrorMessage = "Invalid email address")]
     [Required(ErrorMessage = "Instructor  email address")]
     public string? Email { get; set; }
@@ -26,6 +22,12 @@ public class Instructor
 
     // NEW FIELD: Stores the filename of the instructor's photo
     public string Photo { get; set; } = "default-user.png";
+
+    //Foreign Key: Link to the Category ID
+    public int CategoryId { get; set; }
+
+    // Navigation property to access Category data
+    public virtual Category? Category { get; set; }
 
     // Navigation property
     public virtual ICollection<FitnessClass> FitnessClasses { get; set; } = new List<FitnessClass>();

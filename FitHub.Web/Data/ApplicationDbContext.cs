@@ -2,6 +2,7 @@
 using FitHub.Web.Models.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 using System.Runtime.Intrinsics.X86;
 
 namespace FitHub.Web.Data;
@@ -48,6 +49,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             builder.Entity<FitnessClass>()
                 .Property(f => f.Price)
                 .HasPrecision(18, 2);
+
+            // LOGIC: Configure the Foreign Key relationship between Instructor and Category
+            // Configuración de la llave foránea entre Instructor y Categoría
+            builder.Entity<Instructor>()
+               .HasOne(i => i.Category)           // Each instructor belongs to one category
+               .WithMany(c => c.Instructors)      // Each category has a list of instructors
+               .HasForeignKey(i => i.CategoryId)  // Defining the Foreign Key property
+               .OnDelete(DeleteBehavior.Restrict); // FIX: Prevents "Multiple Cascade Paths" error
         }
         catch (Exception ex)
         {

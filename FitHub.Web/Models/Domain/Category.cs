@@ -14,4 +14,7 @@ public class Category
     // Navigation property for the One-to-Many relationship
     // Una categoría puede tener múltiples clases asociadas
     public virtual ICollection<FitnessClass> FitnessClasses { get; set; } = new List<FitnessClass>();
+
+    // Navigation property for the relationship
+    public virtual ICollection<Instructor> Instructors { get; set; } = new List<Instructor>();
 }

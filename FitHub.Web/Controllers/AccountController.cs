@@ -167,7 +167,7 @@ public class AccountController : Controller
                 if (result.Succeeded)
                 {
                     TempData["Success"] = "Your profile has been updated successfully!";
-                    return RedirectToAction(nameof(MyProfile));
+                    return RedirectToAction("Index", "Home");
                 }
 
                 foreach (var error in result.Errors)
@@ -180,6 +180,7 @@ public class AccountController : Controller
         {
             TempData["Error"] = $"Error Updating Profile: {ex.Message}";
         }
+
         return View(profileViewModel);
     }
 

@@ -1,50 +1,70 @@
 ﻿@model FitHub.Web.ViewModels.InstructorViewModel
 
-<div class="container mt-5 animate__animated animate__fadeIn">
+@{
+    ViewData["Title"] = "Add New Warrior";
+}
+
+   <div class="container mt-5 animate__animated animate__fadeIn" style="min-height: 71vh;">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card bg-glass-dark border-danger shadow-lg p-4">
-                <h2 class="text-white fw-bold mb-4 border-bottom border-danger pb-2">
-                    <i class="bi bi-person-plus text-danger"></i> Add New Instructor
+        <div class="col-md-8 col-lg-6">
+            @* Red neon glassmorphism card *@
+            <div class="card bg-glass-dark border-danger shadow-lg p-4 border-0">
+                
+                <h2 class="text-white fw-black mb-4 text-uppercase italic">
+                    <i class="bi bi-person-plus text-danger"></i> Register Instructor
                 </h2>
 
                 <form asp-action="Create" method="post" enctype="multipart/form-data">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    @* Try-catch logic is handled in the Controller, but we display errors here *@
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Name" class="form-label text-silver small fw-bold">FULL NAME</label>
-                            <input asp-for="Name" class="form-control fithub-input" placeholder="e.g. John Doe" />
-                            <span asp-validation-for="Name" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Specialty" class="form-label text-silver small fw-bold">SPECIALTY</label>
-                            <input asp-for="Specialty" class="form-control fithub-input" placeholder="e.g. Yoga Master" />
-                            <span asp-validation-for="Specialty" class="text-danger small"></span>
-                        </div>
+                    @* --- NAME --- *@
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label text-silver small fw-bold text-uppercase">Warrior Name</label>
+                        <input asp-for="Name" class="form-control fithub-input" placeholder="e.g. Marcus Thorne" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
+                    @* --- CATEGORY --- *@
+                    <div class="mb-3">
+                        <label asp-for="CategoryId" class="form-label text-silver small fw-bold text-uppercase">Specialty Category</label>
+                        <select asp-for="CategoryId" class="form-select fithub-input"
+                                asp-items="@Model.Categories">
+                            <option value="">-- Select Specialty --</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                    </div>
+
+                    @* --- CONTACT --- *@
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="Email" class="form-label text-silver small fw-bold">EMAIL ADDRESS</label>
-                            <input asp-for="Email" class="form-control fithub-input" />
+                            <label asp-for="Email" class="form-label text-silver small fw-bold text-uppercase">Official Email</label>
+                            <input asp-for="Email" class="form-control fithub-input" placeholder="coach@fithub.com" />
                             <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="Phone" class="form-label text-silver small fw-bold">PHONE NUMBER</label>
-                            <input asp-for="Phone" class="form-control fithub-input" />
+                            <label asp-for="Phone" class="form-label text-silver small fw-bold text-uppercase">Phone</label>
+                            <input asp-for="Phone" class="form-control fithub-input" placeholder="+1 555-000" />
                             <span asp-validation-for="Phone" class="text-danger small"></span>
                         </div>
                     </div>
 
+                    @* --- PHOTO --- *@
                     <div class="mb-4">
-                        <label asp-for="PhotoFile" class="form-label text-silver small fw-bold">PROFILE PHOTO</label>
-                        <input asp-for="PhotoFile" type="file" class="form-control fithub-input" accept="image/*" />
+                        <label asp-for="PhotoFile" class="form-label text-silver small fw-bold text-uppercase">Profile Image</label>
+                        <input asp-for="PhotoFile" type="file" class="form-control fithub-input-sm" accept="image/*" />
+                        <span asp-validation-for="PhotoFile" class="text-danger small"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between pt-3">
-                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
-                        <button type="submit" class="btn btn-fithub px-5 shadow-neon-sm fw-bold">SAVE INSTRUCTOR</button>
+                    @* --- ACTIONS --- *@
+                    <div class="d-flex justify-content-between align-items-center pt-3">
+                        <a asp-action="Index" class="btn btn-outline-secondary text-silver text-decoration-none small fw-bold">
+                            <i class="bi bi-chevron-left me-1"></i> BACK TO LIST
+                        </a>
+                        <button type="submit" class="btn btn-fithub px-5 py-2 fw-black shadow-neon-sm">
+                            HIRE WARRIOR
+                        </button>
                     </div>
                 </form>
             </div>

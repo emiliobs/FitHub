@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace FitHub.Web.ViewModels;
@@ -11,10 +12,6 @@ public class InstructorViewModel
     [StringLength(80)]
     [RegularExpression(@"^[a-zA-ZÀ-ÿ\s'-]+$", ErrorMessage = "Only letters are allowed")]
     public string Name { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Specialty is required")]
-    [StringLength(100)]
-    public string Specialty { get; set; } = string.Empty;
 
     [EmailAddress(ErrorMessage = "Invalid email address")]
     [Required(ErrorMessage = "Instructor  email address")]
@@ -30,4 +27,13 @@ public class InstructorViewModel
 
     // Stores the existing photo name during Edit
     public string? ExistingPhoto { get; set; }
+
+    
+    // Este ID recibirá el valor seleccionado del menú desplegable
+    [Required(ErrorMessage = "Please select a specialty")]
+    [Display(Name = "Specialty Category")]
+    public int CategoryId { get; set; }
+
+    // List used ONLY to populate the HTML Select, not saved in DB
+    public IEnumerable<SelectListItem>? Categories { get; set; }
 }
