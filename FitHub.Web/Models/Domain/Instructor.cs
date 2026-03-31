@@ -16,10 +16,12 @@ public class Instructor
     [StringLength(100)]
     public string Specialty { get; set; } = string.Empty;
 
-    [EmailAddress(ErrorMessage = "Invalid email format")]
+    [EmailAddress(ErrorMessage = "Invalid email address")]
+    [Required(ErrorMessage = "Instructor  email address")]
     public string? Email { get; set; }
 
-    [Phone(ErrorMessage = "Invalid phone format")]
+    [Required(ErrorMessage = "Instructor phono is requered")]
+    [Phone(ErrorMessage = "Invalid phone number")]
     public string? Phone { get; set; }
 
     // NEW FIELD: Stores the filename of the instructor's photo

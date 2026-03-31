@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace FitHub.Web.ViewModels;
 
@@ -16,8 +17,10 @@ public class InstructorViewModel
     public string Specialty { get; set; } = string.Empty;
 
     [EmailAddress(ErrorMessage = "Invalid email address")]
+    [Required(ErrorMessage = "Instructor  email address")]
     public string? Email { get; set; }
 
+    [Required(ErrorMessage = "Instructor phono is requered")]
     [Phone(ErrorMessage = "Invalid phone number")]
     public string? Phone { get; set; }
 

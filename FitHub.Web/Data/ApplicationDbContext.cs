@@ -39,6 +39,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .WithMany(c => c.Bookings)
                 .HasForeignKey(b => b.FitnessClassId);
 
+            // <ake Instructor Email Unique to prevent duplicates and ensure data integrity
+            builder.Entity<Instructor>()
+                .HasIndex(i => i.Email)
+                .IsUnique();
+
             // SQL Server Decimal Precision for Currency (Price)
             builder.Entity<FitnessClass>()
                 .Property(f => f.Price)

@@ -9,7 +9,7 @@
         <h2 class="text-white fw-bold">
             <i class="bi bi-person-badge text-danger"></i> Staff Management
         </h2>
-        <a asp-action="Create" class="btn btn-fithub px-4 shadow-neon-sm">
+        <a asp-action="Create" class="btn btn-fithub  px-4 shadow-neon-sm">
             <i class="bi bi-plus-circle me-1"></i> Add Instructor
         </a>
     </div>
@@ -45,11 +45,15 @@
                                 <i class="bi bi-telephone text-danger"></i> @item.Phone
                             </td>
                             <td class="text-center">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0" title="Edit">
                                     <i class="bi bi-pencil-square fs-5"></i>
                                 </a>
+
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm border-0" title="View Profile">
+                                    <i class="bi bi-eye fs-5"></i>
+                                </a>
                                 
-                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" id="delete-form-@item.Id" class="d-inline">
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" id="delete-form-@item.Id" class="d-inline" title="Delete">
                                     @Html.AntiForgeryToken()
                                     <button type="button" class="btn btn-outline-danger btn-sm border-0"
                                             onclick="confirmDelete(() => document.getElementById('delete-form-@item.Id').submit())">
@@ -71,13 +75,21 @@
             $('#instructorsTable').DataTable({
                 "responsive": true,
                 "pageLength": 5,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
                 "language": {
-                    "search": "<span class='text-silver'>Filter Staff:</span>",
-                    "lengthMenu": "<span class='text-silver'>Show _MENU_ entries</span>"
+                    "search": "<span class='text-silver'>Search:</span>",
+                    "lengthMenu": "<span class='text-silver'>Show _MENU_ entries</span>",
+                    "info": "<span class='text-silver small'>Showing _START_ to _END_ of _TOTAL_ categories</span>",
+                    "paginate": {
+                        "next": "Next",
+                        "previous": "Prev"
+                    }
                 }
             });
-            // Custom styling for the search input to match our dark theme
+
+           
             $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2');
+            $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2');
         });
     </script>
 }
