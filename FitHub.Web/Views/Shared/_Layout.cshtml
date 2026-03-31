@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FitHub</title>
     
-    @* --- Stylesheets --- *@
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -16,13 +16,12 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light navbar-modern sticky-top mb-3">
             <div class="container">
-                @* --- Brand Logo --- *@
+                 
                 <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-heart-pulse-fill me-2 text-white" style="font-size: 1.6rem;"></i>
                     <span class="fw-bolder" style="letter-spacing: -0.5px;">FITHUB</span>
                 </a>
 
-                @* --- Mobile Toggler --- *@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -30,31 +29,29 @@
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @* --- Public Home Link --- *@
                         <li class="nav-item">
                             <a class="nav-link text-dark d-flex align-items-center" asp-controller="Home" asp-action="Index">
                                 <i class="bi bi-house-door me-1 text-primary"></i> Home
                             </a>
                         </li>
 
-                        @* --- Admin & Manager Direct Links --- *@
                         @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
                         {
-                            @* User Security Management *@
+                            // User Security Management 
                             <li class="nav-item">
                                 <a class="nav-link text-dark d-flex align-items-center" asp-controller="Users" asp-action="Index">
                                     <i class="bi bi-shield-lock me-1 text-info"></i> Users
                                 </a>
                             </li>
 
-                            @* Staff / Instructor Management *@
+                            // Staff / Instructor Management 
                             <li class="nav-item">
                                 <a class="nav-link text-dark d-flex align-items-center" asp-controller="Instructors" asp-action="Index">
                                     <i class="bi bi-person-badge me-1 text-succces"></i> Staff
                                 </a>
                             </li>
 
-                            @* Class Categories Management *@
+                            // Class Categories Management 
                             <li class="nav-item">
                                 <a class="nav-link text-dark d-flex align-items-center" asp-controller="Categories" asp-action="Index">
                                     <i class="bi bi-tags me-1 text-success"></i> Categories
@@ -63,7 +60,6 @@
                         }
                     </ul>
 
-                    @* --- Right Side: Login/Profile --- *@
                     <div class="ms-auto d-flex align-items-center">
                         <partial name="_LoginPartial" />
                     </div>
@@ -72,14 +68,13 @@
         </nav>
     </header>
 
-    @* --- Main Content Area --- *@
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    @* --- Footer Section --- *@
+   
     <footer class="footer-modern py-4 mt-5">
         <div class="container text-center">
             <div class="footer-content">
@@ -95,7 +90,7 @@
         </div>
     </footer>
     
-    @* --- Scripts --- *@
+   
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -103,7 +98,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-    @* --- Real-time Notifications (SweetAlert) --- *@
+   
     @if (TempData["Success"] != null)
     {
         <script>showSuccess('@TempData["Success"]');</script>

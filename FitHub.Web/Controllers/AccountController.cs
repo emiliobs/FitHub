@@ -98,13 +98,15 @@ public class AccountController : Controller
                 {
                     await _userManager.AddToRoleAsync(user, "Member");
                     await _signInManager.SignInAsync(user, isPersistent: false);
+
                     TempData["Success"] = "Welcome to the FitHub Energy family!";
                     return RedirectToAction("Index", "Home");
                 }
 
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                     ModelState.AddModelError(string.Empty, error.Description);
+                    //TempData["Error"] = $"Registration failed: {error.Description}";
                 }
             }
         }

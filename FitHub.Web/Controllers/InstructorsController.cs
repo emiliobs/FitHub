@@ -9,10 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FitHub.Web.Controllers;
 
-/**
- * Access restricted to Admin and Manager roles for security compliance
- * Acceso restringido a roles Admin y Manager para cumplimiento de seguridad
- */
+//Access restricted to Admin and Manager roles for security compliance
 
 [Authorize(Roles = "Admin,Manager")]
 public class InstructorsController : Controller
@@ -26,10 +23,8 @@ public class InstructorsController : Controller
         this._webHostEnvironment = webHostEnvironment;
     }
 
-    /**
-     * GET: Instructors/Index
-     * Fetches all instructors and performs Eager Loading on the Category relationship
-     */
+    //GET: Instructors/Index
+    //Fetches all instructors and performs Eager Loading on the Category relationship
 
     public async Task<IActionResult> Index()
     {
@@ -51,10 +46,8 @@ public class InstructorsController : Controller
         }
     }
 
-    /**
-     * GET: Instructors/Details/{id}
-     * Retrieves a single instructor profile including its relational category
-     */
+    // GET: Instructors/Details/{id}
+    //Retrieves a single instructor profile including its relational category
 
     public async Task<IActionResult> Details(int? id)
     {
@@ -95,11 +88,7 @@ public class InstructorsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(InstructorViewModel instructorViewModel)
     {
-        /**
-         * CRITICAL FIX: MANUALLY REMOVING NAVIGATION PROPERTIES FROM VALIDATION
-         * We remove 'Category' because the form only sends the ID, not the full object.
-         * This prevents ModelState.IsValid from returning false incorrectly.
-         */
+        //We remove 'Category' because the form only sends the ID, not the full object.
         ModelState.Remove("Category");
 
         try
@@ -110,6 +99,7 @@ public class InstructorsController : Controller
             if (emailExists)
             {
                 ModelState.AddModelError("Email", "An instructor with this email already exists.");
+                TempData["Error"] = $"Error: An instructor with this {instructorViewModel.Email} already exists.";
             }
 
             // Checking if the refined model state is now valid
@@ -149,8 +139,7 @@ public class InstructorsController : Controller
 
         /**
          * RECOVERY LOGIC: If the flow reaches here, it means validation failed.
-         * We MUST reload the categories list, otherwise the 'Specialty' dropdown will be empty 
-         * and the view will crash during the re-rendering.
+         * We MUST reload the categories list and the view will crash during the re-rendering.
          */
         var categories = await _context.Categories.ToListAsync();
         instructorViewModel.Categories = categories.Select(c => new SelectListItem
@@ -162,10 +151,8 @@ public class InstructorsController : Controller
         return View(instructorViewModel);
     }
 
-    /**
-     * GET: Instructors/Edit/{id}
-     * Prepares the edit form with existing instructor data
-     */
+    //GET: Instructors/Edit/{id}
+    //Prepares the edit form with existing instructor data
 
     public async Task<IActionResult> Edit(int? id)
     {
@@ -195,10 +182,8 @@ public class InstructorsController : Controller
         return View(instructorViewModel);
     }
 
-    /**
-     * POST: Instructors/Edit
-     * Updates existing instructor records and manages old file deletion
-     */
+    //POST: Instructors/Edit
+    //Updates existing instructor records and manages old file deletion
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -250,10 +235,8 @@ public class InstructorsController : Controller
         return View(instructorViewModel);
     }
 
-    /**
-     * POST: Instructors/DeleteFetch/{id}
-     * Asynchronous endpoint for JS Fetch API deletion with physical file removal
-     */
+    //POST: Instructors/DeleteFetch/{id}
+    //Asynchronous endpoint for JS Fetch API deletion with physical file removal
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -285,10 +268,8 @@ public class InstructorsController : Controller
         }
     }
 
-    /**
-     * HELPER: UploadFile
-     * Saves IFormFile to the server and returns the unique filename
-     */
+    //HELPER: UploadFile
+    // Saves IFormFile to the server and returns the unique filename
 
     private async Task<string> UploadFile(IFormFile photoFile)
     {

@@ -7,7 +7,7 @@
    <div class="container mt-5 animate__animated animate__fadeIn" style="min-height: 71vh;">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            @* Red neon glassmorphism card *@
+            
             <div class="card bg-glass-dark border-danger shadow-lg p-4 border-0">
                 
                 <h2 class="text-white fw-black mb-4 text-uppercase italic">
@@ -16,17 +16,17 @@
 
                 <form asp-action="Create" method="post" enctype="multipart/form-data">
                     
-                    @* Try-catch logic is handled in the Controller, but we display errors here *@
+                    
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
-                    @* --- NAME --- *@
+                   
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label text-silver small fw-bold text-uppercase">Warrior Name</label>
                         <input asp-for="Name" class="form-control fithub-input" placeholder="e.g. Marcus Thorne" />
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
-                    @* --- CATEGORY --- *@
+                    
                     <div class="mb-3">
                         <label asp-for="CategoryId" class="form-label text-silver small fw-bold text-uppercase">Specialty Category</label>
                         <select asp-for="CategoryId" class="form-select fithub-input"
@@ -36,7 +36,7 @@
                         <span asp-validation-for="CategoryId" class="text-danger small"></span>
                     </div>
 
-                    @* --- CONTACT --- *@
+                  
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="Email" class="form-label text-silver small fw-bold text-uppercase">Official Email</label>
@@ -50,14 +50,14 @@
                         </div>
                     </div>
 
-                    @* --- PHOTO --- *@
+                  
                     <div class="mb-4">
                         <label asp-for="PhotoFile" class="form-label text-silver small fw-bold text-uppercase">Profile Image</label>
                         <input asp-for="PhotoFile" type="file" class="form-control fithub-input-sm" accept="image/*" />
                         <span asp-validation-for="PhotoFile" class="text-danger small"></span>
                     </div>
 
-                    @* --- ACTIONS --- *@
+                    
                     <div class="d-flex justify-content-between align-items-center pt-3">
                         <a asp-action="Index" class="btn btn-outline-secondary text-silver text-decoration-none small fw-bold">
                             <i class="bi bi-chevron-left me-1"></i> BACK TO LIST

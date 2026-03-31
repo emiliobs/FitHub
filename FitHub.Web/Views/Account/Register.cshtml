@@ -13,7 +13,7 @@
                 <p class="text-silver small">Create your profile to start training</p>
             </div>
 
-            @* Formulario completo con enctype *@
+           
             <form asp-action="Register" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
@@ -49,18 +49,17 @@
                     </div>
                 </div>
 
-                @* NEW: Profile Picture Input and Preview Container *@
+                
                 <div class="mb-4">
                     <label asp-for="PhotoFile" class="text-silver small fw-bold">PROFILE PICTURE</label>
                     
-                    @* Preview area *@
                     <div id="photo-preview-container" class="text-center mb-3 d-none">
                         <img id="photo-preview" src="#" alt="Preview"
                              class="rounded-circle border border-danger p-1"
                              style="width: 100px; height: 100px; object-fit: cover;" />
                     </div>
 
-                    @* Input field with ID for JS *@
+                    
                     <input asp-for="PhotoFile" type="file" id="PhotoFileInput" class="form-control fithub-input-sm border-danger" accept="image/*" />
                     <small class="text-white d-block mt-1">Format: JPG, PNG. Max size: 2MB</small>
                     <span asp-validation-for="PhotoFile" class="text-danger small"></span>
@@ -82,7 +81,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
-    @* NEW: JavaScript for Image Preview *@
+    // NEW: JavaScript for Image Preview 
     <script>
         $(document).ready(function() {
             // Listen for changes in the file input

@@ -1,4 +1,4 @@
-﻿@* Defining the model as a single Instructor domain entity *@
+﻿
 @model FitHub.Web.Models.Domain.Instructor
 
 @{
@@ -7,17 +7,17 @@
 
 <div class="container mt-5" style="min-height: 71vh;">
     <div class="row justify-content-center">
-        @* Rectangular and imposing layout *@
+        
         <div class="col-lg-10">
             <div class="card bg-glass-dark border-0 shadow-lg overflow-hidden" style="border-radius: 25px;">
                 
-                @* Decorative top banner with blur effect *@
+                
                 <div class="bg-danger" style="height: 120px; opacity: 0.1; filter: blur(50px); position: absolute; width: 100%; top: 0; z-index: 0;"></div>
 
                 <div class="card-body p-0 position-relative" style="z-index: 1;">
                     <div class="row g-0">
                         
-                        @* --- Left Section: Profile Identity --- *@
+                        
                         <div class="col-md-5 text-center p-5 bg-glass-inner border-end border-secondary border-opacity-10">
                             <div class="position-relative d-inline-block mt-3">
                                 <img src="~/Images/Profiles/@Model.Photo"
@@ -38,7 +38,7 @@
                             </span>
                         </div>
 
-                        @* --- Right Section: Information & Original Buttons --- *@
+                       
                         <div class="col-md-7 p-5 d-flex flex-column justify-content-center">
                             <div class="mb-4">
                                 <h4 class="text-danger fw-black text-uppercase tracking-wider">Instructor Details</h4>
@@ -46,7 +46,7 @@
                             </div>
 
                             <div class="row g-4">
-                                @* Contact: Email *@
+                                
                                 <div class="col-12">
                                     <div class="d-flex align-items-center">
                                         <div class="bg-danger-soft rounded-3 p-3 me-3 text-danger border border-danger border-opacity-25 shadow-sm">
@@ -59,7 +59,6 @@
                                     </div>
                                 </div>
 
-                                @* Contact: Phone *@
                                 <div class="col-12">
                                     <div class="d-flex align-items-center">
                                         <div class="bg-danger-soft rounded-3 p-3 me-3 text-danger border border-danger border-opacity-25 shadow-sm">
@@ -73,7 +72,7 @@
                                 </div>
                             </div>
 
-                            @* --- Action Buttons: Restored Titles --- *@
+                          
                             <div class="d-flex gap-3 mt-5 pt-4">
                                 <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 fw-bold hover-zoom">
                                     <i class="bi bi-arrow-left me-1"></i> Back to List

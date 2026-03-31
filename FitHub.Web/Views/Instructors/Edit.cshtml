@@ -1,35 +1,34 @@
-﻿@* Using the InstructorViewModel to handle both instructor data and the category list *@
+﻿
 @model FitHub.Web.ViewModels.InstructorViewModel
 
-@* Browser metadata and page title *@
+
 @{
     ViewData["Title"] = "Edit Instructor Profile";
 }
 
-@* Main container with a fade-in entry animation *@
+
 <div class="container mt-5 animate__animated animate__fadeIn">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            @* Card with neon purple aesthetic to represent the 'Edit' state in FitHub *@
+          
             <div class="card bg-glass-dark border-neon-purple shadow-lg p-4 border-0">
                 
-                @* Header with high-impact typography and branding icon *@
+               
                 <h2 class="text-white fw-black mb-4 text-uppercase italic" style="letter-spacing: -1px;">
                     <i class="bi bi-pencil-square text-neon-purple"></i> Edit Instructor
                 </h2>
 
-                @* FORM: Setup with multipart encoding to support file transfers (photos) *@
+                
                 <form asp-action="Edit" method="post" enctype="multipart/form-data">
                     
-                    @* PERSISTENCE: Hidden fields are crucial for the Update logic in ASP.NET Core *@
-                    @* These fields ensure IDs and existing filenames aren't lost during the Postback *@
+                    
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="ExistingPhoto" />
 
-                    @* Validation summary for overall model state feedback *@
+                   
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                    @* --- NAME FIELD --- *@
+                    
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <label asp-for="Name" class="form-label text-silver small fw-bold">FULL NAME</label>
@@ -37,8 +36,7 @@
                             <span asp-validation-for="Name" class="text-neon-purple small"></span>
                         </div>
 
-                        @* --- THE FIX: CATEGORY SELECT REPLACES OLD SPECIALTY INPUT --- *@
-                        @* Binding to CategoryId ensures relational integrity with the Categories table *@
+                       
                         <div class="col-md-12 mb-3">
                             <label asp-for="CategoryId" class="form-label text-silver small fw-bold text-uppercase">Specialty Category</label>
                             <select asp-for="CategoryId" class="form-select fithub-input border-neon-purple-soft"
@@ -49,7 +47,7 @@
                         </div>
                     </div>
 
-                    @* --- EMAIL & PHONE --- *@
+                   
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="Email" class="form-label text-silver small fw-bold">EMAIL</label>
@@ -63,8 +61,7 @@
                         </div>
                     </div>
 
-                    @* --- PHOTO MANAGEMENT SECTION --- *@
-                    @* Displays current file and provides an input for replacement *@
+                   
                     <div class="mb-4 mt-3 p-3 border border-secondary rounded bg-dark bg-opacity-25">
                         <label class="form-label text-silver small fw-bold d-block mb-3">PROFILE PHOTO</label>
                         <div class="d-flex align-items-center gap-4">
@@ -81,7 +78,7 @@
                         </div>
                     </div>
 
-                    @* --- ACTION BUTTONS: Submission and Navigation --- *@
+                    
                     <div class="d-flex justify-content-between align-items-center pt-3">
                         <a asp-action="Index" class="btn btn-outline-secondary text-silver text-decoration-none small fw-bold">
                             <i class="bi bi-chevron-left"></i> DISCARD CHANGES
