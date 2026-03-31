@@ -40,7 +40,9 @@ public class DbInitializer
                     FirstName = "Emilio",
                     LastName = "Barrera",
                     RegistrationDate = DateTime.UtcNow,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    MembershipPlan = SubscriptionType.Warrior, // granting the highest subscription level to the admin for testing purposes
+                    SubscriptionEndDate = DateTime.UtcNow.AddYears(10) // setting a far future date to ensure the admin's subscription is always active
                 };
 
                 // Using a simple password for initial setup

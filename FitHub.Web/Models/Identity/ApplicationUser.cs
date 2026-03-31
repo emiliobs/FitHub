@@ -29,9 +29,23 @@ public class ApplicationUser : IdentityUser
     [Display(Name = "Member Since")]
     public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
 
+    [Required]
+    public SubscriptionType MembershipPlan { get; set; } = SubscriptionType.None;
+
+    // Nullable because a 'None' user doesn't have an expiration date
+    [DataType(DataType.Date)]
+    public DateTime? SubscriptionEndDate { get; set; }
+
+    // Navigation property for the relationship with Bookings (Already defined in your context)
+    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
     [NotMapped]
     public string FullName => $"{FirstName} {LastName}";
 
-    // Navigation property
-    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    // Helper method to check if the subscription is active based on the current date and subscription end date
+    // Helper property to check if the subscription is currently active
+    public bool IsSubscriptionActive =>
+        MembershipPlan != SubscriptionType.None &&
+        SubscriptionEndDate.HasValue &&
+        SubscriptionEndDate.Value >= DateTime.UtcNow;
 }

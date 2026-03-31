@@ -29,6 +29,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         try
         {
+            // Custom configuration for ApplicationUser
+            builder.Entity<ApplicationUser>(entity =>
+            {
+                entity.Property(u => u.MembershipPlan).HasDefaultValue(SubscriptionType.None);
+            });
+
             // M:N Relationship: Mapping Users and Classes through Bookings
             builder.Entity<Booking>()
                 .HasOne(b => b.ApplicationUser)

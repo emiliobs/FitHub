@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FitHub.Web.Models.Domain;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace FitHub.Web.ViewModels;
 
@@ -32,4 +34,11 @@ public class RegisterViewModel
 
     [Display(Name = "Profile Picture")]
     public IFormFile? PhotoFile { get; set; }
+
+    [Required(ErrorMessage = "Please select a starting plan")]
+    [Display(Name = "Warrior Membership Plan")]
+    public SubscriptionType SelectedPlan { get; set; }
+
+    // This list will be populated in the Controller to show options in the View
+    public IEnumerable<SelectListItem>? AvailablePlans { get; set; }
 }
