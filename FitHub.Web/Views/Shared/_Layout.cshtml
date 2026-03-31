@@ -37,28 +37,49 @@
                             </a>
                         </li>
 
+                        @* --- Fitness Classes (For All Authenticated Users) --- *@
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark d-flex align-items-center" asp-controller="FitnessClasses" asp-action="Index">
+                                    <i class="bi bi-calendar-event me-1 text-info"></i> Classes
+                                </a>
+                            </li>
+                        }
+
                         @* --- Admin & Manager Direct Links --- *@
                         @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
                         {
-                            @* User Security Management *@
-                            <li class="nav-item">
-                                <a class="nav-link text-dark d-flex align-items-center" asp-controller="Users" asp-action="Index">
-                                    <i class="bi bi-shield-lock me-1 text-info"></i> Users
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark d-flex align-items-center" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-gear me-1 text-danger"></i> Management
                                 </a>
-                            </li>
-
-                            @* Staff / Instructor Management *@
-                            <li class="nav-item">
-                                <a class="nav-link text-dark d-flex align-items-center" asp-controller="Instructors" asp-action="Index">
-                                    <i class="bi bi-person-badge me-1 text-succces"></i> Staff
-                                </a>
-                            </li>
-
-                            @* Class Categories Management *@
-                            <li class="nav-item">
-                                <a class="nav-link text-dark d-flex align-items-center" asp-controller="Categories" asp-action="Index">
-                                    <i class="bi bi-tags me-1 text-success"></i> Categories
-                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" asp-controller="Categories" asp-action="Index">
+                                            <i class="bi bi-tags me-2 text-warning"></i> Categories
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" asp-controller="Instructors" asp-action="Index">
+                                            <i class="bi bi-person-badge me-2 text-success"></i> Instructors
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" asp-controller="FitnessClasses" asp-action="Create">
+                                            <i class="bi bi-plus-circle me-2 text-info"></i> Create Class
+                                        </a>
+                                    </li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center" asp-controller="Users" asp-action="Index">
+                                                <i class="bi bi-shield-lock me-2 text-primary"></i> Users
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
                             </li>
                         }
                     </ul>

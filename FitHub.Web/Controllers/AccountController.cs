@@ -77,41 +77,106 @@ public class AccountController : Controller
     {
         try
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Note: We use the dynamic helper that accepts IFormFile
-                var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel.PhotoFile);
-
-                var user = new ApplicationUser
+                // Log validation errors
+                var errorMessages = new List<string>();
+                foreach (var state in ModelState.Values)
                 {
-                    UserName = registerViewModel.Email,
-                    Email = registerViewModel.Email,
-                    FirstName = registerViewModel.FirstName,
-                    LastName = registerViewModel.LastName,
-                    Photo = uniqueFileNamePhoto,
-                    RegistrationDate = DateTime.UtcNow
-                };
-
-                var result = await _userManager.CreateAsync(user, registerViewModel.Password);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, "Member");
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    TempData["Success"] = "Welcome to the FitHub Energy family!";
-                    return RedirectToAction("Index", "Home");
+                    foreach (var error in state.Errors)
+                    {
+                        errorMessages.Add(error.ErrorMessage);
+                        Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                    }
                 }
 
+                if (errorMessages.Count > 0)
+                {
+                    TempData["Error"] = "Validation errors: " + string.Join(", ", errorMessages);
+                }
+
+                return View(registerViewModel);
+            }
+
+            // Check if email already exists
+            var existingUser = await _userManager.FindByEmailAsync(registerViewModel.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Email", "This email is already registered. Please use a different email or try logging in.");
+                TempData["Error"] = "This email address is already registered. Please use a different email or login with your existing account.";
+                return View(registerViewModel);
+            }
+
+            // Validate email format
+            if (!registerViewModel.Email.Contains("@") || !registerViewModel.Email.Contains("."))
+            {
+                ModelState.AddModelError("Email", "Please enter a valid email address.");
+                TempData["Error"] = "Please enter a valid email address.";
+                return View(registerViewModel);
+            }
+
+            // Validate names are not empty
+            if (string.IsNullOrWhiteSpace(registerViewModel.FirstName))
+            {
+                ModelState.AddModelError("FirstName", "First name is required.");
+                TempData["Error"] = "First name is required.";
+                return View(registerViewModel);
+            }
+
+            if (string.IsNullOrWhiteSpace(registerViewModel.LastName))
+            {
+                ModelState.AddModelError("LastName", "Last name is required.");
+                TempData["Error"] = "Last name is required.";
+                return View(registerViewModel);
+            }
+
+            // Note: We use the dynamic helper that accepts IFormFile
+            var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel.PhotoFile);
+
+            var user = new ApplicationUser
+            {
+                UserName = registerViewModel.Email,
+                Email = registerViewModel.Email,
+                FirstName = registerViewModel.FirstName,
+                LastName = registerViewModel.LastName,
+                Photo = uniqueFileNamePhoto,
+                RegistrationDate = DateTime.UtcNow
+            };
+
+            var result = await _userManager.CreateAsync(user, registerViewModel.Password);
+
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "Member");
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                TempData["Success"] = "Welcome to the FitHub Energy family!";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // If creation failed, collect error messages
+            if (!result.Succeeded)
+            {
+                var errorList = new List<string>();
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
+                    errorList.Add(error.Description);
+                    Console.WriteLine($"Registration Error: {error.Description}");
+                }
+
+                if (errorList.Count > 0)
+                {
+                    TempData["Error"] = "Registration failed: " + string.Join(", ", errorList);
                 }
             }
         }
         catch (Exception ex)
         {
-            TempData["Error"] = $"Error register member: {ex.Message}";
+            Console.WriteLine($"Register Exception: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            TempData["Error"] = $"Error registering: {ex.Message}";
         }
+
         return View(registerViewModel);
     }
 
@@ -202,5 +267,11 @@ public class AccountController : Controller
             }
         }
         return uniqueFileNamePhoto;
+    }
+
+    // GET: /Account/AccessDenied
+    public IActionResult AccessDenied()
+    {
+        return View();
     }
 }

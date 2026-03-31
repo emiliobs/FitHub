@@ -106,6 +106,22 @@ public class DbInitializer
                 await context.Instructors.AddRangeAsync(instructors);
                 await context.SaveChangesAsync();
             }
+
+            // 5. Seed FitnessClasses - Sample classes
+            if (!context.FitnessClasses.Any())
+            {
+                var fitnessClasses = new List<FitnessClass>
+                {
+                    new FitnessClass { Title = "Morning Yoga Flow", Description = "Start your day with energizing yoga poses", Capacity = 20, ScheduleDate = DateTime.UtcNow.AddDays(1).AddHours(8), Price = 15.00m, InstructorId = 2, CategoryId = 3 },
+                    new FitnessClass { Title = "HIIT Blast", Description = "High-intensity interval training for fat burn", Capacity = 15, ScheduleDate = DateTime.UtcNow.AddDays(2).AddHours(18), Price = 20.00m, InstructorId = 5, CategoryId = 11 },
+                    new FitnessClass { Title = "CrossFit Fundamentals", Description = "Learn the basics of CrossFit", Capacity = 12, ScheduleDate = DateTime.UtcNow.AddDays(3).AddHours(10), Price = 25.00m, InstructorId = 1, CategoryId = 4 },
+                    new FitnessClass { Title = "Zumba Dance Party", Description = "Fun dance workout to upbeat music", Capacity = 25, ScheduleDate = DateTime.UtcNow.AddDays(4).AddHours(19), Price = 12.00m, InstructorId = 3, CategoryId = 5 },
+                    new FitnessClass { Title = "Strength Training 101", Description = "Build muscle with basic strength exercises", Capacity = 10, ScheduleDate = DateTime.UtcNow.AddDays(5).AddHours(9), Price = 18.00m, InstructorId = 10, CategoryId = 2 }
+                };
+
+                await context.FitnessClasses.AddRangeAsync(fitnessClasses);
+                await context.SaveChangesAsync();
+            }
         }
         catch (Exception ex)
         {

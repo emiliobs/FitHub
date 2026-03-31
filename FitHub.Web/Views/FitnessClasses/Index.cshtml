@@ -1,0 +1,98 @@
+@model IEnumerable<FitHub.Web.Models.Domain.FitnessClass>
+
+<div class="container mt-5" style="min-height: 70vh;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold">
+            <i class="bi bi-calendar-event text-danger"></i> Fitness Classes
+        </h2>
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <a asp-action="Create" class="btn btn-fithub px-4">
+                <i class="bi bi-plus-circle"></i> Create New Class
+            </a>
+        }
+    </div>
+
+    <div class="card shadow-lg p-4 border-0">
+        <div class="table-responsive">
+            <table id="fitnessClassesTable" class="table table-dark table-hover bg-transparent mb-0">
+                <thead>
+                    <tr class="border-danger">
+                        <th class="text-danger fw-black small">TITLE</th>
+                        <th class="text-danger fw-black small">DESCRIPTION</th>
+                        <th class="text-danger fw-black small">SCHEDULE</th>
+                        <th class="text-danger fw-black small">INSTRUCTOR</th>
+                        <th class="text-danger fw-black small">CATEGORY</th>
+                        <th class="text-danger fw-black small">PRICE</th>
+                        <th class="text-danger fw-black small">CAPACITY</th>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <th class="text-center text-danger fw-black small">ACTIONS</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody class="text-silver">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="border-secondary align-middle">
+                            <td class="fw-bold py-3">@item.Title</td>
+                            <td>@(item.Description ?? "No description")</td>
+                            <td>@item.ScheduleDate.ToString("g")</td>
+                            <td>@item.Instructor.Name</td>
+                            <td>@item.Category.Name</td>
+                            <td>$@item.Price.ToString("F2")</td>
+                            <td>@item.Capacity</td>
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            {
+                                <td class="text-center">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0 mx-1">
+                                        <i class="bi bi-pencil-square fs-5"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm border-0 mx-1">
+                                        <i class="bi bi-info-circle fs-5"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" id="form-@item.Id" class="d-inline">
+                                        <button type="button" class="btn btn-outline-danger btn-sm border-0 mx-1"
+                                                onclick="confirmDelete(() => document.getElementById('form-@item.Id').submit())">
+                                            <i class="bi bi-trash fs-5"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#fitnessClassesTable').DataTable({
+                "responsive": true,
+                "pageLength": 10,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                "language": {
+                    "search": "<span class='text-silver'>Search:</span>",
+                    "lengthMenu": "<span class='text-silver'>Show _MENU_ entries</span>",
+                    "info": "<span class='text-silver small'>Showing _START_ to _END_ of _TOTAL_ classes</span>",
+                    "paginate": {
+                        "next": "Next",
+                        "previous": "Prev"
+                    }
+                }
+            });
+
+            $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2');
+            $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2');
+        });
+
+        function confirmDelete(callback) {
+            if (confirm('Are you sure you want to delete this fitness class?')) {
+                callback();
+            }
+        }
+    </script>
+}
