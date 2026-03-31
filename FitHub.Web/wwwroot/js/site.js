@@ -1,40 +1,56 @@
-﻿// SUCCESS MESSAGE - SweetAlert Success
+﻿// SUCCESS MESSAGE - FitHub SweetAlert Success
 // Mensaje de éxito optimizado con los colores de FitHub
 function showSuccess(message) {
     Swal.fire({
         icon: 'success',
-        title: 'Success',
+        title: '<span style="color: #ffffff">Success</span>',
         text: message,
-        confirmButtonColor: '#FF6B00' // FitHub Orange
+        background: '#121212', // Dark background
+        iconColor: '#FF6B00',   // Neon Orange
+        confirmButtonColor: '#FF6B00',
+        color: '#b0b0b0',       // Silver text
+        customClass: {
+            popup: 'border-fithub-neon'
+        }
     });
 }
 
-// ERROR MESSAGE - SweetAlert Error
+// ERROR MESSAGE - FitHub SweetAlert Error
 // Mensaje de error para excepciones capturadas
 function showError(message) {
     Swal.fire({
         icon: 'error',
-        title: 'Error',
+        title: '<span style="color: #ffffff">Error</span>',
         text: message,
-        confirmButtonColor: '#1A1A1A' // FitHub Carbon Black
+        background: '#121212',
+        iconColor: '#dc3545',   // Neon Red
+        confirmButtonColor: '#1A1A1A', // Carbon Black
+        color: '#b0b0b0',
+        customClass: {
+            popup: 'border-fithub-red'
+        }
     });
 }
 
-// CONFIRM DELETE - Reusable with callback
-// Confirmación de eliminación reutilizable
+// CONFIRM DELETE - Ultra Modern FitHub Red Style
+// Confirmación de eliminación con estética de alto impacto
 function confirmDelete(callback) {
     Swal.fire({
-        title: 'Are you sure?',
-        text: "This action cannot be undone!",
+        title: '<h2 style="color: #ffffff; font-weight: 800; letter-spacing: -1px;">ARE YOU SURE?</h2>',
+        html: '<p style="color: #b0b0b0;">This action is <b style="color: #ff3b3b;">permanent</b>. The Warrior will be removed from the system.</p>',
         icon: 'warning',
+        iconColor: '#ff3b3b', // Vibrant Neon Red
+        background: '#0a0a0a', // Deep Carbon Black
         showCancelButton: true,
-        confirmButtonColor: '#FF6B00',
-        cancelButtonColor: '#1A1A1A',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'Cancel'
+        confirmButtonColor: '#d33', // Action Red
+        cancelButtonColor: '#1A1A1A', // FitHub Grey/Black
+        confirmButtonText: '<i class="bi bi-trash-fill"></i> YES, DELETE IT!',
+        cancelButtonText: 'CANCEL',
+        customClass: {
+            popup: 'fithub-delete-popup animate__animated animate__pulse'
+        }
     }).then((result) => {
         if (result.isConfirmed) {
-            // Execute the logic passed as parameter
             callback();
         }
     });

@@ -1,0 +1,90 @@
+﻿@model FitHub.Web.ViewModels.InstructorViewModel
+
+@{
+    ViewData["Title"] = "Edit Instructor Profile";
+}
+
+<div class="container mt-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card bg-glass-dark border-neon-purple shadow-lg p-4 border-0">
+                <h2 class="text-white fw-black mb-4 text-uppercase italic" style="letter-spacing: -1px;">
+                    <i class="bi bi-pencil-square text-neon-purple"></i> Edit Instructor
+                </h2>
+
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    @* Hidden fields are crucial for the Update logic *@
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="ExistingPhoto" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    @* --- Name & Specialty --- *@
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Name" class="form-label text-silver small fw-bold">FULL NAME</label>
+                            <input asp-for="Name" class="form-control fithub-input border-neon-purple-soft" />
+                            <span asp-validation-for="Name" class="text-neon-purple small"></span>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Specialty" class="form-label text-silver small fw-bold">SPECIALTY</label>
+                            <input asp-for="Specialty" class="form-control fithub-input border-neon-purple-soft" />
+                            <span asp-validation-for="Specialty" class="text-neon-purple small"></span>
+                        </div>
+                    </div>
+
+                    @* --- Email & Phone --- *@
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label text-silver small fw-bold">EMAIL</label>
+                            <input asp-for="Email" class="form-control fithub-input border-neon-purple-soft" />
+                            <span asp-validation-for="Email" class="text-neon-purple small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Phone" class="form-label text-silver small fw-bold">PHONE</label>
+                            <input asp-for="Phone" class="form-control fithub-input border-neon-purple-soft" />
+                            <span asp-validation-for="Phone" class="text-neon-purple small"></span>
+                        </div>
+                    </div>
+
+                    @* --- Photo Management --- *@
+                    <div class="mb-4 mt-3 p-3 border border-secondary rounded bg-dark bg-opacity-25">
+                        <label class="form-label text-silver small fw-bold d-block mb-3">PROFILE PHOTO</label>
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="current-photo text-center">
+                                <img src="~/Images/Profiles/@Model.ExistingPhoto" 
+                                     class="rounded-circle border border-neon-purple shadow-sm" 
+                                     style="width: 80px; height: 80px; object-fit: cover;" alt="Current" />
+                                <small class="d-block text-white mt-1">Current</small>
+                            </div>
+                            <div class="flex-grow-1">
+                                <input asp-for="PhotoFile" type="file" class="form-control fithub-input-sm" accept="image/*" />
+                                <small class="text-white italic">Leave empty to keep current photo</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* --- Buttons --- *@
+                    <div class="d-flex justify-content-between align-items-center pt-3">
+                        <a asp-action="Index" class="text-silver text-decoration-none small fw-bold">
+                            <i class="bi bi-chevron-left"></i> DISCARD CHANGES
+                        </a>
+                        <button type="submit" class="btn btn-fithub-purple px-5 py-2 fw-black shadow-neon-purple-sm">
+                            UPDATE WARRIOR
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Specific styles for Edit view to match your Electric Palette */
+    .border-neon-purple { border: 2px solid #ff00ff !important; }
+    .border-neon-purple-soft { border: 1px solid rgba(255, 0, 255, 0.3) !important; }
+    .text-neon-purple { color: #ff00ff !important; }
+    .btn-fithub-purple { background-color: #ff00ff; color: #000; border: none; }
+    .btn-fithub-purple:hover { background-color: #d400d4; color: #fff; }
+    .shadow-neon-purple-sm { box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); }
+</style>

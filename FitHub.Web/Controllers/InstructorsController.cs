@@ -1,4 +1,5 @@
-﻿using FitHub.Web.Data;
+﻿using AspNetCoreGeneratedDocument;
+using FitHub.Web.Data;
 using FitHub.Web.Models.Domain;
 using FitHub.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -38,13 +39,18 @@ public class InstructorsController : Controller
     // GET: Instructor/Details/5
     public async Task<IActionResult> Details(int? id)
     {
-        if (id == null) return NotFound();
+        if (id == null)
+        {
+            return NotFound();
+        }
 
         // We fetch the instructor from the database
-        var instructor = await _context.Instructors
-            .FirstOrDefaultAsync(m => m.Id == id);
+        var instructor = await _context.Instructors.FirstOrDefaultAsync(m => m.Id == id);
 
-        if (instructor == null) return NotFound();
+        if (instructor == null)
+        {
+            return NotFound();
+        }
 
         return View(instructor);
     }
@@ -99,6 +105,168 @@ public class InstructorsController : Controller
 
         return View(instructorViewModel);
     }
+
+    // GET: INstructors/Edit/5
+    public async Task<IActionResult> Edit(int id)
+    {
+        var instructor = await _context.Instructors.FindAsync(id);
+
+        if (instructor == null)
+        {
+            return NotFound();
+        }
+
+        var instructorViewModel = new InstructorViewModel
+        {
+            Id = instructor!.Id,
+            Name = instructor.Name,
+            Specialty = instructor.Specialty,
+            Email = instructor.Email,
+            Phone = instructor.Phone,
+            ExistingPhoto = instructor.Photo
+        };
+
+        return View(instructorViewModel);
+    }
+
+    // POST: Instructor?Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(InstructorViewModel instructorViewModel)
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                var instructor = await _context.Instructors.FindAsync(instructorViewModel.Id);
+                if (instructor == null)
+                {
+                    return NotFound();
+                }
+
+                instructor.Name = instructorViewModel.Name;
+                instructor.Specialty = instructorViewModel.Specialty;
+                instructor.Email = instructorViewModel.Email;
+                instructor.Phone = instructorViewModel.Phone;
+
+                if (instructorViewModel.PhotoFile != null)
+                {
+                    if (instructor.Phone != "default-user.png")
+                    {
+                        DeleteFile(instructor.Photo);
+                    }
+
+                    instructor.Photo = await UploadFile(instructorViewModel.PhotoFile);
+                }
+
+                _context.Update(instructor);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"Instructor {instructor.Name} updated successfully!";
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"An error acurred while Editing the Instructor: {ex.Message}";
+        }
+
+        return View(instructorViewModel);
+    }
+
+    // POST: Instructors/Delete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteFetch(int id)
+    {
+        try
+        {
+            var instructor = await _context.Instructors.FindAsync(id);
+
+            if (instructor == null)
+            {
+                return NotFound();
+            }
+
+            // Delete physical photo if it's no the default one
+            if (!string.IsNullOrEmpty(instructor.Photo) && instructor.Phone != "default-user.png")
+            {
+                var path = Path.Combine(_webHostEnvironment.WebRootPath, "Images/Profiles", instructor.Photo);
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+            }
+
+            _context.Instructors.Remove(instructor);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = $"Instructor {instructor.Name} deleted successfully!" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { suceess = false, message = "Error during deletion: " + ex.Message });
+        }
+    }
+
+    // POST
+
+    // GET: Instructors/Delete/5
+    //[HttpGet]
+    //public async Task<IActionResult> Delete(int? id)
+    //{
+    //    if (id == null)
+    //    {
+    //        return NotFound();
+    //    }
+
+    //    var instructor = await _context.Instructors.FirstOrDefaultAsync(m => m.Id == id);
+
+    //    if (instructor == null)
+    //    {
+    //        return NotFound();
+    //    }
+
+    //    return View(instructor);
+    //}
+
+    //// POST: Instructors/Delete/5
+    //[HttpPost, ActionName("Delete")]
+    //[ValidateAntiForgeryToken]
+    //public async Task<IActionResult> DeleteConfirm(int id)
+    //{
+    //    try
+    //    {
+    //        var instructor = await _context.Instructors.FindAsync(id);
+
+    //        if (instructor != null)
+    //        {
+    //            // Delete physical photo if it's no the default one
+    //            if (instructor.Phone != "default-user.png")
+    //            {
+    //                var path = Path.Combine(_webHostEnvironment.WebRootPath, "Images/Profiles", instructor.Photo);
+
+    //                if (System.IO.File.Exists(path))
+    //                {
+    //                    System.IO.File.Delete(path);
+    //                }
+    //            }
+
+    //            // Remove the instructor from the database
+    //            _context.Instructors.Remove(instructor);
+    //            await _context.SaveChangesAsync();
+
+    //            TempData["Success"] = $"Instructor {instructor.Name} deleted successfully!";
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        TempData["Error"] = $"Error: Cannot delete instructor: {ex.Message}";
+    //    }
+
+    //    return RedirectToAction("Index");
+    //}
 
     // Helper method to handle file upload
     private async Task<string> UploadFile(IFormFile photoFile)

@@ -1,24 +1,34 @@
-﻿@model IEnumerable<FitHub.Web.Models.Domain.Instructor>
+﻿@* Defining the model as an enumerable list of Instructor domain entities *@
+@model IEnumerable<FitHub.Web.Models.Domain.Instructor>
 
+@* Setting the page title for the browser environment *@
 @{
     ViewData["Title"] = "Staff Management";
 }
 
+@* Main dashboard container with a minimum height for consistent layout *@
 <div class="container mt-5" style="min-height: 70vh;">
+    @* Flexbox header to align the title and the creation button *@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-white fw-bold">
+            @* Visual icon representing the instructor staff *@
             <i class="bi bi-person-badge text-danger"></i> Staff Management
         </h2>
+        @* Anchor tag pointing to the Create action with neon styling *@
         <a asp-action="Create" class="btn btn-fithub  px-4 shadow-neon-sm">
             <i class="bi bi-plus-circle me-1"></i> Add Instructor
         </a>
     </div>
 
+    @* Card component to encapsulate the table with glassmorphism effects *@
     <div class="card shadow-lg p-4 border-0 bg-glass-dark">
+        @* Responsive wrapper to ensure the table adapts to mobile screens *@
         <div class="table-responsive">
+            @* Main data table with FitHub dark theme and hover effects *@
             <table id="instructorsTable" class="table table-dark table-hover bg-transparent mb-0">
                 <thead>
                     <tr class="border-danger">
+                        @* Definition of table headers with brand colors and typography *@
                         <th class="text-danger fw-black small">PHOTO</th>
                         <th class="text-danger fw-black small">NAME</th>
                         <th class="text-danger fw-black small text-center">SPECIALTY</th>
@@ -27,39 +37,48 @@
                     </tr>
                 </thead>
                 <tbody class="text-silver">
+                    @* Loop to iterate through each instructor in the database collection *@
                     @foreach (var item in Model)
                     {
-                        <tr class="border-secondary align-middle">
+                        @* Row with a unique ID to allow JavaScript to find and remove it during Fetch deletion *@
+                        <tr id="row-@item.Id" class="border-secondary align-middle">
                             <td class="py-3">
+                                @* Profile picture rendering with circular clipping and neon border *@
                                 <img src="~/images/profiles/@item.Photo"
                                      alt="@item.Name"
                                      class="rounded-circle border border-danger shadow-sm"
                                      style="width: 50px; height: 50px; object-fit: cover;" />
                             </td>
+                            @* Main name display in bold white for high contrast *@
                             <td class="fw-bold text-white">@item.Name</td>
                             <td class="text-center">
+                                @* Instructor specialty highlighted in a red-bordered badge *@
                                 <span class="badge bg-outline-danger border border-danger">@item.Specialty</span>
                             </td>
+                            @* Contact column combining email and phone with icons *@
                             <td class="small">
                                 <i class="bi bi-envelope text-danger"></i> @item.Email<br />
                                 <i class="bi bi-telephone text-danger"></i> @item.Phone
                             </td>
                             <td class="text-center">
+                                @* Navigation link to the Edit form for the specific ID *@
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0" title="Edit">
                                     <i class="bi bi-pencil-square fs-5"></i>
                                 </a>
 
+                                @* Navigation link to the Details profile view *@
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm border-0" title="View Profile">
                                     <i class="bi bi-eye fs-5"></i>
                                 </a>
-                                
-                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" id="delete-form-@item.Id" class="d-inline" title="Delete">
-                                    @Html.AntiForgeryToken()
-                                    <button type="button" class="btn btn-outline-danger btn-sm border-0"
-                                            onclick="confirmDelete(() => document.getElementById('delete-form-@item.Id').submit())">
-                                        <i class="bi bi-trash fs-5"></i>
-                                    </button>
-                                </form>
+
+                                @* Antiforgery token included here to be accessed by JavaScript Fetch calls *@
+                                @Html.AntiForgeryToken()
+
+                                @* Asynchronous Delete button that triggers the Fetch API logic *@
+                                <button type="button" class="btn btn-outline-danger btn-sm border-0"
+                                        onclick="executeDelete(@item.Id)" title="Delete Instructor">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </button>
                             </td>
                         </tr>
                     }
@@ -72,14 +91,15 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            @* Initializing the DataTables plugin with specific responsive and language settings *@
             $('#instructorsTable').DataTable({
                 "responsive": true,
                 "pageLength": 5,
                 "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
                 "language": {
-                    "search": "<span class='text-silver'>Search:</span>",
-                    "lengthMenu": "<span class='text-silver'>Show _MENU_ entries</span>",
-                    "info": "<span class='text-silver small'>Showing _START_ to _END_ of _TOTAL_ categories</span>",
+                    "search": "<span class='text-white'>Search:</span>",
+                    "lengthMenu": "<span class='text-white'>Show _MENU_ entries</span>",
+                    "info": "<span class='text-white small'>Showing _START_ to _END_ of _TOTAL_ entries</span>",
                     "paginate": {
                         "next": "Next",
                         "previous": "Prev"
@@ -87,9 +107,51 @@
                 }
             });
 
-           
+            @* Applying custom brand CSS classes to DataTables generated inputs *@
             $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2');
             $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2');
         });
+
+        @* Main function to handle the deletion of an instructor via Fetch API *@
+        async function executeDelete(id) {
+            @* Calling the system's global SweetAlert confirmation modal *@
+            confirmDelete(async () => {
+                try {
+                    @* Retrieving the Antiforgery token from the page to authorize the secure request *@
+                    const token = $('input[name="__RequestVerificationToken"]').val();
+
+                    @* Executing the asynchronous POST request to the server's DeleteFetch endpoint *@
+                    const response = await fetch(`/Instructors/DeleteFetch/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    });
+
+                    @* Parsing the JSON response received from the controller *@
+                    const result = await response.json();
+
+                    @* Handling success: Animating and removing the row without reloading the page *@
+                    if (result.success) {
+                        const row = document.getElementById(`row-${id}`);
+                        @* Adding Animate.css class for a smooth exit effect *@
+                        row.classList.add('animate__animated', 'animate__fadeOutLeft');
+
+                        @* Waiting for animation completion before DOM removal and success alert *@
+                        setTimeout(() => {
+                            row.remove();
+                            showSuccess(result.message);
+                        }, 600);
+                    } else {
+                        @* Displaying the system's global error alert if deletion fails on server *@
+                        showError(result.message);
+                    }
+                } catch (error) {
+                    @* Fallback for network issues or server crashes *@
+                    showError("Critical connection error. Please try again.");
+                }
+            });
+        }
     </script>
 }

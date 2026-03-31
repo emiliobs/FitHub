@@ -25,12 +25,12 @@
                         <tr class="border-secondary align-middle">
                             <td class="fw-bold py-3">@item.Name</td>
                             <td class="text-center">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0 mx-1">
+                                <a asp-action="Edit" asp-route-id="@item.Id" title="Edit" class="btn btn-outline-warning btn-sm border-0 mx-1">
                                     <i class="bi bi-pencil-square fs-5"></i>
                                 </a>
                                 
                                 <form asp-action="Delete" asp-route-id="@item.Id" id="form-@item.Id" class="d-inline">
-                                    <button type="button" class="btn btn-outline-danger btn-sm border-0 mx-1"
+                                    <button type="button" class="btn btn-outline-danger btn-sm border-0 mx-1" title="Delete"
                                             onclick="confirmDelete(() => document.getElementById('form-@item.Id').submit())">
                                         <i class="bi bi-trash fs-5"></i>
                                     </button>
