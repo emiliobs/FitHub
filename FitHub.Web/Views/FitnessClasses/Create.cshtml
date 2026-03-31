@@ -70,14 +70,16 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label asp-for="CategoryId" class="form-label text-silver fw-bold small text-uppercase">Category</label>
-                                <select asp-for="CategoryId" class="form-select fithub-input-sm" asp-items="ViewBag.CategoryId"></select>
+                                <select asp-for="CategoryId" class="form-select fithub-input-sm" asp-items="ViewBag.CategoryList">    <option value="">-- Select Category --</option>
+                                </select>
                                 <span asp-validation-for="CategoryId" class="text-danger small"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label asp-for="InstructorId" class="form-label text-silver fw-bold small text-uppercase">Instructor</label>
-                                <select asp-for="InstructorId" class="form-select fithub-input-sm" asp-items="ViewBag.InstructorId"></select>
+                                <select asp-for="InstructorId" class="form-select fithub-input-sm" asp-items="ViewBag.InstructorList">    <option value="">-- Select Instructor --</option>
+                                </select>
                                 <span asp-validation-for="InstructorId" class="text-danger small"></span>
                             </div>
                         </div>

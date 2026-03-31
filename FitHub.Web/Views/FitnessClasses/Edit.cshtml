@@ -55,7 +55,8 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label asp-for="ScheduleDate" class="form-label text-silver fw-bold small text-uppercase">Schedule Date & Time</label>
-                                <input asp-for="ScheduleDate" type="datetime-local" class="form-control fithub-input-sm" />
+                                <input asp-for="ScheduleDate" type="datetime-local" class="form-control fithub-input-sm"
+                                    value="@Model.ScheduleDate.ToString("yyyy-MM-ddTHH:mm")" />
                                 <span asp-validation-for="ScheduleDate" class="text-danger small"></span>
                             </div>
                         </div>
@@ -72,14 +73,14 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label asp-for="CategoryId" class="form-label text-silver fw-bold small text-uppercase">Category</label>
-                                <select asp-for="CategoryId" class="form-select fithub-input-sm" asp-items="@(ViewData["CategoryId"] as SelectList)"></select>
+                                   <select asp-for="CategoryId" class="form-select fithub-input-sm" asp-items="ViewBag.CategoryList"></select>
                                 <span asp-validation-for="CategoryId" class="text-danger small"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label asp-for="InstructorId" class="form-label text-silver fw-bold small text-uppercase">Instructor</label>
-                                <select asp-for="InstructorId" class="form-select fithub-input-sm" asp-items="@(ViewData["InstructorId"] as SelectList)"></select>
+                                <select asp-for="InstructorId" class="form-select fithub-input-sm" asp-items="ViewBag.InstructorList"></select>
                                 <span asp-validation-for="InstructorId" class="text-danger small"></span>
                             </div>
                         </div>
