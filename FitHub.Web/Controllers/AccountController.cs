@@ -1,9 +1,11 @@
 ﻿using FitHub.Web.Data;
+using FitHub.Web.Models.Domain;
 using FitHub.Web.Models.Identity;
 using FitHub.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FitHub.Web.Controllers;
 
@@ -69,7 +71,21 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    public IActionResult Register() => View();
+    public IActionResult Register()
+    {
+        // Populate the list of plans from the SubscriptionType Enum
+        var plan = new RegisterViewModel
+        {
+            AvailablePlans = Enum.GetValues(typeof(SubscriptionType))
+                .Cast<SubscriptionType>()
+                .Select(p => new SelectListItem
+                {
+                    Value = p.ToString(),
+                    Text = p.ToString()
+                })
+        };
+        return View(plan);
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -89,7 +105,12 @@ public class AccountController : Controller
                     FirstName = registerViewModel.FirstName,
                     LastName = registerViewModel.LastName,
                     Photo = uniqueFileNamePhoto,
-                    RegistrationDate = DateTime.UtcNow
+                    RegistrationDate = DateTime.UtcNow,
+                    MembershipPlan = registerViewModel.SelectedPlan,
+                    // Assign 30 days if a plan is chosen, otherwise null
+                    SubscriptionEndDate = registerViewModel.SelectedPlan != SubscriptionType.None
+                                      ? DateTime.UtcNow.AddDays(30)
+                                      : null
                 };
 
                 var result = await _userManager.CreateAsync(user, registerViewModel.Password);
@@ -105,7 +126,7 @@ public class AccountController : Controller
 
                 foreach (var error in result.Errors)
                 {
-                     ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, error.Description);
                     //TempData["Error"] = $"Registration failed: {error.Description}";
                 }
             }
@@ -114,6 +135,16 @@ public class AccountController : Controller
         {
             TempData["Error"] = $"Error register member: {ex.Message}";
         }
+
+        // If we reach here, something failed; reload the plans for the view
+        registerViewModel.AvailablePlans = Enum.GetValues(typeof(SubscriptionType))
+            .Cast<SubscriptionType>()
+            .Select(p => new SelectListItem
+            {
+                Value = p.ToString(),
+                Text = p.ToString()
+            });
+
         return View(registerViewModel);
     }
 
