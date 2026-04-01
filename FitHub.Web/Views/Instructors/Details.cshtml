@@ -1,72 +1,88 @@
-﻿@model FitHub.Web.Models.Domain.Instructor
+﻿
+@model FitHub.Web.Models.Domain.Instructor
 
-<div class="container mt-4 animate__animated animate__fadeIn">
+@{
+    ViewData["Title"] = "Instructor Profile";
+}
+
+<div class="container mt-5" style="min-height: 71vh;">
     <div class="row justify-content-center">
-        @* Aumentamos un poco el ancho a col-md-7 para que se vea más imponente *@
-        <div class="col-md-7 col-lg-6">
-            <div class="card bg-glass-dark border-danger shadow-lg text-center overflow-hidden border-0" style="border-radius: 20px;">
+        
+        <div class="col-lg-10">
+            <div class="card bg-glass-dark border-0 shadow-lg overflow-hidden" style="border-radius: 25px;">
                 
-                @* Banner decorativo superior *@
-                <div class="bg-danger" style="height: 100px; opacity: 0.15; filter: blur(40px); position: absolute; width: 100%; top: 0;"></div>
+                
+                <div class="bg-danger" style="height: 120px; opacity: 0.1; filter: blur(50px); position: absolute; width: 100%; top: 0; z-index: 0;"></div>
 
-                <div class="card-body p-4 position-relative">
-                    @* --- Foto Circular Grande con Brillo Neon --- *@
-                    <div class="mb-4 d-inline-block position-relative">
-                        <img src="~/Images/Profiles/@Model.Photo"
-                             class="rounded-circle border border-danger shadow-neon p-1 bg-dark"
-                             style="width: 220px; height: 220px; object-fit: cover; transition: transform .3s;" 
-                             alt="@Model.Name" 
-                             onmouseover="this.style.transform='scale(1.05)'" 
-                             onmouseout="this.style.transform='scale(1)'" />
+                <div class="card-body p-0 position-relative" style="z-index: 1;">
+                    <div class="row g-0">
                         
-                        @* Badge de Verificado o Instructor *@
-                        <div class="position-absolute bottom-0 end-0 bg-danger rounded-circle p-2 border border-dark" style="transform: translate(-15%, -15%);">
-                            <i class="bi bi-check-lg text-white"></i>
-                        </div>
-                    </div>
-                    
-                    <h1 class="text-white fw-black text-uppercase mb-1" style="letter-spacing: -1px;">@Model.Name</h1>
-                    <div class="d-flex justify-content-center mb-4">
-                         <span class="badge rounded-pill bg-outline-danger border border-danger text-danger px-4 py-2 fw-bold uppercase">
-                            <i class="bi bi-lightning-fill me-1"></i> @Model.Specialty
-                        </span>
-                    </div>
-
-                    <hr class="border-secondary mb-4 opacity-25">
-
-                    @* --- Contact Section con Iconos más grandes --- *@
-                    <div class="row text-start justify-content-center g-4 mb-5">
-                        <div class="col-11">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-danger-soft rounded-3 p-3 me-3 text-danger border border-danger border-opacity-25">
-                                    <i class="bi bi-envelope-heart fs-4"></i>
-                                </div>
-                                <div>
-                                    <p class="text-warning small mb-0 fw-bold">OFFICIAL EMAIL</p>
-                                    <p class="text-white mb-0 fs-5">@Model.Email</p>
+                        
+                        <div class="col-md-5 text-center p-5 bg-glass-inner border-end border-secondary border-opacity-10">
+                            <div class="position-relative d-inline-block mt-3">
+                                <img src="~/Images/Profiles/@Model.Photo"
+                                     class="rounded-circle border border-4 border-danger shadow-neon p-1 bg-dark"
+                                     style="width: 240px; height: 240px; object-fit: cover; transition: transform .4s;" 
+                                     alt="@Model.Name" 
+                                     onmouseover="this.style.transform='scale(1.05)'" 
+                                     onmouseout="this.style.transform='scale(1)'" />
+                                
+                                <div class="position-absolute bottom-0 end-0 bg-danger rounded-circle p-3 border border-3 border-dark shadow-lg" style="transform: translate(-10%, -10%);">
+                                    <i class="bi bi-check-lg text-white fs-4"></i>
                                 </div>
                             </div>
                             
-                            <div class="d-flex align-items-center">
-                                <div class="bg-danger-soft rounded-3 p-3 me-3 text-danger border border-danger border-opacity-25">
-                                    <i class="bi bi-phone-vibrate fs-4"></i>
+                            <h2 class="text-white fw-black text-uppercase mt-4 mb-1" style="letter-spacing: -1px; font-size: 2.5rem;">@Model.Name</h2>
+                            <span class="badge rounded-pill bg-outline-danger border border-danger text-danger px-4 py-2 fw-bold uppercase">
+                                <i class="bi bi-lightning-fill me-1"></i> @(Model.Category?.Name ?? "Instructor")
+                            </span>
+                        </div>
+
+                       
+                        <div class="col-md-7 p-5 d-flex flex-column justify-content-center">
+                            <div class="mb-4">
+                                <h4 class="text-danger fw-black text-uppercase tracking-wider">Instructor Details</h4>
+                                <hr class="border-danger opacity-50" style="width: 80px; height: 4px;">
+                            </div>
+
+                            <div class="row g-4">
+                                
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-danger-soft rounded-3 p-3 me-3 text-danger border border-danger border-opacity-25 shadow-sm">
+                                            <i class="bi bi-envelope-heart fs-3"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-warning small mb-0 fw-bold">OFFICIAL EMAIL</p>
+                                            <p class="text-white mb-0 fs-5">@Model.Email</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="text-warning small mb-0 fw-bold">CONTACT PHONE</p>
-                                    <p class="text-white mb-0 fs-5">@Model.Phone</p>
+
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-danger-soft rounded-3 p-3 me-3 text-danger border border-danger border-opacity-25 shadow-sm">
+                                            <i class="bi bi-phone-vibrate fs-3"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-warning small mb-0 fw-bold">CONTACT PHONE</p>
+                                            <p class="text-white mb-0 fs-5">@Model.Phone</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    @* --- Action Buttons --- *@
-                    <div class="d-flex justify-content-center gap-3">
-                        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 fw-bold">
-                            <i class="bi bi-arrow-left me-1"></i> List
-                        </a>
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-fithub px-5 py-2 shadow-neon-sm fw-bold">
-                            <i class="bi bi-pencil-square me-2"></i> EDIT WARRIOR
-                        </a>
+                          
+                            <div class="d-flex gap-3 mt-5 pt-4">
+                                <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 fw-bold hover-zoom">
+                                    <i class="bi bi-arrow-left me-1"></i> Back to List
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-fithub px-5  py-2 shadow-neon-sm fw-bold hover-zoom">
+                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -77,4 +93,8 @@
 <style>
     .bg-danger-soft { background-color: rgba(220, 53, 69, 0.1); }
     .fw-black { font-weight: 900; }
+    .shadow-neon { box-shadow: 0 0 20px rgba(220, 53, 69, 0.5); }
+    .uppercase { text-transform: uppercase; }
+    .hover-zoom { transition: transform .3s ease; }
+    .hover-zoom:hover { transform: scale(1.05); }
 </style>

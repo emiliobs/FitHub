@@ -1,9 +1,11 @@
 ﻿using FitHub.Web.Data;
+using FitHub.Web.Models.Domain;
 using FitHub.Web.Models.Identity;
 using FitHub.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FitHub.Web.Controllers;
 
@@ -69,7 +71,21 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    public IActionResult Register() => View();
+    public IActionResult Register()
+    {
+        // Populate the list of plans from the SubscriptionType Enum
+        var plan = new RegisterViewModel
+        {
+            AvailablePlans = Enum.GetValues(typeof(SubscriptionType))
+                .Cast<SubscriptionType>()
+                .Select(p => new SelectListItem
+                {
+                    Value = p.ToString(),
+                    Text = p.ToString()
+                })
+        };
+        return View(plan);
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -77,7 +93,7 @@ public class AccountController : Controller
     {
         try
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 // Log validation errors
                 var errorMessages = new List<string>();
@@ -133,25 +149,31 @@ public class AccountController : Controller
             // Note: We use the dynamic helper that accepts IFormFile
             var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel.PhotoFile);
 
-            var user = new ApplicationUser
-            {
-                UserName = registerViewModel.Email,
-                Email = registerViewModel.Email,
-                FirstName = registerViewModel.FirstName,
-                LastName = registerViewModel.LastName,
-                Photo = uniqueFileNamePhoto,
-                RegistrationDate = DateTime.UtcNow
-            };
+                var user = new ApplicationUser
+                {
+                    UserName = registerViewModel.Email,
+                    Email = registerViewModel.Email,
+                    FirstName = registerViewModel.FirstName,
+                    LastName = registerViewModel.LastName,
+                    Photo = uniqueFileNamePhoto,
+                    RegistrationDate = DateTime.UtcNow,
+                    MembershipPlan = registerViewModel.SelectedPlan,
+                    // Assign 30 days if a plan is chosen, otherwise null
+                    SubscriptionEndDate = registerViewModel.SelectedPlan != SubscriptionType.None
+                                      ? DateTime.UtcNow.AddDays(30)
+                                      : null
+                };
 
-            var result = await _userManager.CreateAsync(user, registerViewModel.Password);
+                var result = await _userManager.CreateAsync(user, registerViewModel.Password);
 
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, "Member");
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                TempData["Success"] = "Welcome to the FitHub Energy family!";
-                return RedirectToAction("Index", "Home");
-            }
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "Member");
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    TempData["Success"] = "Welcome to the FitHub Energy family!";
+                    return RedirectToAction("Index", "Home");
+                }
 
             // If creation failed, collect error messages
             if (!result.Succeeded)
@@ -176,6 +198,15 @@ public class AccountController : Controller
             Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             TempData["Error"] = $"Error registering: {ex.Message}";
         }
+
+        // If we reach here, something failed; reload the plans for the view
+        registerViewModel.AvailablePlans = Enum.GetValues(typeof(SubscriptionType))
+            .Cast<SubscriptionType>()
+            .Select(p => new SelectListItem
+            {
+                Value = p.ToString(),
+                Text = p.ToString()
+            });
 
         return View(registerViewModel);
     }
@@ -232,7 +263,7 @@ public class AccountController : Controller
                 if (result.Succeeded)
                 {
                     TempData["Success"] = "Your profile has been updated successfully!";
-                    return RedirectToAction(nameof(MyProfile));
+                    return RedirectToAction("Index", "Home");
                 }
 
                 foreach (var error in result.Errors)
@@ -245,6 +276,7 @@ public class AccountController : Controller
         {
             TempData["Error"] = $"Error Updating Profile: {ex.Message}";
         }
+
         return View(profileViewModel);
     }
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FitHub.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialSetup : Migration
+    public partial class InitailSetup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -65,23 +65,6 @@ namespace FitHub.Web.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Instructors",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
-                    Specialty = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Photo = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Instructors", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -188,6 +171,30 @@ namespace FitHub.Web.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Instructors",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    Specialty = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Photo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Instructors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Instructors_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -307,6 +314,17 @@ namespace FitHub.Web.Migrations
                 name: "IX_FitnessClasses_InstructorId",
                 table: "FitnessClasses",
                 column: "InstructorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Instructors_CategoryId",
+                table: "Instructors",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Instructors_Email",
+                table: "Instructors",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -340,10 +358,10 @@ namespace FitHub.Web.Migrations
                 name: "FitnessClasses");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Instructors");
 
             migrationBuilder.DropTable(
-                name: "Instructors");
+                name: "Categories");
         }
     }
 }
