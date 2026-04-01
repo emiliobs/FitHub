@@ -138,12 +138,8 @@ public class AccountController : Controller
 
         // If we reach here, something failed; reload the plans for the view
         registerViewModel.AvailablePlans = Enum.GetValues(typeof(SubscriptionType))
-            .Cast<SubscriptionType>()
-            .Select(p => new SelectListItem
-            {
-                Value = p.ToString(),
-                Text = p.ToString()
-            });
+        .Cast<SubscriptionType>()
+        .Select(p => new SelectListItem { Value = ((int)p).ToString(), Text = p.ToString() });
 
         return View(registerViewModel);
     }
@@ -161,7 +157,9 @@ public class AccountController : Controller
             Email = user.Email ?? "",
             FirstName = user.FirstName,
             LastName = user.LastName,
-            ExistingPhoto = user.Photo
+            ExistingPhoto = user.Photo,
+            MembershipPlan = user.MembershipPlan,
+            SubscriptionEndDate = user.SubscriptionEndDate,
         };
         return View(model);
     }
@@ -177,11 +175,18 @@ public class AccountController : Controller
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByIdAsync(profileViewModel.Id);
-                if (user == null) return NotFound();
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
                 var currentUser = await _userManager.GetUserAsync(User);
-                if (currentUser?.Id != user.Id) return Forbid();
+                if (currentUser?.Id != user.Id)
+                {
+                    return Forbid();
+                }
 
+                // UPDATE ONLY PERMITTED FIELDS
                 user.FirstName = profileViewModel.FirstName;
                 user.LastName = profileViewModel.LastName;
 
@@ -193,6 +198,7 @@ public class AccountController : Controller
                         var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Profiles", user.Photo);
                         if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
                     }
+
                     user.Photo = ProcessUploadedFile(profileViewModel.PhotoFile);
                 }
 
@@ -212,6 +218,14 @@ public class AccountController : Controller
         catch (Exception ex)
         {
             TempData["Error"] = $"Error Updating Profile: {ex.Message}";
+        }
+
+        // If validation fails, we must reload the membership data so the view doesn't break
+        var userForReload = await _userManager.FindByIdAsync(profileViewModel.Id);
+        if (userForReload != null)
+        {
+            profileViewModel.MembershipPlan = userForReload.MembershipPlan;
+            profileViewModel.SubscriptionEndDate = userForReload.SubscriptionEndDate;
         }
 
         return View(profileViewModel);

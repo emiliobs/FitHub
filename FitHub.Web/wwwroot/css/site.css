@@ -251,3 +251,9 @@ main {
     font-weight: bold !important;
     text-transform: uppercase !important;
 }
+
+/* En site.css - Clase para elementos que NO deben moverse */
+.static-card, .static-card:hover {
+    transform: none !important;
+    transition: none !important;
+}
