@@ -1,53 +1,53 @@
-﻿// SUCCESS MESSAGE - FitHub SweetAlert Success
-// Mensaje de éxito optimizado con los colores de FitHub
+﻿// --- SUCCESS MESSAGE: FitHub Vibrant Orange/Green ---
 function showSuccess(message) {
     Swal.fire({
         icon: 'success',
-        title: '<span style="color: #ffffff">Success</span>',
+        title: '<h3 style="color: #ffffff; font-weight: 800;">SUCCESS!</h3>',
         text: message,
-        background: '#121212', // Dark background
-        iconColor: '#FF6B00',   // Neon Orange
-        confirmButtonColor: '#FF6B00',
-        color: '#b0b0b0',       // Silver text
+        background: '#121212',
+        iconColor: '#28a745',   // Vibrant Green for Success
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'GREAT!',
+        color: '#ffffff',       // Pure white for better readability
         customClass: {
-            popup: 'border-fithub-neon'
+            popup: 'border border-success shadow-lg'
         }
     });
 }
 
-// ERROR MESSAGE - FitHub SweetAlert Error
-// Mensaje de error para excepciones capturadas
+// --- ERROR MESSAGE: High Contrast Red ---
 function showError(message) {
     Swal.fire({
         icon: 'error',
-        title: '<span style="color: #ffffff">Error</span>',
+        title: '<h3 style="color: #ffffff; font-weight: 800;">ACTION BLOCKED</h3>',
         text: message,
-        background: '#121212',
-        iconColor: '#dc3545',   // Neon Red
-        confirmButtonColor: '#1A1A1A', // Carbon Black
-        color: '#b0b0b0',
+        background: '#0a0a0a', // Deeper black for more contrast
+        iconColor: '#ff3b3b',   // Vibrant Neon Red
+        confirmButtonColor: '#ff3b3b', // Solid Red Button (Now visible!)
+        confirmButtonText: 'UNDERSTOOD',
+        color: '#e0e0e0',       // Light grey text
         customClass: {
-            popup: 'border-fithub-red'
+            popup: 'border border-danger shadow-neon-red animate__animated animate__shakeX'
         }
     });
 }
 
-// CONFIRM DELETE - Ultra Modern FitHub Red Style
-// Confirmación de eliminación con estética de alto impacto
+// --- CONFIRM DELETE: Ultra High Impact ---
 function confirmDelete(callback) {
     Swal.fire({
-        title: '<h2 style="color: #ffffff; font-weight: 800; letter-spacing: -1px;">ARE YOU SURE?</h2>',
-        html: '<p style="color: #b0b0b0;">This action is <b style="color: #ff3b3b;">permanent</b>. The Warrior will be removed from the system.</p>',
+        title: '<h2 style="color: #ffffff; font-weight: 900; letter-spacing: -1px;">DANGER ZONE</h2>',
+        html: '<p style="color: #e0e0e0;">This action is <b style="color: #ff3b3b; text-decoration: underline;">irreversible</b>. Are you sure you want to proceed?</p>',
         icon: 'warning',
-        iconColor: '#ff3b3b', // Vibrant Neon Red
-        background: '#0a0a0a', // Deep Carbon Black
+        iconColor: '#ff3b3b',
+        background: '#050505',
         showCancelButton: true,
-        confirmButtonColor: '#d33', // Action Red
-        cancelButtonColor: '#1A1A1A', // FitHub Grey/Black
-        confirmButtonText: '<i class="bi bi-trash-fill"></i> YES, DELETE IT!',
-        cancelButtonText: 'CANCEL',
+        confirmButtonColor: '#ff3b3b', // Solid Red
+        cancelButtonColor: '#333333',  // Dark Grey (Not invisible black)
+        confirmButtonText: '<i class="bi bi-trash-fill"></i> DELETE NOW',
+        cancelButtonText: 'BACK TO SAFETY',
+        color: '#ffffff',
         customClass: {
-            popup: 'fithub-delete-popup animate__animated animate__pulse'
+            popup: 'border border-danger animate__animated animate__pulse'
         }
     }).then((result) => {
         if (result.isConfirmed) {
