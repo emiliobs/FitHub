@@ -4,16 +4,15 @@
     ViewData["Title"] = "Join the Energy - Register";
 }
 
-    <div class="container d-flex align-items-center justify-content-center py-4">
+<div class="container d-flex align-items-center justify-content-center py-4">
     <div class="col-md-7">
         <div class="card shadow-lg p-4 border-0 bg-glass-dark animate__animated animate__fadeIn">
             <div class="text-center mb-4">
                 <i class="bi bi-person-plus-fill text-danger display-4 shadow-neon"></i>
-                <h2 class="text-white fw-bold mt-2">JOIN THE ENERGY</h2>
-                <p class="text-silver small">Create your profile to start training</p>
+                <h2 class="text-white fw-bold mt-2 text-uppercase">Join the Energy</h2>
+                <p class="text-silver small">Create your warrior profile to start training</p>
             </div>
 
-           
             <form asp-action="Register" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
@@ -39,35 +38,52 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="Password" class="text-silver small fw-bold">PASSWORD</label>
-                        <input asp-for="Password" class="form-control fithub-input-sm" />
+                        <input asp-for="Password" class="form-control fithub-input-sm" type="password" />
                         <span asp-validation-for="Password" class="text-danger small"></span>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label asp-for="ConfirmPassword" class="text-silver small fw-bold">CONFIRM PASSWORD</label>
-                        <input asp-for="ConfirmPassword" class="form-control fithub-input-sm" />
+                        <input asp-for="ConfirmPassword" class="form-control fithub-input-sm" type="password" />
                         <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                     </div>
                 </div>
 
-                
+                @* --- MEMBERSHIP PLAN SELECTION (Consistent Design) --- *@
+                              
                 <div class="mb-4">
-                    <label asp-for="PhotoFile" class="text-silver small fw-bold">PROFILE PICTURE</label>
+                    <label asp-for="SelectedPlan" class="text-silver small fw-bold text-uppercase">Choose Your Warrior Plan</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-danger text-danger">
+                            <i class="bi bi-gem"></i>
+                        </span>
+                        <select asp-for="SelectedPlan" asp-items="Model.AvailablePlans" class="form-select bg-dark  text-white">
+                            <option value="" disabled selected>-- Select your training level --</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="SelectedPlan" class="text-danger small"></span>
+                    <p class="text-silver x-small mt-1">
+                        <i class="bi bi-info-circle"></i> Tip: Select "None" to pay per individual class.
+                    </p>
+                </div>
+
+                @* --- PROFILE PICTURE UPLOAD --- *@
+                <div class="mb-4">
+                    <label asp-for="PhotoFile" class="text-silver small fw-bold text-uppercase">Profile Picture</label>
                     
                     <div id="photo-preview-container" class="text-center mb-3 d-none">
                         <img id="photo-preview" src="#" alt="Preview"
-                             class="rounded-circle border border-danger p-1"
+                             class="rounded-circle border border-danger p-1 shadow-neon-sm"
                              style="width: 100px; height: 100px; object-fit: cover;" />
                     </div>
 
-                    
-                    <input asp-for="PhotoFile" type="file" id="PhotoFileInput" class="form-control fithub-input-sm border-danger" accept="image/*" />
-                    <small class="text-white d-block mt-1">Format: JPG, PNG. Max size: 2MB</small>
+                    <input asp-for="PhotoFile" type="file" id="PhotoFileInput" class="form-control fithub-input-sm border-danger bg-dark text-white" accept="image/*" />
+                    <small class="text-silver d-block mt-1">Format: JPG, PNG. Max size: 2MB</small>
                     <span asp-validation-for="PhotoFile" class="text-danger small"></span>
                 </div>
 
                 <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-fithub py-2 fw-bold text-uppercase">
-                        START TRAINING NOW
+                    <button type="submit" class="btn btn-fithub py-2 fw-bold text-uppercase shadow-neon">
+                        Start Training Now
                     </button>
                     <a asp-action="Login" class="btn btn-link text-silver small text-decoration-none text-center">
                         Already a member? <span class="text-danger fw-bold">Login here</span>
@@ -80,11 +96,8 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
-    // NEW: JavaScript for Image Preview 
     <script>
         $(document).ready(function() {
-            // Listen for changes in the file input
             $("#PhotoFileInput").change(function() {
                 readURL(this);
             });
@@ -93,18 +106,12 @@
         function readURL(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
-
                 reader.onload = function(e) {
-                    // Set the image source
                     $('#photo-preview').attr('src', e.target.result);
-                    // Show the preview container
-                    $('#photo-preview-container').removeClass('d-none');
+                    $('#photo-preview-container').removeClass('d-none').addClass('animate__animated animate__zoomIn');
                 }
-
-                // Read the file as a Data URL (base64)
                 reader.readAsDataURL(input.files[0]);
             } else {
-                // If no file is selected, hide the preview
                 $('#photo-preview-container').addClass('d-none');
             }
         }
