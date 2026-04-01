@@ -1,0 +1,64 @@
+@model FitHub.Web.Models.Domain.FitnessClass
+
+@{
+    ViewData["Title"] = "Fitness Class Details";
+}
+
+<div class="container mt-5" style="min-height: 70vh;">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center mb-4">
+                <i class="bi bi-info-circle text-danger fs-1 me-3"></i>
+                <div>
+                    <h2 class="text-white fw-bold mb-0">@Model.Title</h2>
+                    <p class="text-silver small">Class Details</p>
+                </div>
+            </div>
+
+            <div class="card shadow-lg p-4 border-0">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-silver fw-bold small text-uppercase">Description</label>
+                            <p class="text-white">@(Model.Description ?? "No description available")</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-silver fw-bold small text-uppercase">Instructor</label>
+                            <p class="text-white">@Model.Instructor.Name (@Model.Instructor.Specialty)</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-silver fw-bold small text-uppercase">Category</label>
+                            <p class="text-white">@Model.Category.Name</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-silver fw-bold small text-uppercase">Schedule</label>
+                            <p class="text-white">@Model.ScheduleDate.ToString("g")</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-silver fw-bold small text-uppercase">Capacity</label>
+                            <p class="text-white">@Model.Capacity Members</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-silver fw-bold small text-uppercase">Price</label>
+                            <p class="text-white fs-5 fw-bold text-danger">$@Model.Price.ToString("F2")</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning py-2">
+                            <i class="bi bi-pencil-square me-2"></i> EDIT CLASS
+                        </a>
+                    }
+                    <a asp-action="Index" class="btn btn-outline-secondary border-0 text-silver">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

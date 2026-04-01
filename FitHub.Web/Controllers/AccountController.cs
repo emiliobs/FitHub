@@ -95,8 +95,59 @@ public class AccountController : Controller
         {
             if (ModelState.IsValid)
             {
-                // Note: We use the dynamic helper that accepts IFormFile
-                var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel.PhotoFile);
+                // Log validation errors
+                var errorMessages = new List<string>();
+                foreach (var state in ModelState.Values)
+                {
+                    foreach (var error in state.Errors)
+                    {
+                        errorMessages.Add(error.ErrorMessage);
+                        Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                    }
+                }
+
+                if (errorMessages.Count > 0)
+                {
+                    TempData["Error"] = "Validation errors: " + string.Join(", ", errorMessages);
+                }
+
+                return View(registerViewModel);
+            }
+
+            // Check if email already exists
+            var existingUser = await _userManager.FindByEmailAsync(registerViewModel.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Email", "This email is already registered. Please use a different email or try logging in.");
+                TempData["Error"] = "This email address is already registered. Please use a different email or login with your existing account.";
+                return View(registerViewModel);
+            }
+
+            // Validate email format
+            if (!registerViewModel.Email.Contains("@") || !registerViewModel.Email.Contains("."))
+            {
+                ModelState.AddModelError("Email", "Please enter a valid email address.");
+                TempData["Error"] = "Please enter a valid email address.";
+                return View(registerViewModel);
+            }
+
+            // Validate names are not empty
+            if (string.IsNullOrWhiteSpace(registerViewModel.FirstName))
+            {
+                ModelState.AddModelError("FirstName", "First name is required.");
+                TempData["Error"] = "First name is required.";
+                return View(registerViewModel);
+            }
+
+            if (string.IsNullOrWhiteSpace(registerViewModel.LastName))
+            {
+                ModelState.AddModelError("LastName", "Last name is required.");
+                TempData["Error"] = "Last name is required.";
+                return View(registerViewModel);
+            }
+
+            // Note: We use the dynamic helper that accepts IFormFile
+            var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel.PhotoFile);
 
                 var user = new ApplicationUser
                 {
@@ -124,16 +175,28 @@ public class AccountController : Controller
                     return RedirectToAction("Index", "Home");
                 }
 
+            // If creation failed, collect error messages
+            if (!result.Succeeded)
+            {
+                var errorList = new List<string>();
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
-                    //TempData["Error"] = $"Registration failed: {error.Description}";
+                    errorList.Add(error.Description);
+                    Console.WriteLine($"Registration Error: {error.Description}");
+                }
+
+                if (errorList.Count > 0)
+                {
+                    TempData["Error"] = "Registration failed: " + string.Join(", ", errorList);
                 }
             }
         }
         catch (Exception ex)
         {
-            TempData["Error"] = $"Error register member: {ex.Message}";
+            Console.WriteLine($"Register Exception: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            TempData["Error"] = $"Error registering: {ex.Message}";
         }
 
         // If we reach here, something failed; reload the plans for the view
@@ -236,5 +299,11 @@ public class AccountController : Controller
             }
         }
         return uniqueFileNamePhoto;
+    }
+
+    // GET: /Account/AccessDenied
+    public IActionResult AccessDenied()
+    {
+        return View();
     }
 }

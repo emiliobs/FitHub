@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace FitHub.Web.Models.Domain;
 
@@ -33,15 +34,16 @@ public class FitnessClass
     // Foreign Key for Instructor (1:N)
     [Required]
     public int InstructorId { get; set; }
-
+    [ValidateNever]
     public virtual Instructor Instructor { get; set; } = null!;
 
     // Foreign Key for Category (1:N)
     [Required]
     public int CategoryId { get; set; }
-
+    [ValidateNever]
     public virtual Category Category { get; set; } = null!;
 
     // Bookings (Many-to-Many via Booking)
+    [ValidateNever]
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }

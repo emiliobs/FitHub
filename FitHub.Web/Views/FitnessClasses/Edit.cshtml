@@ -1,0 +1,104 @@
+@model FitHub.Web.Models.Domain.FitnessClass
+
+@{
+    ViewData["Title"] = "Edit Fitness Class";
+}
+
+<div class="container mt-5" style="min-height: 70vh;">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="d-flex align-items-center mb-4">
+                <i class="bi bi-pencil-square text-danger fs-1 me-3"></i>
+                <div>
+                    <h2 class="text-white fw-bold mb-0">Edit Fitness Class</h2>
+                    <p class="text-silver small">Update class details</p>
+                </div>
+            </div>
+
+            <div class="card shadow-lg p-4">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                        <strong>Validation Errors:</strong>
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Title" class="form-label text-silver fw-bold small text-uppercase">Class Title</label>
+                                <input asp-for="Title" class="form-control fithub-input-sm" />
+                                <span asp-validation-for="Title" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Capacity" class="form-label text-silver fw-bold small text-uppercase">Capacity</label>
+                                <input asp-for="Capacity" type="number" class="form-control fithub-input-sm" min="1" max="200" />
+                                <span asp-validation-for="Capacity" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Description" class="form-label text-silver fw-bold small text-uppercase">Description</label>
+                        <textarea asp-for="Description" class="form-control fithub-input-sm" rows="3"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="ScheduleDate" class="form-label text-silver fw-bold small text-uppercase">Schedule Date & Time</label>
+                                <input asp-for="ScheduleDate" type="datetime-local" class="form-control fithub-input-sm"
+                                    value="@Model.ScheduleDate.ToString("yyyy-MM-ddTHH:mm")" />
+                                <span asp-validation-for="ScheduleDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Price" class="form-label text-silver fw-bold small text-uppercase">Price ($)</label>
+                                <input asp-for="Price" type="number" step="0.01" class="form-control fithub-input-sm" min="0" max="500" />
+                                <span asp-validation-for="Price" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="CategoryId" class="form-label text-silver fw-bold small text-uppercase">Category</label>
+                                   <select asp-for="CategoryId" class="form-select fithub-input-sm" asp-items="ViewBag.CategoryList"></select>
+                                <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="InstructorId" class="form-label text-silver fw-bold small text-uppercase">Instructor</label>
+                                <select asp-for="InstructorId" class="form-select fithub-input-sm" asp-items="ViewBag.InstructorList"></select>
+                                <span asp-validation-for="InstructorId" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-fithub py-2">
+                            <i class="bi bi-save2 me-2"></i> UPDATE CLASS
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary border-0 text-silver mt-2">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

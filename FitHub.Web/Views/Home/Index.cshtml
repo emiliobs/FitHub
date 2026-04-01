@@ -11,9 +11,18 @@
             Manage your fitness center, categories, and training routines in one place.
         </p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center animate__animated animate__fadeInUp">
-            <a asp-controller="Categories" asp-action="Index" class="btn btn-fithub btn-lg px-5 fw-bold">
-                <i class="bi bi-play-fill"></i> GET STARTED
-            </a>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-fithub btn-lg px-5 fw-bold">
+                    <i class="bi bi-play-fill"></i> EXPLORE CLASSES
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="btn btn-fithub btn-lg px-5 fw-bold">
+                    <i class="bi bi-play-fill"></i> GET STARTED
+                </a>
+            }
             <button class="btn btn-outline-light btn-lg px-4 fw-bold border-2">LEARN MORE</button>
         </div>
     </div>
