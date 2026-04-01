@@ -1,0 +1,115 @@
+﻿@model IEnumerable<FitHub.Web.Models.Domain.FitnessClass>
+
+@{
+    ViewData["Title"] = "Training Sessions";
+}
+
+<div class="container mt-5" style="min-height: 70vh;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold">
+            <i class="bi bi-calendar-week text-danger"></i> Training Sessions
+        </h2>
+        
+        <a asp-action="Create" class="btn btn-fithub px-4 shadow-neon-sm text-uppercase fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> Add New Class
+        </a>
+    </div>
+     
+    <div class="card shadow-lg p-4 border-0 bg-glass-dark">
+        <div class="table-responsive">
+            <table id="classesTable" class="table table-dark table-hover bg-transparent mb-0">
+                <thead>
+                    <tr class="border-danger">
+                        <th class="text-danger fw-black small text-uppercase">Class & Category</th>
+                        <th class="text-danger fw-black small text-uppercase">Instructor</th>
+                        <th class="text-danger fw-black small text-center text-uppercase">Schedule</th>
+                        <th class="text-danger fw-black small text-center text-uppercase">Capacity</th>
+                        <th class="text-danger fw-black small text-uppercase">Price</th>
+                        <th class="text-center text-danger fw-black small text-uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-silver">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="border-secondary align-middle">
+                            <td class="py-3">
+                                <div class="fw-bold text-white">@item.Title</div>
+                                <span class="badge bg-outline-danger border border-danger x-small text-uppercase mt-1">
+                                    @(item.Category?.Name ?? "General")
+                                </span>
+                            </td>
+                            
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="~/images/profiles/@item.Instructor.Photo"
+                                         class="rounded-circle border border-danger shadow-sm me-2"
+                                         style="width: 40px; height: 40px; object-fit: cover;" />
+                                    <span class="small">@item.Instructor.Name</span>
+                                </div>
+                            </td>
+                            
+                            <td class="text-center small">
+                                <div class="text-white">@item.ScheduleDate.ToString("MMM dd, yyyy")</div>
+                                <div class="text-danger fw-bold">@item.ScheduleDate.ToString("HH:mm") HRS</div>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-dark border border-secondary px-3">
+                                    @item.Bookings.Count / @item.Capacity
+                                </span>
+                            </td>
+                            
+                            <td class="fw-bold text-white">@item.Price.ToString("C")</td>
+
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0" title="Edit">
+                                        <i class="bi bi-pencil-square fs-5"></i>
+                                    </a>
+
+                                    @* Standard Hidden Form for Security *@
+                                    <form id="delete-form-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="button" class="btn btn-outline-danger btn-sm border-0"
+                                                onclick="submitDelete(@item.Id)" title="Delete">
+                                            <i class="bi bi-trash fs-5"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#classesTable').DataTable({
+                "responsive": true,
+                "pageLength": 5,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                "language": {
+                    "search": "<span class='text-white'>Search:</span>",
+                    "lengthMenu": "<span class='text-white text-small'>Show _MENU_ entries</span>",
+                    "info": "<span class='text-white small'>Showing _START_ to _END_ of _TOTAL_ entries</span>"
+                }
+            });
+
+            // Clean styling for DataTables inputs
+            $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2 border-secondary text-white bg-dark');
+            $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2 bg-dark text-white border-secondary');
+        });
+
+        // Simple function to trigger SweetAlert and then submit the form
+        function submitDelete(id) {
+            confirmDelete(() => {
+                document.getElementById('delete-form-' + id).submit();
+            });
+        }
+    </script>
+}

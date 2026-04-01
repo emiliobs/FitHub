@@ -115,6 +115,79 @@ public class DbInitializer
                 await context.Instructors.AddRangeAsync(instructors);
                 await context.SaveChangesAsync();
             }
+
+            // 5. SEED FITNESS CLASSES: Creating the workout schedule
+            if (!context.FitnessClasses.Any())
+            {
+                var dbInstructors = await context.Instructors.ToListAsync();
+                var dbCategories = await context.Categories.ToListAsync();
+
+                var classes = new List<FitnessClass>
+                {
+                    new FitnessClass { Title = "Iron Morning", Description = "High intensity weightlifting", Capacity = 20, ScheduleDate = DateTime.Now.AddDays(1).AddHours(8), Price = 15.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Weightlifting").Id, InstructorId = dbInstructors.First(i => i.Name == "Chris Evans").Id },
+
+                    new FitnessClass { Title = "Zen Flow", Description = "Sunrise yoga for flexibility", Capacity = 25, ScheduleDate = DateTime.Now.AddDays(1).AddHours(7), Price = 10.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Yoga").Id, InstructorId = dbInstructors.First(i => i.Name == "Elena Rodriguez").Id },
+
+                    new FitnessClass { Title = "Warrior WOD", Description = "Official CrossFit training", Capacity = 15, ScheduleDate = DateTime.Now.AddDays(2).AddHours(18), Price = 20.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Crossfit").Id, InstructorId = dbInstructors.First(i => i.Name == "Marcus Thorne").Id },
+
+                    new FitnessClass { Title = "Hyper HIIT", Description = "Burn calories fast", Capacity = 30, ScheduleDate = DateTime.Now.AddDays(1).AddHours(17), Price = 12.50m,
+                        CategoryId = dbCategories.First(c => c.Name == "HIIT").Id, InstructorId = dbInstructors.First(i => i.Name == "Chloe Smith").Id },
+
+                    new FitnessClass { Title = "Zumba Party", Description = "Dance and sweat", Capacity = 40, ScheduleDate = DateTime.Now.AddDays(3).AddHours(19), Price = 8.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Zumba").Id, InstructorId = dbInstructors.First(i => i.Name == "Sarah Jenkins").Id },
+
+                    new FitnessClass { Title = "MMA Basics", Description = "Martial arts introduction", Capacity = 12, ScheduleDate = DateTime.Now.AddDays(2).AddHours(16), Price = 25.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Martial Arts").Id, InstructorId = dbInstructors.First(i => i.Name == "Tom Hardy").Id },
+
+                    new FitnessClass { Title = "Power Pump", Description = "Bodybuilding fundamentals", Capacity = 20, ScheduleDate = DateTime.Now.AddDays(1).AddHours(15), Price = 18.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Bodybuilding").Id, InstructorId = dbInstructors.First(i => i.Name == "Robert Pattinson").Id },
+
+                    new FitnessClass { Title = "Spinning Pro", Description = "High speed cycling", Capacity = 25, ScheduleDate = DateTime.Now.AddDays(1).AddHours(10), Price = 15.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Spinning").Id, InstructorId = dbInstructors.First(i => i.Name == "Maria Garcia").Id },
+
+                    new FitnessClass { Title = "Titan Strength", Description = "Strongman specialized training", Capacity = 10, ScheduleDate = DateTime.Now.AddDays(4).AddHours(14), Price = 30.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Strongman").Id, InstructorId = dbInstructors.First(i => i.Name == "Henry Cavill").Id },
+
+                    new FitnessClass { Title = "Deep Stretching", Description = "Relax and recover", Capacity = 30, ScheduleDate = DateTime.Now.AddDays(2).AddHours(20), Price = 9.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Stretching").Id, InstructorId = dbInstructors.First(i => i.Name == "Zendaya Coleman").Id },
+
+                    new FitnessClass { Title = "Aqua Blast", Description = "Low impact swimming session", Capacity = 15, ScheduleDate = DateTime.Now.AddDays(1).AddHours(11), Price = 22.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Swimming").Id, InstructorId = dbInstructors.First(i => i.Name == "Jason Momoa").Id },
+
+                    new FitnessClass { Title = "Boxing Ring", Description = "Combat conditioning", Capacity = 10, ScheduleDate = DateTime.Now.AddDays(3).AddHours(18), Price = 20.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Boxing").Id, InstructorId = dbInstructors.First(i => i.Name == "Scarlett J.").Id },
+
+                    new FitnessClass { Title = "Olympic Lifting", Description = "Powerlifting mastery", Capacity = 8, ScheduleDate = DateTime.Now.AddDays(5).AddHours(13), Price = 35.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Powerlifting").Id, InstructorId = dbInstructors.First(i => i.Name == "Dwayne Johnson").Id },
+
+                    new FitnessClass { Title = "Functional Core", Description = "Improve daily movement", Capacity = 20, ScheduleDate = DateTime.Now.AddDays(2).AddHours(9), Price = 14.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Functional Training").Id, InstructorId = dbInstructors.First(i => i.Name == "Gal Gadot").Id },
+
+                    new FitnessClass { Title = "Spider Calisthenics", Description = "Bodyweight only workout", Capacity = 15, ScheduleDate = DateTime.Now.AddDays(1).AddHours(16), Price = 12.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Calisthenics").Id, InstructorId = dbInstructors.First(i => i.Name == "Tom Holland").Id },
+
+                    new FitnessClass { Title = "Pilates Focus", Description = "Core and control", Capacity = 18, ScheduleDate = DateTime.Now.AddDays(1).AddHours(12), Price = 16.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Pilates").Id, InstructorId = dbInstructors.First(i => i.Name == "Emma Watson").Id },
+
+                    new FitnessClass { Title = "Cardio Run", Description = "Endurance and stamina", Capacity = 50, ScheduleDate = DateTime.Now.AddDays(2).AddHours(6), Price = 5.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Cardio").Id, InstructorId = dbInstructors.First(i => i.Name == "David Beckham").Id },
+
+                    new FitnessClass { Title = "Flexy Morning", Description = "Gentle flexibility training", Capacity = 20, ScheduleDate = DateTime.Now.AddDays(1).AddHours(8), Price = 10.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Flexibility").Id, InstructorId = dbInstructors.First(i => i.Name == "Emma Watson").Id },
+
+                    new FitnessClass { Title = "Total Recovery", Description = "Muscle therapy session", Capacity = 12, ScheduleDate = DateTime.Now.AddDays(3).AddHours(17), Price = 18.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Recovery").Id, InstructorId = dbInstructors.First(i => i.Name == "Brie Larson").Id },
+
+                    new FitnessClass { Title = "80s Aerobics", Description = "Retro workout fun", Capacity = 30, ScheduleDate = DateTime.Now.AddDays(4).AddHours(10), Price = 10.00m,
+                        CategoryId = dbCategories.First(c => c.Name == "Aerobics").Id, InstructorId = dbInstructors.First(i => i.Name == "Margot Robbie").Id }
+                };
+
+                await context.FitnessClasses.AddRangeAsync(classes);
+                await context.SaveChangesAsync();
+            }
         }
         catch (Exception ex)
         {

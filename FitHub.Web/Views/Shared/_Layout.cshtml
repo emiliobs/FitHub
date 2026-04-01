@@ -44,19 +44,26 @@
                                 </a>
                             </li>
 
-                            // Staff / Instructor Management 
+                            // Class Categories Management
+                            <li class="nav-item">
+                                <a class="nav-link text-dark d-flex align-items-center" asp-controller="Categories" asp-action="Index">
+                                    <i class="bi bi-tags me-1 text-success"></i> Categories
+                                </a>
+                            </li>
+
+                             // Staff / Instructor Management 
                             <li class="nav-item">
                                 <a class="nav-link text-dark d-flex align-items-center" asp-controller="Instructors" asp-action="Index">
                                     <i class="bi bi-person-badge me-1 text-succces"></i> Staff
                                 </a>
                             </li>
 
-                            // Class Categories Management 
                             <li class="nav-item">
-                                <a class="nav-link text-dark d-flex align-items-center" asp-controller="Categories" asp-action="Index">
-                                    <i class="bi bi-tags me-1 text-success"></i> Categories
+                                <a class="nav-link text-dark d-flex align-items-center" asp-controller="FitnessClasses" asp-section="Index">
+                                    <i class="bi bi-calendar-event text-warning me-2"></i> Fitness Classes
                                 </a>
                             </li>
+                            
                         }
                     </ul>
 
