@@ -63,19 +63,40 @@
                             <td class="fw-bold text-white">@item.Price.ToString("C")</td>
 
                             <td class="text-center">
-                                <div class="btn-group">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0" title="Edit">
-                                        <i class="bi bi-pencil-square fs-5"></i>
-                                    </a>
-
-                                    @* Standard Hidden Form for Security *@
-                                    <form id="delete-form-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post">
-                                        @Html.AntiForgeryToken()
-                                        <button type="button" class="btn btn-outline-danger btn-sm border-0"
-                                                onclick="submitDelete(@item.Id)" title="Delete">
-                                            <i class="bi bi-trash fs-5"></i>
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    
+                                    @* 1. PUBLIC ACTION: Reserve (For all logged-in warriors) *@
+                                    <form asp-controller="Bookings" asp-action="Cancel" method="post">
+                                        <input type="hidden" name="classId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-fithub btn-sm rounded-pill px-3 shadow-neon-sm">
+                                            Reserve
                                         </button>
                                     </form>
+
+                                    @* 2. ADMIN ACTIONS: Attendance, Edit, and Delete *@
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                                    {
+                                        <div class="vr mx-1 opacity-25"></div> @* Small visual separator *@
+
+                                        <a asp-action="Attendance" asp-route-id="@item.Id"
+                                               class="btn btn-outline-info btn-sm rounded-circle" title="View Attendance">
+                                            <i class="bi bi-people-fill"></i>
+                                        </a>
+
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                               class="btn btn-outline-warning btn-sm rounded-circle" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <form id="delete-form-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                                                    onclick="submitDelete(@item.Id)" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                                                        
                                 </div>
                             </td>
                         </tr>
