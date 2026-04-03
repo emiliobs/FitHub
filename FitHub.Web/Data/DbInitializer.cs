@@ -188,6 +188,35 @@ public class DbInitializer
                 await context.FitnessClasses.AddRangeAsync(classes);
                 await context.SaveChangesAsync();
             }
+
+            // 6. SEED BOOKINGS: Assigning initial battles to the Admin Warrior
+            if (!context.Bookings.Any())
+            {
+                // Retrieve the admin user we just created or checked
+                var admin = await userManager.FindByEmailAsync("emilio@yopmail.com");
+                var availableClasses = await context.FitnessClasses.Take(3).ToListAsync();
+
+                if (admin != null && availableClasses.Any())
+                {
+                    var initialBookings = new List<Booking>();
+
+                    foreach (var fitnessClass in availableClasses)
+                    {
+                        initialBookings.Add(new Booking
+                        {
+                            ApplicationUserId = admin.Id,
+                            FitnessClassId = fitnessClass.Id,
+                            BookingDate = DateTime.UtcNow.AddHours(-2), // Booked 2 hours ago
+                            PaidPrice = fitnessClass.Price, // Snapshot of the current price
+                            Status = BookingStatus.Active,
+                            InternalNotes = "Initial tactical training seed."
+                        });
+                    }
+
+                    await context.Bookings.AddRangeAsync(initialBookings);
+                    await context.SaveChangesAsync();
+                }
+            }
         }
         catch (Exception ex)
         {

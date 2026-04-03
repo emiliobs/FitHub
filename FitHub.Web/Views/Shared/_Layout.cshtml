@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FitHub</title>
-    
+
     
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -37,7 +37,7 @@
 
                         @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
                         {
-                            // User Security Management 
+                            // User Security Management
                             <li class="nav-item">
                                 <a class="nav-link text-dark d-flex align-items-center" asp-controller="Users" asp-action="Index">
                                     <i class="bi bi-shield-lock me-1 text-info"></i> Users
@@ -51,7 +51,7 @@
                                 </a>
                             </li>
 
-                             // Staff / Instructor Management 
+                            // Staff / Instructor Management
                             <li class="nav-item">
                                 <a class="nav-link text-dark d-flex align-items-center" asp-controller="Instructors" asp-action="Index">
                                     <i class="bi bi-person-badge me-1 text-succces"></i> Staff
@@ -63,7 +63,15 @@
                                     <i class="bi bi-calendar-event text-warning me-2"></i> Classes
                                 </a>
                             </li>
-                            
+                        }
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark d-flex align-items-center" asp-controller="Bookings" asp-action="MySchedule">
+                                    <i class="bi bi-calendar-check text-danger me-1"></i> My Schedule
+                                </a>
+                            </li>
                         }
 
                         <li class="nav-item">
@@ -83,7 +91,7 @@
                         </div>
 
                     </ul>
-                    
+
                     
                 </div>
             </div>
@@ -111,8 +119,8 @@
             </div>
         </div>
     </footer>
+
     
-   
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
