@@ -222,4 +222,39 @@ public class FitnessClassesController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+    // GET: FitnessClasses/Attendance/5
+    [Authorize(Roles = "Admin,Manager")]
+    [HttpGet]
+    public async Task<IActionResult> Attendance(int? id)
+    {
+        if (id is null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            // Deep Include: Class -> Bookings -> ApplicationUser
+            var fitnessClass = await _context.FitnessClasses
+                .Include(c => c.Instructor)
+                .Include(c => c.Category)
+                .Include(c => c.Bookings)
+                .ThenInclude(b => b.ApplicationUser)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (fitnessClass is null)
+            {
+                return NotFound();
+            }
+
+            return View(fitnessClass);
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"An error occurred while retrieving attendance data: {ex.Message}";
+
+            return RedirectToAction(nameof(Index));
+        }
+    }
 }
