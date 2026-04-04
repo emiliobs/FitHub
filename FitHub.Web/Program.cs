@@ -55,6 +55,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// THIS IS THE KEY: Captures 404, 500, etc.
+app.UseStatusCodePagesWithReExecute("/Home/HandleError/{0}");
+
 // Create a scope to resolve services and run the Seeder
 using (var scope = app.Services.CreateScope())
 {

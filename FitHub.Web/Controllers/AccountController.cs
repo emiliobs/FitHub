@@ -251,4 +251,13 @@ public class AccountController : Controller
         }
         return uniqueFileNamePhoto;
     }
+
+    // GET: /Account/AccessDenied
+    [AllowAnonymous]
+    public IActionResult AccessDenied()
+    {
+        // Simply returns the security error view;
+        // the [Authorize] attribute will handle redirection to this page when access is denied
+        return View();
+    }
 }
