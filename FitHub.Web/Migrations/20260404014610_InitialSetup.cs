@@ -238,6 +238,8 @@ namespace FitHub.Web.Migrations
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FitnessClassId = table.Column<int>(type: "int", nullable: false),
                     BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaidPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    InternalNotes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

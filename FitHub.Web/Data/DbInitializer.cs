@@ -12,12 +12,11 @@ public class DbInitializer
     {
         try
         {
-            // Getting necessary services from the DI container
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
-            // 1. SEED ROLES: Ensuring basic security roles exist
+            // 1. SEED ROLES
             string[] roleNames = { "Admin", "Manager", "Instructor", "Member" };
             foreach (var roleName in roleNames)
             {
@@ -27,69 +26,61 @@ public class DbInitializer
                 }
             }
 
-            // 2. SEED ADMIN USER: Creating the initial administrator
-            var adminEmail = "admin@yopmail.com";
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-            if (adminUser == null)
+            // 2. SEED USERS: Creating the 3 main Admin accounts
+            var usersToSeed = new List<(string Email, string FirstName, string Role)>
             {
-                var user = new ApplicationUser
-                {
-                    UserName = adminEmail,
-                    Email = adminEmail,
-                    FirstName = "Emilio",
-                    LastName = "Barrera",
-                    RegistrationDate = DateTime.UtcNow,
-                    EmailConfirmed = true,
-                    MembershipPlan = SubscriptionType.Warrior, // granting the highest subscription level to the admin for testing purposes
-                    SubscriptionEndDate = DateTime.UtcNow.AddYears(10) // setting a far future date to ensure the admin's subscription is always active
-                };
+                ("admin@yopmail.com", "Admin", "Admin"),
+                ("emilio@yopmail.com", "Emilio Barrera", "Admin"),
+                ("kaur@yopmail.com", "Mehakdeep kaur", "Admin")
+            };
 
-                // Using a simple password for initial setup
-                await userManager.CreateAsync(user, "123");
-                await userManager.AddToRoleAsync(user, "Admin");
+            foreach (var userData in usersToSeed)
+            {
+                var existingUser = await userManager.FindByEmailAsync(userData.Email);
+                if (existingUser == null)
+                {
+                    var user = new ApplicationUser
+                    {
+                        UserName = userData.Email,
+                        Email = userData.Email,
+                        FirstName = userData.FirstName,
+                        LastName = "Barrera",
+                        RegistrationDate = DateTime.UtcNow,
+                        EmailConfirmed = true,
+                        MembershipPlan = SubscriptionType.Warrior,
+                        SubscriptionEndDate = DateTime.UtcNow.AddYears(1)
+                    };
+                    await userManager.CreateAsync(user, "123");
+                    await userManager.AddToRoleAsync(user, userData.Role);
+                }
             }
 
-            // 3. SEED CATEGORIES: Required for the Instructor relationship
+            // 3. SEED CATEGORIES
             if (!context.Categories.Any())
             {
                 var categories = new List<Category>
                 {
-                    new Category { Name = "Cardio" },            // ID 1
-                    new Category { Name = "Weightlifting" },     // ID 2
-                    new Category { Name = "Yoga" },              // ID 3
-                    new Category { Name = "Crossfit" },          // ID 4
-                    new Category { Name = "Zumba" },             // ID 5
-                    new Category { Name = "Pilates" },           // ID 6
-                    new Category { Name = "Spinning" },          // ID 7
-                    new Category { Name = "Boxing" },            // ID 8
-                    new Category { Name = "Swimming" },          // ID 9
-                    new Category { Name = "Bodybuilding" },      // ID 10
-                    new Category { Name = "HIIT" },              // ID 11
-                    new Category { Name = "Functional Training" },// ID 12
-                    new Category { Name = "Martial Arts" },      // ID 13
-                    new Category { Name = "Calisthenics" },      // ID 14
-                    new Category { Name = "Flexibility" },       // ID 15
-                    new Category { Name = "Powerlifting" },      // ID 16
-                    new Category { Name = "Aerobics" },          // ID 17
-                    new Category { Name = "Stretching" },        // ID 18
-                    new Category { Name = "Strongman" },         // ID 19
-                    new Category { Name = "Recovery" }           // ID 20
+                    new Category { Name = "Cardio" }, new Category { Name = "Weightlifting" },
+                    new Category { Name = "Yoga" }, new Category { Name = "Crossfit" },
+                    new Category { Name = "Zumba" }, new Category { Name = "Pilates" },
+                    new Category { Name = "Spinning" }, new Category { Name = "Boxing" },
+                    new Category { Name = "Swimming" }, new Category { Name = "Bodybuilding" },
+                    new Category { Name = "HIIT" }, new Category { Name = "Functional Training" },
+                    new Category { Name = "Martial Arts" }, new Category { Name = "Calisthenics" },
+                    new Category { Name = "Flexibility" }, new Category { Name = "Powerlifting" },
+                    new Category { Name = "Aerobics" }, new Category { Name = "Stretching" },
+                    new Category { Name = "Strongman" }, new Category { Name = "Recovery" }
                 };
-
                 await context.Categories.AddRangeAsync(categories);
                 await context.SaveChangesAsync();
             }
 
-            // 4. SEED INSTRUCTORS: Connecting them to existing Categories
+            // 4. SEED INSTRUCTORS
             if (!context.Instructors.Any())
             {
-                // Fetch categories from DB to get their generated IDs
                 var dbCategories = await context.Categories.ToListAsync();
-
                 var instructors = new List<Instructor>
                 {
-                    // We map each instructor to a CategoryId instead of a plain text specialty
                     new Instructor { Name = "Marcus Thorne", CategoryId = dbCategories.First(c => c.Name == "Crossfit").Id, Email = "marcus@fithub.com", Phone = "07712345671", Photo = "default-user.png" },
                     new Instructor { Name = "Elena Rodriguez", CategoryId = dbCategories.First(c => c.Name == "Yoga").Id, Email = "elena@fithub.com", Phone = "07712345672", Photo = "default-user.png" },
                     new Instructor { Name = "Sarah Jenkins", CategoryId = dbCategories.First(c => c.Name == "Zumba").Id, Email = "sarah@fithub.com", Phone = "07712345673", Photo = "default-user.png" },
@@ -111,12 +102,11 @@ public class DbInitializer
                     new Instructor { Name = "Tom Holland", CategoryId = dbCategories.First(c => c.Name == "Calisthenics").Id, Email = "spider@fithub.com", Phone = "07712345689", Photo = "default-user.png" },
                     new Instructor { Name = "Zendaya Coleman", CategoryId = dbCategories.First(c => c.Name == "Stretching").Id, Email = "zen@fithub.com", Phone = "07712345690", Photo = "default-user.png" }
                 };
-
                 await context.Instructors.AddRangeAsync(instructors);
                 await context.SaveChangesAsync();
             }
 
-            // 5. SEED FITNESS CLASSES: Creating the workout schedule
+            // 5. SEED FITNESS CLASSES
             if (!context.FitnessClasses.Any())
             {
                 var dbInstructors = await context.Instructors.ToListAsync();
@@ -126,101 +116,65 @@ public class DbInitializer
                 {
                     new FitnessClass { Title = "Iron Morning", Description = "High intensity weightlifting", Capacity = 20, ScheduleDate = DateTime.Now.AddDays(1).AddHours(8), Price = 15.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Weightlifting").Id, InstructorId = dbInstructors.First(i => i.Name == "Chris Evans").Id },
-
                     new FitnessClass { Title = "Zen Flow", Description = "Sunrise yoga for flexibility", Capacity = 25, ScheduleDate = DateTime.Now.AddDays(1).AddHours(7), Price = 10.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Yoga").Id, InstructorId = dbInstructors.First(i => i.Name == "Elena Rodriguez").Id },
-
                     new FitnessClass { Title = "Warrior WOD", Description = "Official CrossFit training", Capacity = 15, ScheduleDate = DateTime.Now.AddDays(2).AddHours(18), Price = 20.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Crossfit").Id, InstructorId = dbInstructors.First(i => i.Name == "Marcus Thorne").Id },
-
                     new FitnessClass { Title = "Hyper HIIT", Description = "Burn calories fast", Capacity = 30, ScheduleDate = DateTime.Now.AddDays(1).AddHours(17), Price = 12.50m,
                         CategoryId = dbCategories.First(c => c.Name == "HIIT").Id, InstructorId = dbInstructors.First(i => i.Name == "Chloe Smith").Id },
-
                     new FitnessClass { Title = "Zumba Party", Description = "Dance and sweat", Capacity = 40, ScheduleDate = DateTime.Now.AddDays(3).AddHours(19), Price = 8.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Zumba").Id, InstructorId = dbInstructors.First(i => i.Name == "Sarah Jenkins").Id },
-
                     new FitnessClass { Title = "MMA Basics", Description = "Martial arts introduction", Capacity = 12, ScheduleDate = DateTime.Now.AddDays(2).AddHours(16), Price = 25.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Martial Arts").Id, InstructorId = dbInstructors.First(i => i.Name == "Tom Hardy").Id },
-
                     new FitnessClass { Title = "Power Pump", Description = "Bodybuilding fundamentals", Capacity = 20, ScheduleDate = DateTime.Now.AddDays(1).AddHours(15), Price = 18.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Bodybuilding").Id, InstructorId = dbInstructors.First(i => i.Name == "Robert Pattinson").Id },
-
                     new FitnessClass { Title = "Spinning Pro", Description = "High speed cycling", Capacity = 25, ScheduleDate = DateTime.Now.AddDays(1).AddHours(10), Price = 15.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Spinning").Id, InstructorId = dbInstructors.First(i => i.Name == "Maria Garcia").Id },
-
                     new FitnessClass { Title = "Titan Strength", Description = "Strongman specialized training", Capacity = 10, ScheduleDate = DateTime.Now.AddDays(4).AddHours(14), Price = 30.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Strongman").Id, InstructorId = dbInstructors.First(i => i.Name == "Henry Cavill").Id },
-
-                    new FitnessClass { Title = "Deep Stretching", Description = "Relax and recover", Capacity = 30, ScheduleDate = DateTime.Now.AddDays(2).AddHours(20), Price = 9.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Stretching").Id, InstructorId = dbInstructors.First(i => i.Name == "Zendaya Coleman").Id },
-
-                    new FitnessClass { Title = "Aqua Blast", Description = "Low impact swimming session", Capacity = 15, ScheduleDate = DateTime.Now.AddDays(1).AddHours(11), Price = 22.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Swimming").Id, InstructorId = dbInstructors.First(i => i.Name == "Jason Momoa").Id },
-
-                    new FitnessClass { Title = "Boxing Ring", Description = "Combat conditioning", Capacity = 10, ScheduleDate = DateTime.Now.AddDays(3).AddHours(18), Price = 20.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Boxing").Id, InstructorId = dbInstructors.First(i => i.Name == "Scarlett J.").Id },
-
-                    new FitnessClass { Title = "Olympic Lifting", Description = "Powerlifting mastery", Capacity = 8, ScheduleDate = DateTime.Now.AddDays(5).AddHours(13), Price = 35.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Powerlifting").Id, InstructorId = dbInstructors.First(i => i.Name == "Dwayne Johnson").Id },
-
-                    new FitnessClass { Title = "Functional Core", Description = "Improve daily movement", Capacity = 20, ScheduleDate = DateTime.Now.AddDays(2).AddHours(9), Price = 14.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Functional Training").Id, InstructorId = dbInstructors.First(i => i.Name == "Gal Gadot").Id },
-
-                    new FitnessClass { Title = "Spider Calisthenics", Description = "Bodyweight only workout", Capacity = 15, ScheduleDate = DateTime.Now.AddDays(1).AddHours(16), Price = 12.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Calisthenics").Id, InstructorId = dbInstructors.First(i => i.Name == "Tom Holland").Id },
-
-                    new FitnessClass { Title = "Pilates Focus", Description = "Core and control", Capacity = 18, ScheduleDate = DateTime.Now.AddDays(1).AddHours(12), Price = 16.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Pilates").Id, InstructorId = dbInstructors.First(i => i.Name == "Emma Watson").Id },
-
-                    new FitnessClass { Title = "Cardio Run", Description = "Endurance and stamina", Capacity = 50, ScheduleDate = DateTime.Now.AddDays(2).AddHours(6), Price = 5.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Cardio").Id, InstructorId = dbInstructors.First(i => i.Name == "David Beckham").Id },
-
-                    new FitnessClass { Title = "Flexy Morning", Description = "Gentle flexibility training", Capacity = 20, ScheduleDate = DateTime.Now.AddDays(1).AddHours(8), Price = 10.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Flexibility").Id, InstructorId = dbInstructors.First(i => i.Name == "Emma Watson").Id },
-
-                    new FitnessClass { Title = "Total Recovery", Description = "Muscle therapy session", Capacity = 12, ScheduleDate = DateTime.Now.AddDays(3).AddHours(17), Price = 18.00m,
-                        CategoryId = dbCategories.First(c => c.Name == "Recovery").Id, InstructorId = dbInstructors.First(i => i.Name == "Brie Larson").Id },
-
                     new FitnessClass { Title = "80s Aerobics", Description = "Retro workout fun", Capacity = 30, ScheduleDate = DateTime.Now.AddDays(4).AddHours(10), Price = 10.00m,
                         CategoryId = dbCategories.First(c => c.Name == "Aerobics").Id, InstructorId = dbInstructors.First(i => i.Name == "Margot Robbie").Id }
                 };
-
                 await context.FitnessClasses.AddRangeAsync(classes);
                 await context.SaveChangesAsync();
             }
 
-            // 6. SEED BOOKINGS: Assigning initial battles to the Admin Warrior
+            // 6. BULK SEED BOOKINGS (This populates the Attendance Table)
             if (!context.Bookings.Any())
             {
-                // Retrieve the admin user we just created or checked
-                var admin = await userManager.FindByEmailAsync("emilio@yopmail.com");
-                var availableClasses = await context.FitnessClasses.Take(3).ToListAsync();
+                var admin = await userManager.FindByEmailAsync("admin@yopmail.com");
+                var emilio = await userManager.FindByEmailAsync("emilio@yopmail.com");
+                var kaur = await userManager.FindByEmailAsync("kaur@yopmail.com");
 
-                if (admin != null && availableClasses.Any())
+                // We enroll the 3 teammates in ALL classes generated above
+                var allGymClasses = await context.FitnessClasses.ToListAsync();
+
+                if (allGymClasses.Any())
                 {
-                    var initialBookings = new List<Booking>();
-
-                    foreach (var fitnessClass in availableClasses)
+                    var bulkBookings = new List<Booking>();
+                    foreach (var fClass in allGymClasses)
                     {
-                        initialBookings.Add(new Booking
+                        if (admin != null)
                         {
-                            ApplicationUserId = admin.Id,
-                            FitnessClassId = fitnessClass.Id,
-                            BookingDate = DateTime.UtcNow.AddHours(-2), // Booked 2 hours ago
-                            PaidPrice = fitnessClass.Price, // Snapshot of the current price
-                            Status = BookingStatus.Active,
-                            InternalNotes = "Initial tactical training seed."
-                        });
+                            bulkBookings.Add(new Booking { ApplicationUserId = admin.Id, FitnessClassId = fClass.Id, BookingDate = DateTime.UtcNow.AddHours(-5), PaidPrice = fClass.Price, Status = BookingStatus.Active, InternalNotes = "Seed Enrollment" });
+                        }
+                        if (emilio != null)
+                        {
+                            bulkBookings.Add(new Booking { ApplicationUserId = emilio.Id, FitnessClassId = fClass.Id, BookingDate = DateTime.UtcNow.AddHours(-3), PaidPrice = fClass.Price, Status = BookingStatus.Active, InternalNotes = "Seed Enrollment" });
+                        }
+                        if (kaur != null)
+                        {
+                            bulkBookings.Add(new Booking { ApplicationUserId = kaur.Id, FitnessClassId = fClass.Id, BookingDate = DateTime.UtcNow.AddHours(-1), PaidPrice = fClass.Price, Status = BookingStatus.Active, InternalNotes = "Seed Enrollment" });
+                        }
                     }
 
-                    await context.Bookings.AddRangeAsync(initialBookings);
+                    await context.Bookings.AddRangeAsync(bulkBookings);
                     await context.SaveChangesAsync();
                 }
             }
         }
         catch (Exception ex)
         {
-            // Logging the exception for debugging purposes
             throw new Exception("Error during database seeding: " + ex.Message, ex);
         }
     }

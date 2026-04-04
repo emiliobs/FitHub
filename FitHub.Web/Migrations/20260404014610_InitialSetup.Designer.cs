@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitHub.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260401145948_InitialSetup")]
+    [Migration("20260404014610_InitialSetup")]
     partial class InitialSetup
     {
         /// <inheritdoc />
@@ -42,6 +42,13 @@ namespace FitHub.Web.Migrations
 
                     b.Property<int>("FitnessClassId")
                         .HasColumnType("int");
+
+                    b.Property<string>("InternalNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("PaidPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
