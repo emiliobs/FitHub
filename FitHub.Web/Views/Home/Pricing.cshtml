@@ -1,0 +1,115 @@
+﻿@{
+    ViewData["Title"] = "Warrior Membership Plans";
+}
+
+<div class="container py-5 animate__animated animate__fadeInUp">
+    
+    @* --- HEADER --- *@
+    <div class="text-center mb-5">
+        <h1 class="display-3 fw-bold text-white mb-0">
+            CHOOSE YOUR <span class="text-danger">BATTLE</span>
+        </h1>
+        <h3 class="fw-light text-silver border-bottom border-danger d-inline-block pb-3 px-4 text-uppercase tracking-wider">
+            Select the membership that unlocks your potential
+        </h3>
+    </div>
+
+    @* --- PRICING GRID --- *@
+    <div class="row g-4 align-items-stretch justify-content-center">
+
+        @* --- BASIC PLAN --- *@
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 bg-glass-dark border-secondary p-4 shadow-lg transform-hover">
+                <div class="text-center mb-4">
+                    <img src="~/images/profiles/basic-warrior.png" alt="Basic Warrior" class="img-fluid rounded-circle mb-3 border border-secondary" style="width: 100px; height: 100px; object-fit: cover; opacity: 0.8;">
+                    <h4 class="text-white fw-bold mb-1">BASIC WARRIOR</h4>
+                    <p class="text-secondary small text-uppercase tracking-widest mt-0">Casual Training</p>
+                    <h2 class="text-danger fw-black display-5 mt-3">£19.99<span class="fs-6 text-silver">/mo</span></h2>
+                </div>
+                
+                <hr class="border-secondary opacity-25">
+                
+                <ul class="list-unstyled mt-4 text-silver space-y-2">
+                    <li><i class="bi bi-check2 text-danger me-2"></i> Standard Gym Access</li>
+                    <li><i class="bi bi-check2 text-danger me-2"></i> 1 Fitness Class/mo</li>
+                    <li><i class="bi bi-x text-muted me-2"></i> 24/7 Access</li>
+                    <li><i class="bi bi-x text-muted me-2"></i> Personal Trainer</li>
+                </ul>
+                
+                <div class="mt-auto pt-4">
+                    <a asp-controller="Account" asp-action="Register" asp-route-planId="Basic" class="btn btn-outline-danger w-100 py-3 fw-bold">
+                        JOIN THE TRIBE
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @* --- WARRIOR PLAN (HIGHLIGHTED) --- *@
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 bg-glass-dark border-danger p-4 shadow-neon transform-hover position-relative overflow-hidden">
+                @* Most Popular Badge *@
+                <span class="badge bg-danger position-absolute top-0 start-50 translate-middle-x mt-3 px-3 py-2 text-uppercase fw-black shadow-neon-sm">
+                    Most Popular
+                </span>
+
+                <div class="text-center mb-4 mt-3">
+                    <img src="~/images/profiles/elite-warrior.png" alt="Elite Warrior" class="img-fluid rounded-circle mb-3 border border-danger shadow-neon-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                    <h4 class="text-white fw-bold mb-1">WARRIOR TIER</h4>
+                    <p class="text-danger fw-bold text-uppercase small tracking-widest mt-0">Unleash the Beast</p>
+                    <h2 class="text-danger fw-black display-5 mt-3">£59.99<span class="fs-6 text-silver">/mo</span></h2>
+                </div>
+                
+                <hr class="border-danger opacity-25">
+                
+                <ul class="list-unstyled mt-4 text-silver space-y-2 fw-medium">
+                    <li><i class="bi bi-shield-fill-check text-danger me-2"></i> 24/7 Premium Access</li>
+                    <li><i class="bi bi-shield-fill-check text-danger me-2"></i> Unlimited Fitness Classes</li>
+                    <li><i class="bi bi-shield-fill-check text-danger me-2"></i> Monthly Personal Trainer Session</li>
+                    <li><i class="bi bi-shield-fill-check text-danger me-2"></i> Priority Booking</li>
+                </ul>
+                
+                <div class="mt-auto pt-4">
+                    <a asp-controller="Account" asp-action="Register" asp-route-planId="Warrior" class="btn btn-fithub w-100 py-3 fw-black fs-5 shadow-neon-sm">
+                        BECOME A WARRIOR
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @* --- PREMIUM PLAN --- *@
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 bg-glass-dark border-info p-4 shadow-lg transform-hover">
+                <div class="text-center mb-4">
+                    <img src="~/images/profiles/premium-warrior.png" alt="Premium Warrior" class="img-fluid rounded-circle mb-3 border border-info" style="width: 100px; height: 100px; object-fit: cover; opacity: 0.9;">
+                    <h4 class="text-white fw-bold mb-1">PREMIUM WARRIOR</h4>
+                    <p class="text-info fw-bold text-uppercase small tracking-widest mt-0">Total Training Mastery</p>
+                    <h2 class="text-danger fw-black display-5 mt-3">£99.99<span class="fs-6 text-silver">/mo</span></h2>
+                </div>
+                
+                <hr class="border-info opacity-25">
+                
+                <ul class="list-unstyled mt-4 text-silver space-y-2">
+                    <li><i class="bi bi-check2 text-info me-2"></i> All Warrior Plan Features</li>
+                    <li><i class="bi bi-check2 text-info me-2"></i> Weekly Personal Trainer</li>
+                    <li><i class="bi bi-check2 text-info me-2"></i> Nutritional Coaching</li>
+                    <li><i class="bi bi-check2 text-info me-2"></i> Access to Spa & Recovery</li>
+                </ul>
+                
+                <div class="mt-auto pt-4">
+                    <a asp-controller="Account" asp-action="Register" asp-route-planId="Premium" class="btn btn-outline-info w-100 py-3 fw-bold">
+                        UPGRADE MY BATTLE
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    @* --- NOTE SECTION --- *@
+    <div class="text-center mt-5 pt-4 border-top border-secondary border-opacity-10">
+        <p class="text-silver small">
+            <i class="bi bi-info-circle text-danger me-2"></i> All plans are subject to our terms of service. Prices are listed in USD.
+            <a href="#" class="text-danger fw-bold text-decoration-none ms-1">View Full Terms</a>
+        </p>
+    </div>
+</div>

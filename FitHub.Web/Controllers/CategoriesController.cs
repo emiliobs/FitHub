@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -171,18 +172,34 @@ namespace FitHub.Web.Controllers
         {
             try
             {
-                var category = await _context.Categories.FindAsync(id);
-                if (category != null)
-                {
-                    _context.Categories.Remove(category);
-                    await _context.SaveChangesAsync();
+                var category = await _context.Categories
+                    .Include(c => c.Instructors) // Assumming we have these relations
+                    .Include(c => c.FitnessClasses)
+                    .FirstOrDefaultAsync(m => m.Id == id);
 
-                    TempData["Success"] = "Category deleted successfully!";
+                if (category is null)
+                {
+                    TempData["Error"] = "The category you are trying to delete was not found.";
+                    return RedirectToAction(nameof(Index));
                 }
+
+                if (category.Instructors.Any())
+                {
+                    TempData["Error"] = $"Cannot delete {category.Name} because it is currently assigned to {category.Instructors.Count} " +
+                                        $"instructor(s). Please reassign them first.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"Category {category.Name} has been removed successfully!";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"The category could not be deleted : {ex.Message}";
+                TempData["Error"] = "An unexpected server error occurred while trying to delete the category. " +
+                                    "Please contact system support.";
             }
 
             return RedirectToAction(nameof(Index));

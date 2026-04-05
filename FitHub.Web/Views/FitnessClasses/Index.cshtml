@@ -1,64 +1,104 @@
 @model IEnumerable<FitHub.Web.Models.Domain.FitnessClass>
 
+@{
+    ViewData["Title"] = "Training Sessions";
+}
+
 <div class="container mt-5" style="min-height: 70vh;">
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-white fw-bold">
-            <i class="bi bi-calendar-event text-danger"></i> Fitness Classes
+            <i class="bi bi-calendar-week text-danger"></i> Training Sessions
         </h2>
-        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-        {
-            <a asp-action="Create" class="btn btn-fithub px-4">
-                <i class="bi bi-plus-circle"></i> Create New Class
-            </a>
-        }
+        
+        <a asp-action="Create" class="btn btn-fithub px-4 shadow-neon-sm text-uppercase fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> Add New Class
+        </a>
     </div>
-
-    <div class="card shadow-lg p-4 border-0">
+     
+    <div class="card shadow-lg p-4 border-0 bg-glass-dark">
         <div class="table-responsive">
-            <table id="fitnessClassesTable" class="table table-dark table-hover bg-transparent mb-0">
+            <table id="classesTable" class="table table-dark table-hover bg-transparent mb-0">
                 <thead>
                     <tr class="border-danger">
-                        <th class="text-danger fw-black small">TITLE</th>
-                        <th class="text-danger fw-black small">DESCRIPTION</th>
-                        <th class="text-danger fw-black small">SCHEDULE</th>
-                        <th class="text-danger fw-black small">INSTRUCTOR</th>
-                        <th class="text-danger fw-black small">CATEGORY</th>
-                        <th class="text-danger fw-black small">PRICE</th>
-                        <th class="text-danger fw-black small">CAPACITY</th>
-                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-                        {
-                            <th class="text-center text-danger fw-black small">ACTIONS</th>
-                        }
+                        <th class="text-danger fw-black small text-uppercase">Class & Category</th>
+                        <th class="text-danger fw-black small text-uppercase">Instructor</th>
+                        <th class="text-danger fw-black small text-center text-uppercase">Schedule</th>
+                        <th class="text-danger fw-black small text-center text-uppercase">Capacity</th>
+                        <th class="text-danger fw-black small text-uppercase">Price</th>
+                        <th class="text-center text-danger fw-black small text-uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="text-silver">
                     @foreach (var item in Model)
                     {
                         <tr class="border-secondary align-middle">
-                            <td class="fw-bold py-3">@item.Title</td>
-                            <td>@(item.Description ?? "No description")</td>
-                            <td>@item.ScheduleDate.ToString("g")</td>
-                            <td>@item.Instructor.Name</td>
-                            <td>@item.Category.Name</td>
-                            <td>$@item.Price.ToString("F2")</td>
-                            <td>@item.Capacity</td>
-                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-                            {
-                                <td class="text-center">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0 mx-1">
-                                        <i class="bi bi-pencil-square fs-5"></i>
-                                    </a>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm border-0 mx-1">
-                                        <i class="bi bi-info-circle fs-5"></i>
-                                    </a>
-                                    <form asp-action="Delete" asp-route-id="@item.Id" id="form-@item.Id" class="d-inline">
-                                        <button type="button" class="btn btn-outline-danger btn-sm border-0 mx-1"
-                                                onclick="confirmDelete(() => document.getElementById('form-@item.Id').submit())">
-                                            <i class="bi bi-trash fs-5"></i>
+                            <td class="py-3">
+                                <div class="fw-bold text-white">@item.Title</div>
+                                <span class="badge bg-outline-danger border border-danger x-small text-uppercase mt-1">
+                                    @(item.Category?.Name ?? "General")
+                                </span>
+                            </td>
+                            
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="~/images/profiles/@item.Instructor.Photo"
+                                         class="rounded-circle border border-danger shadow-sm me-2"
+                                         style="width: 40px; height: 40px; object-fit: cover;" />
+                                    <span class="small">@item.Instructor.Name</span>
+                                </div>
+                            </td>
+                            
+                            <td class="text-center small">
+                                <div class="text-white">@item.ScheduleDate.ToString("MMM dd, yyyy")</div>
+                                <div class="text-danger fw-bold">@item.ScheduleDate.ToString("HH:mm") HRS</div>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-dark border border-secondary px-3">
+                                    @item.Bookings.Count / @item.Capacity
+                                </span>
+                            </td>
+                            
+                            <td class="fw-bold text-white">@item.Price.ToString("C")</td>
+
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    
+                                    @* 1. PUBLIC ACTION: Reserve (For all logged-in warriors) *@
+                                    <form asp-controller="Bookings" asp-action="Cancel" method="post">
+                                        <input type="hidden" name="classId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-fithub btn-sm rounded-pill px-3 shadow-neon-sm">
+                                            Reserve
                                         </button>
                                     </form>
-                                </td>
-                            }
+
+                                    @* 2. ADMIN ACTIONS: Attendance, Edit, and Delete *@
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                                    {
+                                        <div class="vr mx-1 opacity-25"></div> @* Small visual separator *@
+
+                                        <a asp-action="Attendance" asp-route-id="@item.Id"
+                                               class="btn btn-outline-info btn-sm rounded-circle" title="View Attendance">
+                                            <i class="bi bi-people-fill"></i>
+                                        </a>
+
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                               class="btn btn-outline-warning btn-sm rounded-circle" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <form id="delete-form-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                                                    onclick="submitDelete(@item.Id)" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                                                        
+                                </div>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -70,29 +110,27 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#fitnessClassesTable').DataTable({
+            $('#classesTable').DataTable({
                 "responsive": true,
-                "pageLength": 10,
-                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                "pageLength": 5,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
                 "language": {
-                    "search": "<span class='text-silver'>Search:</span>",
-                    "lengthMenu": "<span class='text-silver'>Show _MENU_ entries</span>",
-                    "info": "<span class='text-silver small'>Showing _START_ to _END_ of _TOTAL_ classes</span>",
-                    "paginate": {
-                        "next": "Next",
-                        "previous": "Prev"
-                    }
+                    "search": "<span class='text-white'>Search:</span>",
+                    "lengthMenu": "<span class='text-white text-small'>Show _MENU_ entries</span>",
+                    "info": "<span class='text-white small'>Showing _START_ to _END_ of _TOTAL_ entries</span>"
                 }
             });
 
-            $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2');
-            $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2');
+            // Clean styling for DataTables inputs
+            $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2 border-secondary text-white bg-dark');
+            $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2 bg-dark text-white border-secondary');
         });
 
-        function confirmDelete(callback) {
-            if (confirm('Are you sure you want to delete this fitness class?')) {
-                callback();
-            }
+        // Simple function to trigger SweetAlert and then submit the form
+        function submitDelete(id) {
+            confirmDelete(() => {
+                document.getElementById('delete-form-' + id).submit();
+            });
         }
     </script>
 }

@@ -1,5 +1,6 @@
 ﻿using FitHub.Web.Models.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FitHub.Web.Models.Domain;
 
@@ -22,6 +23,15 @@ public class Booking
 
     [Required]
     public DateTime BookingDate { get; set; } = DateTime.UtcNow;
+
+    // Snapshot of the price at the moment of booking (Historical Data)
+    [Required]
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal PaidPrice { get; set; }
+
+    // Optional notes for the instructor or the warrior
+    [MaxLength(500)]
+    public string? InternalNotes { get; set; }
 
     [Required]
     public BookingStatus Status { get; set; } = BookingStatus.Active;

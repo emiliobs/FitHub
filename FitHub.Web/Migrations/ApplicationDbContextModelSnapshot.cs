@@ -40,6 +40,13 @@ namespace FitHub.Web.Migrations
                     b.Property<int>("FitnessClassId")
                         .HasColumnType("int");
 
+                    b.Property<string>("InternalNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("PaidPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 

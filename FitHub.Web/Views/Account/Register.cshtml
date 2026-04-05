@@ -1,4 +1,5 @@
-﻿@model FitHub.Web.ViewModels.RegisterViewModel
+﻿@using FitHub.Web.Models.Domain
+@model FitHub.Web.ViewModels.RegisterViewModel
 
 @{
     ViewData["Title"] = "Join the Energy - Register";
@@ -56,9 +57,13 @@
                         <span class="input-group-text bg-dark border-danger text-danger">
                             <i class="bi bi-gem"></i>
                         </span>
-                        <select asp-for="SelectedPlan" asp-items="Model.AvailablePlans" class="form-select bg-dark  text-white">
-                            <option value="" disabled selected>-- Select your training level --</option>
+                        <select asp-for="SelectedPlan"asp-items="Html.GetEnumSelectList<SubscriptionType>()"
+                                class="form-select  border-danger text-white bg-black">
+                            <option value="" selected disabled>-- Select your training level --</option>
                         </select>
+                       @*  <select asp-for="SelectedPlan" asp-items="Model.AvailablePlans" class="form-select bg-dark  text-white">
+                            <option value="" disabled selected>-- Select your training level --</option>
+                        </select> *@
                     </div>
                     <span asp-validation-for="SelectedPlan" class="text-danger small"></span>
                     <p class="text-silver x-small mt-1">

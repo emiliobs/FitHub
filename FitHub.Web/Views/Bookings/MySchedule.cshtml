@@ -1,0 +1,114 @@
+﻿@model IEnumerable<FitHub.Web.Models.Domain.Booking>
+
+@{
+    ViewData["Title"] = "My Training Schedule";
+}
+
+<div class="container py-5 animate__animated animate__fadeIn">
+    
+    @* --- HEADER SECTION --- *@
+    <div class="d-flex justify-content-between align-items-end mb-5 border-bottom border-danger pb-3">
+        <div>
+            <h1 class="display-4 fw-black text-white mb-0 text-uppercase">
+                My <span class="text-danger">Battles</span>
+            </h1>
+            <p class="text-silver mb-0 tracking-wider">Your personal training agenda and upcoming missions.</p>
+        </div>
+        <a asp-controller="Bookings" asp-action="MySchedule" class="btn btn-outline-danger rounded-pill px-4 fw-bold shadow-neon-sm">
+            <i class="bi bi-plus-lg me-2"></i>BOOK MORE
+        </a>
+       @*  <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-outline-danger rounded-pill px-4 fw-bold shadow-neon-sm">
+            <i class="bi bi-plus-lg me-2"></i>BOOK MORE
+        </a> *@
+    </div>
+
+    @if (!Model.Any())
+    {
+        @* --- EMPTY STATE: When no bookings exist --- *@
+        <div class="text-center py-5 bg-glass-dark rounded-4 border border-secondary border-opacity-25 shadow-lg">
+            <div class="mb-4">
+                <i class="bi bi-calendar-x text-secondary opacity-25" style="font-size: 6rem;"></i>
+            </div>
+            <h3 class="text-white fw-bold">NO MISSIONS ASSIGNED</h3>
+            <p class="text-silver mb-4">You haven't reserved any classes yet. The arena is waiting for you!</p>
+            <a asp-controller="Bookings" asp-action="MySchedule" class="btn btn-fithub btn-lg px-5 shadow-neon-sm fw-black">
+                GO TO CLASSES
+            </a>            
+            @* <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-fithub btn-lg px-5 shadow-neon-sm fw-black">
+                GO TO CLASSES
+            </a> *@
+        </div>
+    }
+    else
+    {
+        @* --- BOOKINGS GRID --- *@
+        <div class="row g-4">
+            @foreach (var booking in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 bg-glass-dark border-danger border-opacity-25 shadow-neon-hover transform-hover" style="border-radius: 20px; overflow: hidden;">
+                        
+                        @* Card Header with Date Badge *@
+                        <div class="card-header bg-dark bg-opacity-50 border-bottom border-danger border-opacity-10 py-3 d-flex justify-content-between align-items-center">
+                            <span class="badge bg-danger text-uppercase fw-black px-3 py-2">
+                                <i class="bi bi-calendar3 me-1"></i> @booking.FitnessClass.ScheduleDate.ToString("MMM dd")
+                            </span>
+                            <span class="text-white fw-bold">
+                                <i class="bi bi-clock-fill text-danger me-1"></i> @booking.FitnessClass.ScheduleDate.ToString("HH:mm")
+                            </span>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <h4 class="text-white fw-bold mb-1">@booking.FitnessClass.Title</h4>
+                            <p class="text-danger small fw-bold text-uppercase tracking-widest mb-4">
+                                @booking.FitnessClass.Category?.Name
+                            </p>
+
+                            @* Instructor Info Section *@
+                            <div class="d-flex align-items-center mb-4 p-3 rounded-3 bg-black bg-opacity-40 border border-secondary border-opacity-10">
+                                <div class="p-2 rounded-circle bg-danger bg-opacity-10 me-3">
+                                    <i class="bi bi-person-workspace text-danger fs-4"></i>
+                                </div>
+                                <div>
+                                    <p class="text-silver small mb-0">Lead Instructor</p>
+                                    <p class="text-white fw-bold mb-0">@booking.FitnessClass.Instructor?.Name</p>
+                                </div>
+                            </div>
+
+                            @* Pricing / Status Snapshot *@
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <span class="text-silver small">Tactical Price:</span>
+                                <span class="text-white fw-bold">$@booking.PaidPrice</span>
+                            </div>
+
+                            @* Actions *@
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-secondary btn-sm rounded-pill opacity-50 cursor-default" disabled>
+                                    <i class="bi bi-qr-code-scan me-2"></i> READY FOR CHECK-IN
+                                </button>
+                               
+                                @* --- Inside the foreach loop for your bookings --- *@
+                                <form id="cancelForm-@booking.Id" asp-action="Cancel" method="post">
+                                    <input type="hidden" name="bookingId" value="@booking.Id" />
+    
+                                    @* We call your existing confirmDelete function passing the form submit as callback *@
+                                    <button type="button" 
+                                            onclick="confirmDelete(() => document.getElementById('cancelForm-@booking.Id').submit())" 
+                                            class="btn btn-link text-silver btn-sm text-decoration-none w-100 mt-2 hover-danger transition-all">
+                                        <i class="bi bi-x-circle me-1"></i> Cancel Reservation
+                                    </button>
+                                </form>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .hover-danger:hover { color: #ff4d4d !important; transform: scale(1.05); }
+    .transition-all { transition: all 0.3s ease; }
+</style>

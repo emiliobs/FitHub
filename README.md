@@ -34,7 +34,8 @@
 * **User Feedback:** Integration with **SweetAlert2** for success and error notifications.
 
 ## 📸 Screenshots
-<img width="388" height="742" alt="image" src="https://github.com/user-attachments/assets/bba408c1-361f-4e8a-a957-d5f4a3f22c1a" />
+<img width="449" height="752" alt="image" src="https://github.com/user-attachments/assets/da1c0f59-b349-4650-b180-e3e9a9074268" />
+
 
 
 ---

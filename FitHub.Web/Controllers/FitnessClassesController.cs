@@ -1,276 +1,260 @@
 using FitHub.Web.Data;
 using FitHub.Web.Models.Domain;
+using FitHub.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace FitHub.Web.Controllers
+namespace FitHub.Web.Controllers;
+
+[Authorize(Roles = "Admin, Manager")] // Only Admins and Managers can manage fitness classes
+public class FitnessClassesController : Controller
 {
-    public class FitnessClassesController : Controller
+    private readonly ApplicationDbContext _context;
+
+    public FitnessClassesController(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
+        this._context = context;
+    }
 
-        public FitnessClassesController(ApplicationDbContext context)
+    // GET: FitnessClasses
+    public async Task<IActionResult> Index()
+    {
+        // We include Category and Instructor to show their names in the list view
+        var clasees = await _context.FitnessClasses
+            .Include(f => f.Category)
+            .Include(f => f.Instructor)
+            .OrderByDescending(f => f.ScheduleDate)
+            .ToListAsync();
+
+        return View(clasees);
+    }
+
+    // GET: FitnessClasses/Details/5
+    public async Task<IActionResult> Create()
+    {
+        var viewModel = new FitnessClassViewModel
         {
-            _context = context;
-        }
-
-        // Helper to avoid repetition
-        private void PopulateDropdowns(int? selectedCategoryId = null, int? selectedInstructorId = null)
-        {
-            ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name", selectedCategoryId);
-            ViewBag.InstructorList = new SelectList(_context.Instructors, "Id", "Name", selectedInstructorId);
-        }
-
-        // GET: FitnessClasses - Public for browsing
-        public async Task<IActionResult> Index()
-        {
-            var fitnessClasses = await _context.FitnessClasses
-                .Include(f => f.Instructor)
-                .Include(f => f.Category)
-                .OrderBy(f => f.ScheduleDate)
-                .ToListAsync();
-            return View(fitnessClasses);
-        }
-
-        // GET: FitnessClasses/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var fitnessClass = await _context.FitnessClasses
-                .Include(f => f.Instructor)
-                .Include(f => f.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (fitnessClass == null)
-                return NotFound();
-
-            return View(fitnessClass);
-        }
-
-        // GET: FitnessClasses/Create
-        [Authorize(Roles = "Admin,Manager")]
-        public IActionResult Create()
-        {
-            PopulateDropdowns();
-            return View();
-        }
-
-        // POST: FitnessClasses/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Capacity,ScheduleDate,Price,InstructorId,CategoryId")] FitnessClass fitnessClass)
-        {
-            if (!ModelState.IsValid)
+            // Populating Dropdowns
+            Categories = await _context.Categories.Select(c => new SelectListItem
             {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                TempData["Error"] = "Validation errors: " + string.Join(", ", errors);
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
-            }
+                Value = c.Id.ToString(),
+                Text = c.Name
+            }).ToListAsync(),
 
-            if (fitnessClass.ScheduleDate <= DateTime.UtcNow)
+            Instructors = await _context.Instructors.Select(i => new SelectListItem
             {
-                ModelState.AddModelError("ScheduleDate", "Schedule date must be in the future.");
-                TempData["Error"] = "Schedule date must be in the future.";
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
-            }
+                Value = i.Id.ToString(),
+                Text = i.Name
+            }).ToListAsync()
+        };
 
-            var instructor = await _context.Instructors.FindAsync(fitnessClass.InstructorId);
-            if (instructor == null)
+        return View(viewModel);
+    }
+
+    // POST: FitnessClasses/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(FitnessClassViewModel fitnessClassViewModel)
+    {
+        try
+        {
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("InstructorId", "Selected instructor does not exist.");
-                TempData["Error"] = "Selected instructor does not exist.";
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
-            }
+                var newClass = new FitnessClass
+                {
+                    Title = fitnessClassViewModel.Title,
+                    Description = fitnessClassViewModel.Description,
+                    Capacity = fitnessClassViewModel.Capacity,
+                    ScheduleDate = fitnessClassViewModel.ScheduleDate,
+                    Price = fitnessClassViewModel.Price,
+                    CategoryId = fitnessClassViewModel.CategoryId,
+                    InstructorId = fitnessClassViewModel.InstructorId
+                };
 
-            var category = await _context.Categories.FindAsync(fitnessClass.CategoryId);
-            if (category == null)
+                _context.FitnessClasses.Add(newClass);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "New Fitness class created successfully!";
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"An error occurred while creating the fitness class: {ex.Message}";
+        }
+
+        // If validation fails, we must reload the dropdowns before returning the view
+        fitnessClassViewModel.Categories = await _context.Categories.Select(c => new SelectListItem
+        {
+            Value = c.Id.ToString(),
+            Text = c.Name
+        }).ToListAsync();
+
+        fitnessClassViewModel.Instructors = await _context.Instructors.Select(i => new SelectListItem
+        {
+            Value = i.Id.ToString(),
+            Text = i.Name
+        }).ToListAsync();
+
+        return View(fitnessClassViewModel);
+    }
+
+    // GET: FitnessClasses/Edit/5
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var fitnessClass = await _context.FitnessClasses.FindAsync(id);
+
+        if (fitnessClass is null)
+        {
+            return NotFound();
+        }
+
+        var viewModel = new FitnessClassViewModel
+        {
+            Id = fitnessClass.Id,
+            Title = fitnessClass.Title,
+            Description = fitnessClass.Description,
+            Capacity = fitnessClass.Capacity,
+            ScheduleDate = fitnessClass.ScheduleDate,
+            Price = fitnessClass.Price,
+            CategoryId = fitnessClass.CategoryId,
+            InstructorId = fitnessClass.InstructorId,
+
+            // Populating Dropdowns again for the edit view
+            Categories = await _context.Categories.Select(c => new SelectListItem
             {
-                ModelState.AddModelError("CategoryId", "Selected category does not exist.");
-                TempData["Error"] = "Selected category does not exist.";
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
-            }
+                Value = c.Id.ToString(),
+                Text = c.Name
+            }).ToListAsync(),
 
+            Instructors = await _context.Instructors.Select(i => new SelectListItem
+            {
+                Value = i.Id.ToString(),
+                Text = i.Name
+            }).ToListAsync()
+        };
+
+        return View(viewModel);
+    }
+
+    // POST: FitnessClasses/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, FitnessClassViewModel fitnessClassViewModel)
+    {
+        if (id != fitnessClassViewModel.Id)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
             try
             {
-                _context.Add(fitnessClass);
-                int result = await _context.SaveChangesAsync();
+                var fitnessClass = await _context.FitnessClasses.FindAsync(id);
 
-                if (result > 0)
+                if (fitnessClass is null)
                 {
-                    TempData["Success"] = "Fitness class created successfully!";
-                    return RedirectToAction(nameof(Index));
+                    return NotFound();
                 }
-                else
-                {
-                    TempData["Error"] = "Failed to save the class. Please try again.";
-                    PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                    return View(fitnessClass);
-                }
+
+                fitnessClass.Title = fitnessClassViewModel.Title;
+                fitnessClass.Description = fitnessClassViewModel.Description;
+                fitnessClass.Capacity = fitnessClassViewModel.Capacity;
+                fitnessClass.ScheduleDate = fitnessClassViewModel.ScheduleDate;
+                fitnessClass.Price = fitnessClassViewModel.Price;
+                fitnessClass.CategoryId = fitnessClassViewModel.CategoryId;
+                fitnessClass.InstructorId = fitnessClassViewModel.InstructorId;
+
+                _context.FitnessClasses.Update(fitnessClass);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Fitness session updated successfully!";
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Create Exception: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                TempData["Error"] = $"Error creating class: {ex.Message}";
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
+                TempData["Error"] = $"An error occurred while updating the fitness class: {ex.Message}";
             }
         }
 
-        // GET: FitnessClasses/Edit/5
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> Edit(int? id)
+        return View(fitnessClassViewModel);
+    }
+
+    // POST: FitnessClasses/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        try
         {
-            if (id == null)
-                return NotFound();
+            var fitnessClass = await _context.FitnessClasses
+                .Include(f => f.Bookings) // Critical to include related bookings to check for existing reservations
+                .FirstOrDefaultAsync(f => f.Id == id);
 
-            var fitnessClass = await _context.FitnessClasses.FindAsync(id);
-            if (fitnessClass == null)
-                return NotFound();
-
-            PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-            return View(fitnessClass);
-        }
-
-        // POST: FitnessClasses/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Capacity,ScheduleDate,Price,InstructorId,CategoryId")] FitnessClass fitnessClass)
-        {
-            if (id != fitnessClass.Id)
+            if (fitnessClass is null)
             {
-                TempData["Error"] = "ID mismatch. Please try again.";
+                TempData["Error"] = "The class you are trying to delete was not found.";
                 return RedirectToAction(nameof(Index));
             }
 
-            var instructor = await _context.Instructors.FindAsync(fitnessClass.InstructorId);
-            if (instructor == null)
+            // Prevent deletion if there are existing bookings to avoid orphaned records and maintain data integrity
+            if (fitnessClass.Bookings.Any())
             {
-                ModelState.AddModelError("InstructorId", "Selected instructor does not exist.");
-                TempData["Error"] = "Selected instructor does not exist.";
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
+                TempData["Error"] = $"Action Denied: You Cannot delete {fitnessClass.Title} because it has {fitnessClass.Bookings.Count} " +
+                                    $"Active reservations. Please cancel the booking first.";
+                return RedirectToAction(nameof(Index));
             }
 
-            var category = await _context.Categories.FindAsync(fitnessClass.CategoryId);
-            if (category == null)
-            {
-                ModelState.AddModelError("CategoryId", "Selected category does not exist.");
-                TempData["Error"] = "Selected category does not exist.";
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
-            }
+            _context.FitnessClasses.Remove(fitnessClass);
+            await _context.SaveChangesAsync();
 
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                TempData["Error"] = "Validation errors: " + string.Join(", ", errors);
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
-            }
-
-            try
-            {
-                var existingClass = await _context.FitnessClasses.FindAsync(id);
-                if (existingClass == null)
-                {
-                    TempData["Error"] = "Class not found in database.";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                existingClass.Title = fitnessClass.Title;
-                existingClass.Description = fitnessClass.Description;
-                existingClass.Capacity = fitnessClass.Capacity;
-                existingClass.ScheduleDate = fitnessClass.ScheduleDate;
-                existingClass.Price = fitnessClass.Price;
-                existingClass.InstructorId = fitnessClass.InstructorId;
-                existingClass.CategoryId = fitnessClass.CategoryId;
-
-                _context.Update(existingClass);
-                int result = await _context.SaveChangesAsync();
-
-                if (result > 0)
-                {
-                    TempData["Success"] = "Fitness class updated successfully!";
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    TempData["Error"] = "No changes were saved. Please try again.";
-                    PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                    return View(fitnessClass);
-                }
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                if (!FitnessClassExists(fitnessClass.Id))
-                {
-                    TempData["Error"] = "Class was deleted by another user.";
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    TempData["Error"] = $"Concurrency error: {ex.Message}";
-                    PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                    return View(fitnessClass);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Update Exception: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                TempData["Error"] = $"Error updating class: {ex.Message}";
-                PopulateDropdowns(fitnessClass.CategoryId, fitnessClass.InstructorId);
-                return View(fitnessClass);
-            }
+            TempData["Success"] = $"The training session {fitnessClass.Title} has been deleted successfully from the schedule!";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"A server error occurred while trying delete the fitness class: {ex.Message}";
         }
 
-        // GET: FitnessClasses/Delete/5
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-                return NotFound();
+        return RedirectToAction(nameof(Index));
+    }
 
+    // GET: FitnessClasses/Attendance/5
+    [Authorize(Roles = "Admin,Manager")]
+    [HttpGet]
+    public async Task<IActionResult> Attendance(int? id)
+    {
+        if (id is null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            // Deep Include: Class -> Bookings -> ApplicationUser
             var fitnessClass = await _context.FitnessClasses
-                .Include(f => f.Instructor)
-                .Include(f => f.Category)
+                .Include(c => c.Instructor)
+                .Include(c => c.Category)
+                .Include(c => c.Bookings)
+                .ThenInclude(b => b.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (fitnessClass == null)
+            if (fitnessClass is null)
+            {
                 return NotFound();
+            }
 
             return View(fitnessClass);
         }
-
-        // POST: FitnessClasses/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        catch (Exception ex)
         {
-            var fitnessClass = await _context.FitnessClasses.FindAsync(id);
-            if (fitnessClass != null)
-            {
-                _context.FitnessClasses.Remove(fitnessClass);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Fitness class deleted successfully!";
-            }
+            TempData["Error"] = $"An error occurred while retrieving attendance data: {ex.Message}";
+
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool FitnessClassExists(int id)
-        {
-            return _context.FitnessClasses.Any(e => e.Id == id);
         }
     }
 }

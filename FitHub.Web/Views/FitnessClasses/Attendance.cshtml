@@ -1,0 +1,103 @@
+﻿@model FitHub.Web.Models.Domain.FitnessClass
+
+@{
+    ViewData["Title"] = "Attendance - " + Model.Title;
+}
+
+<div class="container mt-5" style="min-height: 70vh;">
+    @* Header matching your Users Management style *@
+    <div class="card bg-glass-dark border-danger mb-4">
+        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="text-white fw-black mb-0">@Model.Title.ToUpper()</h2>
+                <p class="text-white-50 fw-bold mb-0">
+                    <i class="bi bi-person-badge me-1"></i> Instructor: @Model.Instructor?.Name
+                </p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-dark border border-danger text-danger px-3 py-2 fs-5">
+                    @Model.Bookings.Count / @Model.Capacity WARRIORS
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @* Reusing your bg-glass-dark and table-dark styles *@
+    <div class="card shadow-lg p-4 border-0 bg-glass-dark">
+        <div class="table-responsive">
+            <table id="attendanceTable" class="table table-dark table-hover bg-transparent mb-0">
+                <thead>
+                    <tr class="border-danger">
+                        <th class="text-danger fw-black small">WARRIOR INFO</th>
+                        <th class="text-danger fw-black small">EMAIL</th>
+                        <th class="text-center text-danger fw-black small">MEMBERSHIP</th>
+                        <th class="text-center text-danger fw-black small">ENROLLED ON</th>
+                    </tr>
+                </thead>
+                <tbody class="text-silver">
+                    @foreach (var booking in Model.Bookings)
+                    {
+                        <tr class="border-secondary align-middle">
+                            <td class="py-3">
+                                <div class="d-flex align-items-center">
+                                    @* Profile Photo with your existing logic *@
+                                    <img src="~/images/profiles/@(booking.ApplicationUser.Photo ?? "default-user.png")"
+                                         class="rounded-circle border border-danger me-3"
+                                         style="width: 40px; height: 40px; object-fit: cover;" />
+                                    <span class="fw-bold">@booking.ApplicationUser.FullName</span>
+                                </div>
+                            </td>
+                            <td class="small">@booking.ApplicationUser.Email</td>
+                            <td class="text-center">
+                                @{
+                                    // Reusing your color logic for Tiers
+                                    var badgeClass = booking.ApplicationUser.MembershipPlan switch
+                                    {
+                                        FitHub.Web.Models.Domain.SubscriptionType.Warrior => "bg-danger",
+                                        FitHub.Web.Models.Domain.SubscriptionType.Premium => "bg-warning text-dark",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @badgeClass fw-bold px-2 py-1" style="font-size: 0.7rem;">
+                                    @booking.ApplicationUser.MembershipPlan.ToString().ToUpper()
+                                </span>
+                            </td>
+                            <td class="text-center small">
+                                @booking.BookingDate.ToString("MMM dd, HH:mm")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-2"></i> BACK TO CLASSES
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    
+
+        <script>
+        $(document).ready(function () {
+            $('#attendanceTable').DataTable({
+                "responsive": true,
+                "pageLength": 5,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                "language": {
+                    "search": "<span class='text-white'>Search:</span>",
+                    "lengthMenu": "<span class='text-white text-small'>Show _MENU_ entries</span>",
+                    "info": "<span class='text-white small'>Showing _START_ to _END_ of _TOTAL_ entries</span>"
+                }
+            });
+
+            // Clean styling for DataTables inputs
+            $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2 border-secondary text-white bg-dark');
+            $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2 bg-dark text-white border-secondary');
+        });
+    </script>
+}
