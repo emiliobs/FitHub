@@ -22,6 +22,20 @@ public class Booking
     public virtual FitnessClass FitnessClass { get; set; } = null!;
 
     [Required]
+    [StringLength(32)]
+    public string EnrollmentReference { get; set; } = Guid.NewGuid().ToString("N");
+
+    // Optional links to billing/subscription records created at checkout.
+    public int? SubscriptionId { get; set; }
+    public int? PaymentId { get; set; }
+    public int? InvoiceId { get; set; }
+
+    public virtual Subscription? Subscription { get; set; }
+    public virtual Payment? Payment { get; set; }
+    public virtual Invoice? Invoice { get; set; }
+    public virtual BookingCheckIn? BookingCheckIn { get; set; }
+
+    [Required]
     public DateTime BookingDate { get; set; } = DateTime.UtcNow;
 
     // Snapshot of the price at the moment of booking (Historical Data)

@@ -1,0 +1,39 @@
+@model IEnumerable<FitHub.Web.Models.Domain.Subscription>
+
+@{
+    ViewData["Title"] = "Subscription History";
+}
+
+<div class="container py-5">
+    <h2 class="text-white mb-4">Subscription History</h2>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Category</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.FitnessClass.Title</td>
+                        <td>@item.Category.Name</td>
+                        <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
+                        <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
+                        <td>@(item.IsActive ? "Active" : "Inactive")</td>
+                        <td>@item.PriceAtPurchase.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

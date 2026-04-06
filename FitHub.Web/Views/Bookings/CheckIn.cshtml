@@ -1,0 +1,60 @@
+@model FitHub.Web.ViewModels.BookingCheckInViewModel
+
+@{
+    ViewData["Title"] = "Check-In QR";
+}
+
+<div class="container py-5" style="min-height: 70vh;">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card bg-glass-dark border-danger border-opacity-25 shadow-lg">
+                <div class="card-body text-center p-4">
+                    <h3 class="text-white fw-bold mb-2">Ready for Check-In</h3>
+                    <p class="text-silver mb-1">@Model.ClassTitle</p>
+                    <p class="text-silver small mb-3">Enrollment ID: <span class="text-white">@Model.EnrollmentReference</span></p>
+                    <p class="text-silver small mb-1">Local: <span id="checkInLocalTime" data-utc="@Model.ScheduleDateUtc.ToString("O")">--</span></p>
+                    <p class="text-silver small mb-4">IST: <span id="checkInIstTime" data-utc="@Model.ScheduleDateUtc.ToString("O")">--</span></p>
+
+                    <img src="@Model.QrImageUrl"
+                         alt="Check-In QR"
+                         class="img-fluid rounded border border-danger mb-3"
+                         style="max-width: 320px;" />
+
+                    <p class="text-silver small mb-3">Scan this QR once to mark attendance as present.</p>
+                    <div class="d-grid gap-2">
+                        <a href="@Model.RedeemUrl" class="btn btn-fithub fw-bold">Redeem on this device</a>
+                        <a asp-action="MySchedule" class="btn btn-outline-light">Back to My Schedule</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const local = document.getElementById('checkInLocalTime');
+            const ist = document.getElementById('checkInIstTime');
+            if (!local || !ist) {
+                return;
+            }
+
+            const utcValue = local.getAttribute('data-utc');
+            if (!utcValue) {
+                return;
+            }
+
+            const dt = new Date(utcValue);
+            if (Number.isNaN(dt.getTime())) {
+                return;
+            }
+
+            const browserZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+            local.textContent = `${dt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} (${browserZone})`;
+            ist.textContent = dt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' });
+        })();
+    </script>
+}
+
+

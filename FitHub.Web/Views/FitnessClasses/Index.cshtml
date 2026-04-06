@@ -10,10 +10,13 @@
         <h2 class="text-white fw-bold">
             <i class="bi bi-calendar-week text-danger"></i> Training Sessions
         </h2>
-        
-        <a asp-action="Create" class="btn btn-fithub px-4 shadow-neon-sm text-uppercase fw-bold">
-            <i class="bi bi-plus-circle me-1"></i> Add New Class
-        </a>
+
+        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-fithub px-4 shadow-neon-sm text-uppercase fw-bold">
+                <i class="bi bi-plus-circle me-1"></i> Add New Class
+            </a>
+        }
     </div>
      
     <div class="card shadow-lg p-4 border-0 bg-glass-dark">
@@ -50,13 +53,13 @@
                             </td>
                             
                             <td class="text-center small">
-                                <div class="text-white">@item.ScheduleDate.ToString("MMM dd, yyyy")</div>
-                                <div class="text-danger fw-bold">@item.ScheduleDate.ToString("HH:mm") HRS</div>
+                                <div class="text-white js-local-time" data-utc="@item.ScheduleDate.ToString("O")">--</div>
+                                <div class="text-danger fw-bold js-ist-time" data-utc="@item.ScheduleDate.ToString("O")">--</div>
                             </td>
 
                             <td class="text-center">
                                 <span class="badge bg-dark border border-secondary px-3">
-                                    @item.Bookings.Count / @item.Capacity
+                                    @item.ActiveBookingsCount / @item.Capacity
                                 </span>
                             </td>
                             
@@ -64,14 +67,11 @@
 
                             <td class="text-center">
                                 <div class="d-flex justify-content-center align-items-center gap-2">
-                                    
+
                                     @* 1. PUBLIC ACTION: Reserve (For all logged-in warriors) *@
-                                    <form asp-controller="Bookings" asp-action="Cancel" method="post">
-                                        <input type="hidden" name="classId" value="@item.Id" />
-                                        <button type="submit" class="btn btn-fithub btn-sm rounded-pill px-3 shadow-neon-sm">
-                                            Reserve
-                                        </button>
-                                    </form>
+                                    <a asp-controller="Bookings" asp-action="Reserve" asp-route-classId="@item.Id" class="btn btn-fithub btn-sm rounded-pill px-3 shadow-neon-sm">
+                                        Reserve
+                                    </a>
 
                                     @* 2. ADMIN ACTIONS: Attendance, Edit, and Delete *@
                                     @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
@@ -124,6 +124,36 @@
             // Clean styling for DataTables inputs
             $('.dataTables_filter input').addClass('form-control fithub-input-sm d-inline-block w-auto ms-2 border-secondary text-white bg-dark');
             $('.dataTables_length select').addClass('form-select fithub-input-sm d-inline-block w-auto mx-2 bg-dark text-white border-secondary');
+
+            const browserZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+
+            document.querySelectorAll('.js-local-time').forEach((el) => {
+                const utcValue = el.getAttribute('data-utc');
+                if (!utcValue) {
+                    return;
+                }
+
+                const dt = new Date(utcValue);
+                if (Number.isNaN(dt.getTime())) {
+                    return;
+                }
+
+                el.textContent = dt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) + ` (${browserZone})`;
+            });
+
+            document.querySelectorAll('.js-ist-time').forEach((el) => {
+                const utcValue = el.getAttribute('data-utc');
+                if (!utcValue) {
+                    return;
+                }
+
+                const dt = new Date(utcValue);
+                if (Number.isNaN(dt.getTime())) {
+                    return;
+                }
+
+                el.textContent = `IST: ${dt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' })}`;
+            });
         });
 
         // Simple function to trigger SweetAlert and then submit the form

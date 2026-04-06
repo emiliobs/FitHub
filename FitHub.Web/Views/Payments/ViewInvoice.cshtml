@@ -1,0 +1,26 @@
+@model FitHub.Web.Models.Domain.Invoice
+
+@{
+    ViewData["Title"] = "Invoice";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white">Invoice @Model.InvoiceNumber</h2>
+        <a asp-action="DownloadInvoice" asp-route-invoiceId="@Model.Id" class="btn btn-danger">Download</a>
+    </div>
+
+    <div class="card bg-dark text-light border-secondary">
+        <div class="card-body">
+            <p><strong>Issue Date:</strong> @Model.IssueDate.ToString("yyyy-MM-dd")</p>
+            <p><strong>Due Date:</strong> @Model.DueDate.ToString("yyyy-MM-dd")</p>
+            <p><strong>Description:</strong> @Model.Description</p>
+            <hr />
+            <p><strong>Subtotal:</strong> @Model.Subtotal.ToString("C")</p>
+            <p><strong>Tax:</strong> @Model.TaxAmount.ToString("C")</p>
+            <p><strong>Total:</strong> @Model.TotalAmount.ToString("C")</p>
+            <p><strong>Status:</strong> @(Model.IsPaid ? "Paid" : "Pending")</p>
+        </div>
+    </div>
+</div>
+

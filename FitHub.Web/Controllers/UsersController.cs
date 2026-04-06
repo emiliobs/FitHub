@@ -1,4 +1,5 @@
 ﻿using FitHub.Web.Models.Identity;
+using FitHub.Web.Services;
 using FitHub.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,11 +13,16 @@ public class UsersController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly IInstructorSyncService _instructorSyncService;
 
-    public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+    public UsersController(
+        UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole> roleManager,
+        IInstructorSyncService instructorSyncService)
     {
         this._userManager = userManager;
         this._roleManager = roleManager;
+        this._instructorSyncService = instructorSyncService;
     }
 
     public async Task<IActionResult> Index()
@@ -51,6 +57,12 @@ public class UsersController : Controller
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(newRole) || !await _roleManager.RoleExistsAsync(newRole))
+            {
+                TempData["Error"] = "Invalid role selected.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
@@ -75,6 +87,16 @@ public class UsersController : Controller
 
             if (resul.Succeeded)
             {
+                if (newRole == "Instructor")
+                {
+                    var syncResult = await _instructorSyncService.EnsureInstructorForUserAsync(user);
+                    if (!syncResult.Succeeded)
+                    {
+                        TempData["Error"] = syncResult.ErrorMessage ?? "Role updated, but instructor profile sync failed.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
                 TempData["Success"] = $"Role updated to  -:{newRole}:- successfully for {user.FullName}.";
             }
             else

@@ -1,0 +1,40 @@
+@model FitHub.Web.Models.Domain.Payment
+
+@{
+    ViewData["Title"] = "Payment Details";
+}
+
+<div class="container py-5">
+    <h2 class="text-white mb-4">Payment Details</h2>
+
+    <div class="card bg-dark text-light border-secondary">
+        <div class="card-body">
+            <p><strong>Transaction:</strong> @Model.TransactionId</p>
+            <p><strong>Status:</strong> @Model.Status</p>
+            <p><strong>Amount:</strong> @Model.Amount.ToString("C")</p>
+            <p><strong>Date:</strong> @Model.PaymentDate.ToString("yyyy-MM-dd HH:mm")</p>
+            <p><strong>Method:</strong> @Model.PaymentMethod</p>
+            <p><strong>Notes:</strong> @Model.Notes</p>
+        </div>
+        <div class="card-footer bg-transparent border-0 d-flex gap-2">
+            @if (Model.Status == FitHub.Web.Models.Domain.PaymentStatus.Failed)
+            {
+                <form asp-action="Retry" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="paymentId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-warning">Retry Payment</button>
+                </form>
+            }
+            @if (Model.Status == FitHub.Web.Models.Domain.PaymentStatus.Completed)
+            {
+                <form asp-action="Refund" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="paymentId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-outline-danger">Request Refund</button>
+                </form>
+            }
+            <a asp-action="History" class="btn btn-outline-light">Back</a>
+        </div>
+    </div>
+</div>
+

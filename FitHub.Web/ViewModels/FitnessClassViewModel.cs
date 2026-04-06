@@ -25,6 +25,9 @@ public class FitnessClassViewModel
     [DataType(DataType.DateTime)]
     public DateTime ScheduleDate { get; set; } = DateTime.Now.AddDays(1);
 
+    public string BrowserTimeZone { get; set; } = string.Empty;
+    public int BrowserUtcOffsetMinutes { get; set; }
+
     [Required(ErrorMessage = "Price is mandatory (use 0 for free classes)")]
     [Range(0, 999.99, ErrorMessage = "Price must be between 0 and 999.99")]
     [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]

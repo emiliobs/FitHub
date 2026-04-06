@@ -21,6 +21,16 @@ namespace FitHub.Web.Controllers
             return View();
         }
 
+        public IActionResult GetStarted()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Index", "FitnessClasses");
+            }
+
+            return RedirectToAction(nameof(Pricing));
+        }
+
         [Route("/Home/HandleError/{code}")]
         public IActionResult HandleError(int code)
         {

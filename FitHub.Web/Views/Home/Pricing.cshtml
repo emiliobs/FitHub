@@ -1,23 +1,21 @@
 ﻿@{
-    ViewData["Title"] = "Warrior Membership Plans";
+    ViewData["Title"] = "Training Sessions";
+    var goToClasses = User.Identity?.IsAuthenticated == true;
+
+    var ctaController = goToClasses ? "FitnessClasses" : "Account";
+    var ctaAction = goToClasses ? "Index" : "Register";
 }
 
 <div class="container py-5 animate__animated animate__fadeInUp">
-    
-    @* --- HEADER --- *@
-    <div class="text-center mb-5">
-        <h1 class="display-3 fw-bold text-white mb-0">
-            CHOOSE YOUR <span class="text-danger">BATTLE</span>
-        </h1>
-        <h3 class="fw-light text-silver border-bottom border-danger d-inline-block pb-3 px-4 text-uppercase tracking-wider">
-            Select the membership that unlocks your potential
-        </h3>
-    </div>
 
+    @* --- HEADER --- *@
+        <h1 class="display-3 fw-bold text-white mb-0">
+            CHOOSE YOUR <span class="text-danger">TRAINING</span>
+        </h1>
     @* --- PRICING GRID --- *@
     <div class="row g-4 align-items-stretch justify-content-center">
 
-        @* --- BASIC PLAN --- *@
+        @* --- BASIC TRACK --- *@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100 bg-glass-dark border-secondary p-4 shadow-lg transform-hover">
                 <div class="text-center mb-4">
@@ -26,25 +24,25 @@
                     <p class="text-secondary small text-uppercase tracking-widest mt-0">Casual Training</p>
                     <h2 class="text-danger fw-black display-5 mt-3">£19.99<span class="fs-6 text-silver">/mo</span></h2>
                 </div>
-                
+
                 <hr class="border-secondary opacity-25">
-                
+
                 <ul class="list-unstyled mt-4 text-silver space-y-2">
                     <li><i class="bi bi-check2 text-danger me-2"></i> Standard Gym Access</li>
                     <li><i class="bi bi-check2 text-danger me-2"></i> 1 Fitness Class/mo</li>
                     <li><i class="bi bi-x text-muted me-2"></i> 24/7 Access</li>
                     <li><i class="bi bi-x text-muted me-2"></i> Personal Trainer</li>
                 </ul>
-                
+
                 <div class="mt-auto pt-4">
-                    <a asp-controller="Account" asp-action="Register" asp-route-planId="Basic" class="btn btn-outline-danger w-100 py-3 fw-bold">
-                        JOIN THE TRIBE
+                    <a asp-controller="@ctaController" asp-action="@ctaAction" class="btn btn-outline-danger w-100 py-3 fw-bold">
+                        @(goToClasses ? "GO TO CLASSES" : "JOIN FITHUB")
                     </a>
                 </div>
             </div>
         </div>
 
-        @* --- WARRIOR PLAN (HIGHLIGHTED) --- *@
+        @* --- WARRIOR TRACK (HIGHLIGHTED) --- *@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100 bg-glass-dark border-danger p-4 shadow-neon transform-hover position-relative overflow-hidden">
                 @* Most Popular Badge *@
@@ -58,25 +56,30 @@
                     <p class="text-danger fw-bold text-uppercase small tracking-widest mt-0">Unleash the Beast</p>
                     <h2 class="text-danger fw-black display-5 mt-3">£59.99<span class="fs-6 text-silver">/mo</span></h2>
                 </div>
-                
+
                 <hr class="border-danger opacity-25">
-                
+
                 <ul class="list-unstyled mt-4 text-silver space-y-2 fw-medium">
                     <li><i class="bi bi-shield-fill-check text-danger me-2"></i> 24/7 Premium Access</li>
                     <li><i class="bi bi-shield-fill-check text-danger me-2"></i> Unlimited Fitness Classes</li>
                     <li><i class="bi bi-shield-fill-check text-danger me-2"></i> Monthly Personal Trainer Session</li>
                     <li><i class="bi bi-shield-fill-check text-danger me-2"></i> Priority Booking</li>
                 </ul>
-                
+
                 <div class="mt-auto pt-4">
-                    <a asp-controller="Account" asp-action="Register" asp-route-planId="Warrior" class="btn btn-fithub w-100 py-3 fw-black fs-5 shadow-neon-sm">
-                        BECOME A WARRIOR
+                    <a asp-controller="@ctaController" asp-action="@ctaAction" class="btn btn-fithub w-100 py-3 fw-black fs-5 shadow-neon-sm">
+                        @(goToClasses ? "GO TO CLASSES" : "CREATE ACCOUNT")
+                    </a>
+                </div>
+                <div class="mt-3">
+                    <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-fithub w-100 py-3 fw-bold">
+                        Go to Training Sessions
                     </a>
                 </div>
             </div>
         </div>
 
-        @* --- PREMIUM PLAN --- *@
+        @* --- PREMIUM TRACK --- *@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100 bg-glass-dark border-info p-4 shadow-lg transform-hover">
                 <div class="text-center mb-4">
@@ -85,19 +88,19 @@
                     <p class="text-info fw-bold text-uppercase small tracking-widest mt-0">Total Training Mastery</p>
                     <h2 class="text-danger fw-black display-5 mt-3">£99.99<span class="fs-6 text-silver">/mo</span></h2>
                 </div>
-                
+
                 <hr class="border-info opacity-25">
-                
+
                 <ul class="list-unstyled mt-4 text-silver space-y-2">
                     <li><i class="bi bi-check2 text-info me-2"></i> All Warrior Plan Features</li>
                     <li><i class="bi bi-check2 text-info me-2"></i> Weekly Personal Trainer</li>
                     <li><i class="bi bi-check2 text-info me-2"></i> Nutritional Coaching</li>
                     <li><i class="bi bi-check2 text-info me-2"></i> Access to Spa & Recovery</li>
                 </ul>
-                
+
                 <div class="mt-auto pt-4">
-                    <a asp-controller="Account" asp-action="Register" asp-route-planId="Premium" class="btn btn-outline-info w-100 py-3 fw-bold">
-                        UPGRADE MY BATTLE
+                    <a asp-controller="@ctaController" asp-action="@ctaAction" class="btn btn-outline-info w-100 py-3 fw-bold">
+                        @(goToClasses ? "GO TO CLASSES" : "GET STARTED")
                     </a>
                 </div>
             </div>
@@ -108,7 +111,7 @@
     @* --- NOTE SECTION --- *@
     <div class="text-center mt-5 pt-4 border-top border-secondary border-opacity-10">
         <p class="text-silver small">
-            <i class="bi bi-info-circle text-danger me-2"></i> All plans are subject to our terms of service. Prices are listed in USD.
+            <i class="bi bi-info-circle text-danger me-2"></i> Reserve any class to activate class-based subscription, payment, and invoice history.
             <a href="#" class="text-danger fw-bold text-decoration-none ms-1">View Full Terms</a>
         </p>
     </div>

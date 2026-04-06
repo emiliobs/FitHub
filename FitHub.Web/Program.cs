@@ -1,5 +1,7 @@
 using FitHub.Web.Data;
 using FitHub.Web.Models.Identity;
+using FitHub.Web.Options;
+using FitHub.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.WebRequestMethods;
@@ -35,6 +37,15 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 }).AddEntityFrameworkStores<ApplicationDbContext>()
   .AddDefaultTokenProviders();
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanManageClasses", policy =>
+        policy.RequireRole("Admin", "Manager"));
+
+    options.AddPolicy("CanManageBilling", policy =>
+        policy.RequireRole("Admin", "Manager"));
+});
+
 // Configurar la ruta del Login (Importante para que [Authorize] sepa a dónde ir)
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -43,8 +54,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 // Add services to the container.
+builder.Services.Configure<StripeOptions>(builder.Configuration.GetSection(StripeOptions.SectionName));
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<IInstructorSyncService, InstructorSyncService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline (Middleware)

@@ -1,11 +1,11 @@
 ﻿using FitHub.Web.Data;
 using FitHub.Web.Models.Domain;
 using FitHub.Web.Models.Identity;
+using FitHub.Web.Services;
 using FitHub.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FitHub.Web.Controllers;
 
@@ -14,14 +14,17 @@ public class AccountController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IInstructorSyncService _instructorSyncService;
 
     public AccountController(UserManager<ApplicationUser> userManager,
                              SignInManager<ApplicationUser> signInManager,
-                             IWebHostEnvironment webHostEnvironment)
+                             IWebHostEnvironment webHostEnvironment,
+                             IInstructorSyncService instructorSyncService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _webHostEnvironment = webHostEnvironment;
+        _instructorSyncService = instructorSyncService;
     }
 
     // GET: /Account/Login
@@ -73,18 +76,12 @@ public class AccountController : Controller
 
     public IActionResult Register()
     {
-        // Populate the list of plans from the SubscriptionType Enum
-        var plan = new RegisterViewModel
+        if (User.Identity?.IsAuthenticated == true)
         {
-            AvailablePlans = Enum.GetValues(typeof(SubscriptionType))
-                .Cast<SubscriptionType>()
-                .Select(p => new SelectListItem
-                {
-                    Value = p.ToString(),
-                    Text = p.ToString()
-                })
-        };
-        return View(plan);
+            return RedirectToAction("Index", "FitnessClasses");
+        }
+
+        return View(new RegisterViewModel());
     }
 
     [HttpPost]
@@ -106,11 +103,8 @@ public class AccountController : Controller
                     LastName = registerViewModel.LastName,
                     Photo = uniqueFileNamePhoto,
                     RegistrationDate = DateTime.UtcNow,
-                    MembershipPlan = registerViewModel.SelectedPlan,
-                    // Assign 30 days if a plan is chosen, otherwise null
-                    SubscriptionEndDate = registerViewModel.SelectedPlan != SubscriptionType.None
-                                      ? DateTime.UtcNow.AddDays(30)
-                                      : null
+                    MembershipPlan = SubscriptionType.None,
+                    SubscriptionEndDate = null
                 };
 
                 var result = await _userManager.CreateAsync(user, registerViewModel.Password);
@@ -135,11 +129,6 @@ public class AccountController : Controller
         {
             TempData["Error"] = $"Error register member: {ex.Message}";
         }
-
-        // If we reach here, something failed; reload the plans for the view
-        registerViewModel.AvailablePlans = Enum.GetValues(typeof(SubscriptionType))
-        .Cast<SubscriptionType>()
-        .Select(p => new SelectListItem { Value = ((int)p).ToString(), Text = p.ToString() });
 
         return View(registerViewModel);
     }
@@ -205,6 +194,16 @@ public class AccountController : Controller
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    if (await _userManager.IsInRoleAsync(user, "Instructor"))
+                    {
+                        var syncResult = await _instructorSyncService.EnsureInstructorForUserAsync(user);
+                        if (!syncResult.Succeeded)
+                        {
+                            TempData["Error"] = syncResult.ErrorMessage ?? "Profile updated, but instructor profile sync failed.";
+                            return RedirectToAction(nameof(MyProfile));
+                        }
+                    }
+
                     TempData["Success"] = "Your profile has been updated successfully!";
                     return RedirectToAction("Index", "Home");
                 }

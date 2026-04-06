@@ -21,6 +21,8 @@
 
             <div class="card bg-glass-dark border-0 shadow-lg p-4">
                 <form asp-action="Create" method="post">
+                    <input type="hidden" asp-for="BrowserTimeZone" id="browserTimeZone" />
+                    <input type="hidden" asp-for="BrowserUtcOffsetMinutes" id="browserUtcOffsetMinutes" />
                     <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
                     <div class="row">
@@ -41,8 +43,12 @@
                             <div class="row">
                                 <div class="col-6 mb-4">
                                     <label asp-for="ScheduleDate" class="text-silver small fw-bold mb-2 text-uppercase">Date & Time</label>
-                                    <input asp-for="ScheduleDate" type="datetime-local" class="form-control fithub-input-sm  border-start-0 ps-0" />
+                                    <input asp-for="ScheduleDate" type="datetime-local" id="scheduleDateInput" class="form-control fithub-input-sm  border-start-0 ps-0" />
                                     <span asp-validation-for="ScheduleDate" class="text-danger x-small"></span>
+                                    <div class="text-silver x-small mt-2">
+                                        <div id="browserTimeLabel"></div>
+                                        <div id="istTimeLabel"></div>
+                                    </div>
                                 </div>
                                 <div class="col-6 mb-4">
                                     <label asp-for="Price" class="text-silver small fw-bold mb-2 text-uppercase">Access Price ($)</label>
@@ -97,4 +103,67 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const tzField = document.getElementById('browserTimeZone');
+            const offsetField = document.getElementById('browserUtcOffsetMinutes');
+            const scheduleInput = document.getElementById('scheduleDateInput');
+            const localLabel = document.getElementById('browserTimeLabel');
+            const istLabel = document.getElementById('istTimeLabel');
+
+            if (tzField) {
+                tzField.value = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            }
+
+            if (offsetField) {
+                offsetField.value = String(new Date().getTimezoneOffset());
+            }
+
+            const toDateFromInput = (value) => {
+                if (!value) {
+                    return null;
+                }
+
+                const localDate = new Date(value);
+                return Number.isNaN(localDate.getTime()) ? null : localDate;
+            };
+
+            const renderLabels = () => {
+                if (!scheduleInput || !localLabel || !istLabel) {
+                    return;
+                }
+
+                const selected = toDateFromInput(scheduleInput.value);
+                if (!selected) {
+                    localLabel.textContent = '';
+                    istLabel.textContent = '';
+                    return;
+                }
+
+                const browserZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Browser Zone';
+                const localText = selected.toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short'
+                });
+
+                const istText = selected.toLocaleString('en-IN', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                    timeZone: 'Asia/Kolkata'
+                });
+
+                localLabel.textContent = `Local (${browserZone}): ${localText}`;
+                istLabel.textContent = `IST (Asia/Kolkata): ${istText}`;
+            };
+
+            if (scheduleInput && !scheduleInput.value) {
+                const now = new Date();
+                now.setHours(now.getHours() + 1, 0, 0, 0);
+                scheduleInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            }
+
+            scheduleInput?.addEventListener('change', renderLabels);
+            renderLabels();
+        })();
+    </script>
 }

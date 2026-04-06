@@ -1,0 +1,127 @@
+@model FitHub.Web.ViewModels.ReserveCheckoutViewModel
+
+@{
+    ViewData["Title"] = "Reserve Class";
+}
+
+<div class="container py-5" style="min-height: 70vh;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold mb-0">
+            <i class="bi bi-credit-card-2-front me-2 text-danger"></i>Checkout
+        </h2>
+        <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-outline-light btn-sm">Back to Classes</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card bg-glass-dark border-0 shadow-lg">
+                <div class="card-body">
+                    <h4 class="text-white mb-1">@Model.ClassTitle</h4>
+                    <p class="text-danger text-uppercase small fw-bold mb-4">@Model.CategoryName</p>
+
+                    <div class="row g-3 small mb-4">
+                        <div class="col-sm-6 text-silver">
+                            <i class="bi bi-person-workspace me-1"></i> @Model.InstructorName
+                        </div>
+                        <div class="col-sm-6 text-silver">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            <span id="reserveLocalSchedule" data-utc="@Model.ScheduleDate.ToString("O")">--</span>
+                            <div class="x-small" id="reserveIstSchedule"></div>
+                        </div>
+                        <div class="col-sm-6 text-silver">
+                            <i class="bi bi-people me-1"></i> Seats: @Model.ActiveBookings / @Model.Capacity
+                        </div>
+                        <div class="col-sm-6 text-white fw-bold">
+                            <i class="bi bi-cash-stack me-1 text-danger"></i> @Model.Price.ToString("C")
+                        </div>
+                    </div>
+
+                    <form asp-action="Reserve" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="FitnessClassId" />
+
+                        @if (Model.IsFreeAccess)
+                        {
+                            <div class="mb-3 text-silver small">
+                                No payment is required for this reservation. Your spot will be added immediately.
+                            </div>
+
+                            <button type="submit" class="btn btn-fithub px-4 fw-bold">
+                                <i class="bi bi-person-check-fill me-1"></i>Join for Free
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="mb-3 text-silver small">
+                                Secure checkout powered by Stripe (UK). You will be redirected to complete payment.
+                            </div>
+
+                            <button type="submit" class="btn btn-fithub px-4 fw-bold">
+                                <i class="bi bi-lock-fill me-1"></i>Pay Securely
+                            </button>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card bg-dark border-secondary">
+                <div class="card-body">
+                    <h5 class="text-white">@(Model.IsFreeAccess ? "After Joining" : "After Payment")</h5>
+                    <ul class="text-silver small mb-3">
+                        @if (Model.IsFreeAccess)
+                        {
+                            <li>No payment is captured.</li>
+                            <li>The class appears in your schedule immediately.</li>
+                            <li>You can still check in and view the class later from your schedule.</li>
+                        }
+                        else
+                        {
+                            <li>One transaction entry is created.</li>
+                            <li>An invoice is generated instantly.</li>
+                            <li>The class appears in your schedule.</li>
+                        }
+                    </ul>
+
+                    <div class="d-grid gap-2">
+                        @if (!Model.IsFreeAccess)
+                        {
+                            <a asp-controller="Payments" asp-action="History" class="btn btn-outline-light btn-sm">Transactions</a>
+                            <a asp-controller="Payments" asp-action="Invoices" class="btn btn-outline-danger btn-sm">Invoices</a>
+                            <a asp-controller="Subscriptions" asp-action="History" class="btn btn-outline-info btn-sm">Subscription History</a>
+                        }
+                        <a asp-controller="Bookings" asp-action="MySchedule" class="btn btn-outline-success btn-sm">My Schedule</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const local = document.getElementById('reserveLocalSchedule');
+            const ist = document.getElementById('reserveIstSchedule');
+            if (!local || !ist) {
+                return;
+            }
+
+            const utcValue = local.getAttribute('data-utc');
+            if (!utcValue) {
+                return;
+            }
+
+            const dt = new Date(utcValue);
+            if (Number.isNaN(dt.getTime())) {
+                return;
+            }
+
+            const browserZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+            local.textContent = `${dt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} (${browserZone})`;
+            ist.textContent = `IST: ${dt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' })}`;
+        })();
+    </script>
+}
+

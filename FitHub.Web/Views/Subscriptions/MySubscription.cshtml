@@ -1,0 +1,40 @@
+@model FitHub.Web.Models.Domain.Subscription?
+
+@{
+    ViewData["Title"] = "My Subscription";
+}
+
+<div class="container py-5">
+    <h2 class="text-white mb-4">My Subscription</h2>
+
+    @if (Model == null)
+    {
+        <div class="alert alert-info">No active subscription found.</div>
+            <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-danger">Browse Classes</a>
+    }
+    else
+    {
+        <div class="card bg-dark text-light border-secondary">
+            <div class="card-body">
+                    <h4>@Model.FitnessClass.Title</h4>
+                    <p>Category: @Model.Category.Name</p>
+                <p>Started: @Model.StartDate.ToString("yyyy-MM-dd")</p>
+                <p>Ends: @Model.EndDate.ToString("yyyy-MM-dd")</p>
+                <p>Status: @(Model.IsCurrentlyActive ? "Active" : "Inactive")</p>
+                <p>Auto renew: @(Model.AutoRenew ? "Enabled" : "Disabled")</p>
+                <p>Price: @Model.PriceAtPurchase.ToString("C")</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex gap-2">
+                <form asp-action="Cancel" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="subscriptionId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-outline-warning">Cancel Subscription</button>
+                </form>
+                <a asp-action="History" class="btn btn-outline-light">View History</a>
+                <a asp-controller="Payments" asp-action="Invoices" class="btn btn-danger">My Invoices</a>
+            </div>
+        </div>
+    }
+</div>
+
+

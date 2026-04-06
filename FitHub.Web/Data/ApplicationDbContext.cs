@@ -21,6 +21,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Instructor> Instructors { get; set; }
     public DbSet<FitnessClass> FitnessClasses { get; set; }
     public DbSet<Booking> Bookings { get; set; }
+    public DbSet<BookingCheckIn> BookingCheckIns { get; set; }
+    public DbSet<Subscription> Subscriptions { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -45,6 +49,36 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .HasOne(b => b.FitnessClass)
                 .WithMany(c => c.Bookings)
                 .HasForeignKey(b => b.FitnessClassId);
+
+            builder.Entity<Booking>()
+                .HasIndex(b => b.EnrollmentReference)
+                .IsUnique();
+
+            builder.Entity<BookingCheckIn>()
+                .HasIndex(ci => ci.BookingId)
+                .IsUnique();
+
+            builder.Entity<BookingCheckIn>()
+                .HasIndex(ci => ci.QrToken)
+                .IsUnique();
+
+            builder.Entity<BookingCheckIn>()
+                .HasOne(ci => ci.Booking)
+                .WithOne(b => b.BookingCheckIn)
+                .HasForeignKey<BookingCheckIn>(ci => ci.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<BookingCheckIn>()
+                .HasOne(ci => ci.ApplicationUser)
+                .WithMany()
+                .HasForeignKey(ci => ci.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<BookingCheckIn>()
+                .HasOne(ci => ci.FitnessClass)
+                .WithMany()
+                .HasForeignKey(ci => ci.FitnessClassId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // <ake Instructor Email Unique to prevent duplicates and ensure data integrity
             builder.Entity<Instructor>()

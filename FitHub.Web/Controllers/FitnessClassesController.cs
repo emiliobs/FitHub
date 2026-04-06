@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FitHub.Web.Controllers;
 
-[Authorize(Roles = "Admin, Manager")] // Only Admins and Managers can manage fitness classes
+[Authorize]
 public class FitnessClassesController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -19,24 +19,35 @@ public class FitnessClassesController : Controller
     }
 
     // GET: FitnessClasses
+    [AllowAnonymous]
     public async Task<IActionResult> Index()
     {
-        // We include Category and Instructor to show their names in the list view
-        var clasees = await _context.FitnessClasses
+        var classes = await _context.FitnessClasses
             .Include(f => f.Category)
             .Include(f => f.Instructor)
             .OrderByDescending(f => f.ScheduleDate)
             .ToListAsync();
 
-        return View(clasees);
+        var bookingCounts = await _context.Bookings
+            .Where(b => b.Status == BookingStatus.Active)
+            .GroupBy(b => b.FitnessClassId)
+            .Select(g => new { FitnessClassId = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        foreach (var fitnessClass in classes)
+        {
+            fitnessClass.ActiveBookingsCount = bookingCounts
+                .FirstOrDefault(x => x.FitnessClassId == fitnessClass.Id)?.Count ?? 0;
+        }
+
+        return View(classes);
     }
 
-    // GET: FitnessClasses/Details/5
+    [Authorize(Policy = "CanManageClasses")]
     public async Task<IActionResult> Create()
     {
         var viewModel = new FitnessClassViewModel
         {
-            // Populating Dropdowns
             Categories = await _context.Categories.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
@@ -53,8 +64,8 @@ public class FitnessClassesController : Controller
         return View(viewModel);
     }
 
-    // POST: FitnessClasses/Create
     [HttpPost]
+    [Authorize(Policy = "CanManageClasses")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(FitnessClassViewModel fitnessClassViewModel)
     {
@@ -67,7 +78,7 @@ public class FitnessClassesController : Controller
                     Title = fitnessClassViewModel.Title,
                     Description = fitnessClassViewModel.Description,
                     Capacity = fitnessClassViewModel.Capacity,
-                    ScheduleDate = fitnessClassViewModel.ScheduleDate,
+                    ScheduleDate = ConvertBrowserLocalToUtc(fitnessClassViewModel.ScheduleDate, fitnessClassViewModel.BrowserTimeZone, fitnessClassViewModel.BrowserUtcOffsetMinutes),
                     Price = fitnessClassViewModel.Price,
                     CategoryId = fitnessClassViewModel.CategoryId,
                     InstructorId = fitnessClassViewModel.InstructorId
@@ -77,7 +88,6 @@ public class FitnessClassesController : Controller
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "New Fitness class created successfully!";
-
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -86,7 +96,6 @@ public class FitnessClassesController : Controller
             TempData["Error"] = $"An error occurred while creating the fitness class: {ex.Message}";
         }
 
-        // If validation fails, we must reload the dropdowns before returning the view
         fitnessClassViewModel.Categories = await _context.Categories.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),
@@ -102,8 +111,8 @@ public class FitnessClassesController : Controller
         return View(fitnessClassViewModel);
     }
 
-    // GET: FitnessClasses/Edit/5
     [HttpGet]
+    [Authorize(Policy = "CanManageClasses")]
     public async Task<IActionResult> Edit(int id)
     {
         var fitnessClass = await _context.FitnessClasses.FindAsync(id);
@@ -123,14 +132,11 @@ public class FitnessClassesController : Controller
             Price = fitnessClass.Price,
             CategoryId = fitnessClass.CategoryId,
             InstructorId = fitnessClass.InstructorId,
-
-            // Populating Dropdowns again for the edit view
             Categories = await _context.Categories.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.Name
             }).ToListAsync(),
-
             Instructors = await _context.Instructors.Select(i => new SelectListItem
             {
                 Value = i.Id.ToString(),
@@ -141,8 +147,8 @@ public class FitnessClassesController : Controller
         return View(viewModel);
     }
 
-    // POST: FitnessClasses/Edit/5
     [HttpPost]
+    [Authorize(Policy = "CanManageClasses")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, FitnessClassViewModel fitnessClassViewModel)
     {
@@ -165,7 +171,7 @@ public class FitnessClassesController : Controller
                 fitnessClass.Title = fitnessClassViewModel.Title;
                 fitnessClass.Description = fitnessClassViewModel.Description;
                 fitnessClass.Capacity = fitnessClassViewModel.Capacity;
-                fitnessClass.ScheduleDate = fitnessClassViewModel.ScheduleDate;
+                fitnessClass.ScheduleDate = ConvertBrowserLocalToUtc(fitnessClassViewModel.ScheduleDate, fitnessClassViewModel.BrowserTimeZone, fitnessClassViewModel.BrowserUtcOffsetMinutes);
                 fitnessClass.Price = fitnessClassViewModel.Price;
                 fitnessClass.CategoryId = fitnessClassViewModel.CategoryId;
                 fitnessClass.InstructorId = fitnessClassViewModel.InstructorId;
@@ -185,15 +191,15 @@ public class FitnessClassesController : Controller
         return View(fitnessClassViewModel);
     }
 
-    // POST: FitnessClasses/Delete/5
     [HttpPost, ActionName("Delete")]
+    [Authorize(Policy = "CanManageClasses")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         try
         {
             var fitnessClass = await _context.FitnessClasses
-                .Include(f => f.Bookings) // Critical to include related bookings to check for existing reservations
+                .Include(f => f.Bookings)
                 .FirstOrDefaultAsync(f => f.Id == id);
 
             if (fitnessClass is null)
@@ -202,11 +208,9 @@ public class FitnessClassesController : Controller
                 return RedirectToAction(nameof(Index));
             }
 
-            // Prevent deletion if there are existing bookings to avoid orphaned records and maintain data integrity
             if (fitnessClass.Bookings.Any())
             {
-                TempData["Error"] = $"Action Denied: You Cannot delete {fitnessClass.Title} because it has {fitnessClass.Bookings.Count} " +
-                                    $"Active reservations. Please cancel the booking first.";
+                TempData["Error"] = $"Action Denied: You Cannot delete {fitnessClass.Title} because it has {fitnessClass.Bookings.Count} Active reservations. Please cancel the booking first.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -223,9 +227,8 @@ public class FitnessClassesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: FitnessClasses/Attendance/5
-    [Authorize(Roles = "Admin,Manager")]
     [HttpGet]
+    [Authorize(Policy = "CanManageClasses")]
     public async Task<IActionResult> Attendance(int? id)
     {
         if (id is null)
@@ -235,7 +238,6 @@ public class FitnessClassesController : Controller
 
         try
         {
-            // Deep Include: Class -> Bookings -> ApplicationUser
             var fitnessClass = await _context.FitnessClasses
                 .Include(c => c.Instructor)
                 .Include(c => c.Category)
@@ -256,5 +258,27 @@ public class FitnessClassesController : Controller
 
             return RedirectToAction(nameof(Index));
         }
+    }
+
+    private static DateTime ConvertBrowserLocalToUtc(DateTime browserLocalDateTime, string? browserTimeZone, int browserUtcOffsetMinutes)
+    {
+        var unspecifiedLocal = DateTime.SpecifyKind(browserLocalDateTime, DateTimeKind.Unspecified);
+
+        if (!string.IsNullOrWhiteSpace(browserTimeZone))
+        {
+            try
+            {
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(browserTimeZone);
+                return TimeZoneInfo.ConvertTimeToUtc(unspecifiedLocal, timeZone);
+            }
+            catch
+            {
+                // Fall back to browser offset if the OS timezone ID can't be resolved.
+            }
+        }
+
+        var offset = TimeSpan.FromMinutes(-browserUtcOffsetMinutes);
+        var dto = new DateTimeOffset(unspecifiedLocal, offset);
+        return dto.UtcDateTime;
     }
 }

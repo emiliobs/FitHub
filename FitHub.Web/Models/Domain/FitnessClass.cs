@@ -44,4 +44,7 @@ public class FitnessClass
 
     // Bookings (Many-to-Many via Booking)
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
+    [NotMapped]
+    public int ActiveBookingsCount { get; set; }
 }

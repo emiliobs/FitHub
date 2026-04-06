@@ -1,0 +1,167 @@
+@model FitHub.Web.ViewModels.InstructorScheduleViewModel
+
+@{
+    ViewData["Title"] = "Instructor Schedule";
+}
+
+<div class="container py-5 animate__animated animate__fadeIn" style="min-height: 70vh;">
+    <div class="d-flex justify-content-between align-items-end mb-5 border-bottom border-danger pb-3">
+        <div>
+            <h1 class="display-4 fw-black text-white mb-0 text-uppercase">
+                Instructor <span class="text-danger">Schedule</span>
+            </h1>
+            <p class="text-silver mb-0 tracking-wider">
+                @Model.InstructorName • @Model.InstructorEmail
+            </p>
+        </div>
+        <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-outline-danger rounded-pill px-4 fw-bold shadow-neon-sm">
+            <i class="bi bi-calendar-plus me-2"></i>JOIN OTHER CLASSES
+        </a>
+    </div>
+
+    @if (!Model.Classes.Any())
+    {
+        <div class="text-center py-5 bg-glass-dark rounded-4 border border-secondary border-opacity-25 shadow-lg">
+            <div class="mb-4">
+                <i class="bi bi-calendar-x text-secondary opacity-25" style="font-size: 6rem;"></i>
+            </div>
+            <h3 class="text-white fw-bold">NO CLASSES ASSIGNED</h3>
+            <p class="text-silver mb-4">You do not have any classes assigned yet.</p>
+            <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-fithub btn-lg px-5 shadow-neon-sm fw-black">
+                BROWSE CLASSES
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var fitnessClass in Model.Classes)
+            {
+                <div class="col-12">
+                    <div class="card bg-glass-dark border-danger border-opacity-25 shadow-neon-hover" style="border-radius: 20px; overflow: hidden;">
+                        <div class="card-header bg-dark bg-opacity-50 border-bottom border-danger border-opacity-10 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h4 class="text-white fw-bold mb-1">@fitnessClass.Title</h4>
+                                <div class="text-danger small fw-bold text-uppercase tracking-widest">@fitnessClass.CategoryName</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="badge bg-danger text-uppercase fw-black px-3 py-2 mb-2">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    <span class="js-local-date" data-utc="@fitnessClass.ScheduleDate.ToString("O")">--</span>
+                                </div>
+                                <div class="text-white fw-bold">
+                                    <i class="bi bi-clock-fill text-danger me-1"></i>
+                                    <span class="js-local-clock" data-utc="@fitnessClass.ScheduleDate.ToString("O")">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3 text-silver">
+                                    <div class="small text-uppercase text-secondary">Capacity</div>
+                                    <div class="text-white fw-bold">@fitnessClass.ParticipantCount / @fitnessClass.Capacity</div>
+                                </div>
+                                <div class="col-md-3 text-silver">
+                                    <div class="small text-uppercase text-secondary">Rate</div>
+                                    <div class="text-white fw-bold">@fitnessClass.Price.ToString("C")</div>
+                                </div>
+                                <div class="col-md-6 text-silver">
+                                    <div class="small text-uppercase text-secondary">Participants</div>
+                                    <div class="text-white fw-bold">@fitnessClass.ParticipantCount enrolled</div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover bg-transparent mb-0 align-middle">
+                                    <thead>
+                                        <tr class="border-danger">
+                                            <th class="text-danger fw-black small text-uppercase">Participant</th>
+                                            <th class="text-danger fw-black small text-uppercase">Email</th>
+                                            <th class="text-danger fw-black small text-center text-uppercase">Booked</th>
+                                            <th class="text-danger fw-black small text-center text-uppercase">Status</th>
+                                            <th class="text-danger fw-black small text-center text-uppercase">Check-in</th>
+                                            <th class="text-danger fw-black small text-center text-uppercase">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-silver">
+                                        @if (fitnessClass.Participants.Any())
+                                        {
+                                            foreach (var participant in fitnessClass.Participants)
+                                            {
+                                                <tr class="border-secondary">
+                                                    <td class="fw-bold text-white">@participant.FullName</td>
+                                                    <td class="small">@participant.Email</td>
+                                                    <td class="text-center small">@participant.BookingDate.ToString("MMM dd, HH:mm")</td>
+                                                    <td class="text-center">
+                                                        <span class="badge @(participant.Status == FitHub.Web.Models.Domain.BookingStatus.Completed ? "bg-success" : "bg-danger") fw-bold px-2 py-1">
+                                                            @participant.Status
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @if (participant.IsCheckedIn)
+                                                        {
+                                                            <span class="badge bg-success fw-bold px-2 py-1">REDEEMED</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-secondary fw-bold px-2 py-1">PENDING</span>
+                                                        }
+                                                    </td>
+                                                    <td class="text-center fw-bold text-white">@participant.PaidPrice.ToString("C")</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="6" class="text-center py-4 text-silver">
+                                                    No participants have joined this class yet.
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            document.querySelectorAll('.js-local-date').forEach((el) => {
+                const utcValue = el.getAttribute('data-utc');
+                if (!utcValue) {
+                    return;
+                }
+
+                const dt = new Date(utcValue);
+                if (Number.isNaN(dt.getTime())) {
+                    return;
+                }
+
+                el.textContent = dt.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' });
+            });
+
+            document.querySelectorAll('.js-local-clock').forEach((el) => {
+                const utcValue = el.getAttribute('data-utc');
+                if (!utcValue) {
+                    return;
+                }
+
+                const dt = new Date(utcValue);
+                if (Number.isNaN(dt.getTime())) {
+                    return;
+                }
+
+                el.textContent = dt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+            });
+        })();
+    </script>
+}
+
