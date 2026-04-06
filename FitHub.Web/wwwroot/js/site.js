@@ -4,13 +4,13 @@ function showSuccess(message) {
         icon: 'success',
         title: '<h3 style="color: #ffffff; font-weight: 800;">SUCCESS!</h3>',
         text: message,
-        background: '#121212',
-        iconColor: '#28a745',   // Vibrant Green for Success
-        confirmButtonColor: '#28a745',
+        background: 'rgba(17, 24, 36, 0.92)',
+        iconColor: '#b7c5d9',
+        confirmButtonColor: '#a5b5c9',
         confirmButtonText: 'GREAT!',
-        color: '#ffffff',       // Pure white for better readability
+        color: '#ebf0f7',
         customClass: {
-            popup: 'border border-success shadow-lg'
+            popup: 'fithub-delete-popup'
         }
     });
 }
@@ -21,13 +21,13 @@ function showError(message) {
         icon: 'error',
         title: '<h3 style="color: #ffffff; font-weight: 800;">ACTION BLOCKED</h3>',
         text: message,
-        background: '#0a0a0a', // Deeper black for more contrast
-        iconColor: '#ff3b3b',   // Vibrant Neon Red
-        confirmButtonColor: '#ff3b3b', // Solid Red Button (Now visible!)
+        background: 'rgba(17, 24, 36, 0.92)',
+        iconColor: '#cf8b99',
+        confirmButtonColor: '#c77a89',
         confirmButtonText: 'UNDERSTOOD',
-        color: '#e0e0e0',       // Light grey text
+        color: '#ebf0f7',
         customClass: {
-            popup: 'border border-danger shadow-neon-red animate__animated animate__shakeX'
+            popup: 'fithub-delete-popup animate__animated animate__shakeX'
         }
     });
 }
@@ -36,18 +36,18 @@ function showError(message) {
 function confirmDelete(callback) {
     Swal.fire({
         title: '<h2 style="color: #ffffff; font-weight: 900; letter-spacing: -1px;">DANGER ZONE</h2>',
-        html: '<p style="color: #e0e0e0;">This action is <b style="color: #ff3b3b; text-decoration: underline;">irreversible</b>. Are you sure you want to proceed?</p>',
+        html: '<p style="color: #ebf0f7;">This action is <b style="color: #cf8b99; text-decoration: underline;">irreversible</b>. Are you sure you want to proceed?</p>',
         icon: 'warning',
-        iconColor: '#ff3b3b',
-        background: '#050505',
+        iconColor: '#cf8b99',
+        background: 'rgba(17, 24, 36, 0.94)',
         showCancelButton: true,
-        confirmButtonColor: '#ff3b3b', // Solid Red
-        cancelButtonColor: '#333333',  // Dark Grey (Not invisible black)
+        confirmButtonColor: '#c77a89',
+        cancelButtonColor: '#42516a',
         confirmButtonText: '<i class="bi bi-trash-fill"></i> DELETE NOW',
         cancelButtonText: 'BACK TO SAFETY',
-        color: '#ffffff',
+        color: '#ebf0f7',
         customClass: {
-            popup: 'border border-danger animate__animated animate__pulse'
+            popup: 'fithub-delete-popup animate__animated animate__pulse'
         }
     }).then((result) => {
         if (result.isConfirmed) {
