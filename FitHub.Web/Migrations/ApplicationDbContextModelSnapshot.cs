@@ -736,7 +736,7 @@ namespace FitHub.Web.Migrations
                     b.HasOne("FitHub.Web.Models.Domain.FitnessClass", "FitnessClass")
                         .WithMany()
                         .HasForeignKey("FitnessClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");

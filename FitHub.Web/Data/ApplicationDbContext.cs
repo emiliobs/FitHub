@@ -97,6 +97,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                .WithMany(c => c.Instructors)      // Each category has a list of instructors
                .HasForeignKey(i => i.CategoryId)  // Defining the Foreign Key property
                .OnDelete(DeleteBehavior.Restrict); // FIX: Prevents "Multiple Cascade Paths" error
+
+            // Fix for multiple cascade paths: Prevent cascading deletes from Instructor to Category
+            // and from FitnessClass to Instructor
+            // --- Fix for Multiple Cascade Paths ---
+            builder.Entity<Subscription>()
+                .HasOne(s => s.FitnessClass)
+                .WithMany() // or .WithMany(c => c.Subscriptions) if the property exists
+                .HasForeignKey(s => s.FitnessClassId)
+                .OnDelete(DeleteBehavior.Restrict); // This is the fix!
         }
         catch (Exception ex)
         {
