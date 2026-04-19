@@ -18,23 +18,13 @@
 
                 <div class="form-group mb-3">
                     <label asp-for="Email" class="form-label text-silver small fw-bold text-uppercase">Email Address</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-danger border-end-0">
-                            <i class="bi bi-envelope-at text-danger"></i>
-                        </span>
-                        <input asp-for="Email" class="form-control fithub-input-sm border-start-0 ps-0" placeholder="name@example.com" />
-                    </div>
+                    <input asp-for="Email" class="form-control fithub-input-sm" placeholder="name@example.com" />
                     <span asp-validation-for="Email" class="text-danger small"></span>
                 </div>
 
                 <div class="form-group mb-4">
                     <label asp-for="Password" class="form-label text-silver small fw-bold text-uppercase">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-danger border-end-0">
-                            <i class="bi bi-key-fill text-danger"></i>
-                        </span>
-                        <input asp-for="Password" class="form-control fithub-input-sm border-start-0 ps-0" placeholder="••••••••" />
-                    </div>
+                    <input asp-for="Password" type="password" class="form-control fithub-input-sm" placeholder="••••••••" />
                     <span asp-validation-for="Password" class="text-danger small"></span>
                 </div>
 
