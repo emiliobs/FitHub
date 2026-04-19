@@ -93,7 +93,7 @@ public class AccountController : Controller
             if (ModelState.IsValid)
             {
                 // Note: We use the dynamic helper that accepts IFormFile
-                var uniqueFileNamePhoto = ProcessUploadedFile(registerViewModel.PhotoFile);
+                var uniqueFileNamePhoto = await ProcessUploadedFileAsync(registerViewModel.PhotoFile);
 
                 var user = new ApplicationUser
                 {
@@ -188,7 +188,7 @@ public class AccountController : Controller
                         if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
                     }
 
-                    user.Photo = ProcessUploadedFile(profileViewModel.PhotoFile);
+                    user.Photo = await ProcessUploadedFileAsync(profileViewModel.PhotoFile);
                 }
 
                 var result = await _userManager.UpdateAsync(user);
@@ -231,23 +231,33 @@ public class AccountController : Controller
     }
 
     // [IMPROVED] Helper now accepts IFormFile directly to be reusable
-    private string ProcessUploadedFile(IFormFile? photoFile)
+    private async Task<String> ProcessUploadedFileAsync(IFormFile? photoFile)
     {
         var uniqueFileNamePhoto = "default-user.png";
 
-        if (photoFile != null)
+        try
         {
-            var uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Profiles");
-            if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
-
-            uniqueFileNamePhoto = Guid.NewGuid().ToString() + "_" + photoFile.FileName;
-            var filePath = Path.Combine(uploadFolder, uniqueFileNamePhoto);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            if (photoFile != null)
             {
-                photoFile.CopyTo(fileStream);
+                var uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "Profiles");
+                if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
+
+                uniqueFileNamePhoto = Guid.NewGuid().ToString() + "_" + photoFile.FileName;
+                var filePath = Path.Combine(uploadFolder, uniqueFileNamePhoto);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await photoFile.CopyToAsync(fileStream);
+                }
             }
         }
+        catch (Exception)
+        {
+            // Log the error (not implemented here for brevity)
+            uniqueFileNamePhoto = "default-user.png";
+        }
+
+        // Return the unique file name or default if upload failed
         return uniqueFileNamePhoto;
     }
 
