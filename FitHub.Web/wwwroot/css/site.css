@@ -1,29 +1,58 @@
 /* ============================================================
-   FITHUB ENERGY STYLE — V2 (Vibrant & High Performance)
+   FITHUB THEME — INK WASH GLASSMORPHISM
    ============================================================ */
 
 :root {
-    --red-main: #ff3b3b;
-    --red-glow: #ff5757;
-    --orange-energy: #ff8c42;
-    --pink-energy: #ff4ecd;
-    --blue-energy: #38bdf8;
-    --bg-dark: #0b1220;
-    --glass: rgba(255, 255, 255, 0.12);
-    --border-glow: rgba(255, 255, 255, 0.2);
-    --text-main: #ffffff;
-    --text-soft: #d1d5db;
+    /* Ink Wash (Figma Combination 8 inspired) */
+    --ink-950: #080c12;
+    --ink-900: #0e141d;
+    --ink-850: #141b25;
+    --ink-800: #1a2230;
+    --ink-700: #2b3545;
+    --mist-300: #c3ccd9;
+    --mist-200: #d7dee8;
+    --mist-100: #ebf0f7;
+    --accent-500: #9eaec4;
+    --accent-400: #b5c2d4;
+    --danger-500: #c77a89;
+
+    /* App compatibility aliases */
+    --red-main: var(--accent-500);
+    --red-glow: var(--accent-400);
+    --orange-energy: #8f9eb6;
+    --pink-energy: #a4b2c8;
+    --blue-energy: #8ca0bc;
+    --bg-dark: var(--ink-900);
+
+    --glass: rgba(231, 238, 248, 0.09);
+    --glass-strong: rgba(231, 238, 248, 0.14);
+    --glass-soft: rgba(231, 238, 248, 0.06);
+    --border-glow: rgba(214, 223, 236, 0.22);
+    --text-main: var(--mist-100);
+    --text-soft: var(--mist-300);
+    --shadow-glass: 0 18px 38px rgba(4, 7, 12, 0.46);
 }
 
-/* GLOBAL BODY STYLES */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    color-scheme: dark;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    /* Animated background with radial gradients */
-    background: radial-gradient(circle at 20% 20%, rgba(255, 59, 59, 0.35), transparent 40%), radial-gradient(circle at 80% 30%, rgba(255, 78, 205, 0.25), transparent 40%), radial-gradient(circle at 50% 90%, rgba(56, 189, 248, 0.25), transparent 40%), linear-gradient(135deg, #020617, #0b1220, #111827);
+    background:
+        radial-gradient(circle at 14% 12%, rgba(154, 169, 191, 0.18), transparent 40%),
+        radial-gradient(circle at 88% 20%, rgba(133, 151, 177, 0.13), transparent 45%),
+        radial-gradient(circle at 50% 96%, rgba(115, 132, 156, 0.2), transparent 46%),
+        linear-gradient(145deg, var(--ink-950), var(--ink-900), var(--ink-850));
     background-attachment: fixed;
 }
 
@@ -31,104 +60,277 @@ main {
     flex: 1;
 }
 
-/* MODERN NAVBAR STYLES */
+a {
+    color: var(--mist-100);
+}
+
+a:hover {
+    color: #ffffff;
+}
+
 .navbar-modern {
-    background: linear-gradient(90deg, rgba(255, 59, 59, 0.85), rgba(255, 140, 66, 0.85)) !important;
-    backdrop-filter: blur(14px);
-    box-shadow: 0 5px 25px rgba(255, 59, 59, 0.4);
-    border: none !important;
+    background: linear-gradient(100deg, rgba(24, 32, 44, 0.85), rgba(33, 43, 58, 0.7)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 28px rgba(4, 7, 12, 0.45);
+    border-bottom: 1px solid var(--border-glow) !important;
 }
 
 .navbar-brand {
     font-weight: 900;
-    letter-spacing: 2px;
-    color: white !important;
+    letter-spacing: 1.8px;
+    color: #ffffff !important;
 }
 
 .nav-link {
-    color: white !important;
+    color: var(--mist-100) !important;
     font-weight: 600;
-    transition: 0.3s;
+    transition: transform 0.25s ease, text-shadow 0.25s ease;
 }
 
-    .nav-link:hover {
-        transform: translateY(-2px);
-        text-shadow: 0 0 10px white;
-    }
+.nav-link:hover {
+    transform: translateY(-1px);
+    text-shadow: 0 0 10px rgba(220, 229, 242, 0.55);
+}
 
-/* ENERGY BUTTONS */
+.btn {
+    border-radius: 12px;
+}
+
 .btn-fithub {
-    background: linear-gradient(135deg, var(--red-main), var(--pink-energy), var(--orange-energy));
-    border: none;
-    color: white;
+    background: linear-gradient(130deg, #8d9eb8, #a5b5c9, #7f91ab);
+    border: 1px solid rgba(223, 231, 243, 0.2);
+    color: #ffffff;
     font-weight: 700;
     border-radius: 14px;
     padding: 10px 20px;
-    transition: 0.35s;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
     text-transform: uppercase;
 }
 
-    .btn-fithub:hover {
-        transform: translateY(-4px) scale(1.03);
-        box-shadow: 0 10px 30px rgba(255, 59, 59, 0.5), 0 0 25px rgba(255, 78, 205, 0.4);
-    }
-
-/* GLASSMORPHISM CARDS */
-.card {
-    background: var(--glass) !important;
-    backdrop-filter: blur(18px);
-    border-radius: 20px !important;
-    border: 1px solid var(--border-glow) !important;
-    transition: 0.4s ease;
+.btn-fithub:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(8, 12, 19, 0.5), 0 0 14px rgba(185, 199, 220, 0.26);
 }
 
-    .card:hover {
-        transform: translateY(-8px);
-        border-color: var(--red-main) !important;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 59, 59, 0.3) !important;
-    }
+.btn-outline-light,
+.btn-outline-danger,
+.btn-outline-info,
+.btn-outline-secondary,
+.btn-outline-warning,
+.btn-outline-success {
+    border-color: var(--border-glow);
+    color: var(--mist-100);
+    background: var(--glass-soft);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
 
-/* GRADIENT TEXT EFFECT */
+.btn-outline-light:hover,
+.btn-outline-danger:hover,
+.btn-outline-info:hover,
+.btn-outline-secondary:hover,
+.btn-outline-warning:hover,
+.btn-outline-success:hover {
+    background: var(--glass-strong);
+    color: #ffffff;
+    border-color: rgba(235, 242, 255, 0.4);
+}
+
+.card {
+    background: var(--glass) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 20px !important;
+    border: 1px solid var(--border-glow) !important;
+    box-shadow: var(--shadow-glass);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(224, 233, 246, 0.36) !important;
+    box-shadow: 0 22px 40px rgba(3, 6, 10, 0.56), 0 0 16px rgba(174, 189, 210, 0.15) !important;
+}
+
 .text-energy {
-    background: linear-gradient(90deg, #ff3b3b, #ff8c42, #ff4ecd);
+    background: linear-gradient(90deg, #d5dfec, #a7b8cf, #e7eef8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 900;
 }
 
-/* HERO SECTION WITH BACKGROUND IMAGE */
 .hero-wrap {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(11, 18, 32, 0.9)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop');
+    background:
+        linear-gradient(rgba(8, 11, 17, 0.74), rgba(12, 17, 26, 0.9)),
+        url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop');
     background-size: cover;
     background-position: center;
     min-height: 550px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0 0 40px 40px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    border-radius: 0 0 36px 36px;
+    box-shadow: var(--shadow-glass);
     margin-top: -20px;
 }
 
-    .hero-wrap h1 {
-        font-size: 4rem;
-        text-shadow: 0 0 20px rgba(255, 59, 59, 0.6);
-    }
+.hero-wrap h1 {
+    font-size: 4rem;
+    text-shadow: 0 0 20px rgba(214, 225, 240, 0.26);
+}
 
-/* FOOTER STYLES */
 .footer-modern {
-    background: rgba(0, 0, 0, 0.4) !important;
-    backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 59, 59, 0.2);
-    color: #cbd5e1;
+    background: rgba(16, 22, 33, 0.62) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-glow);
+    color: var(--mist-300);
 }
 
 .text-silver {
-    color: #cbd5e1 !important;
-    letter-spacing: 0.5px;
+    color: var(--mist-300) !important;
+    letter-spacing: 0.4px;
 }
 
-/* HEART PULSE ANIMATION */
+.fw-black {
+    font-weight: 900;
+}
+
+.x-small {
+    font-size: 0.75rem;
+}
+
+.tracking-wider {
+    letter-spacing: 0.12em;
+}
+
+.tracking-widest {
+    letter-spacing: 0.18em;
+}
+
+.bg-glass-dark {
+    background: rgba(20, 28, 40, 0.66) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border-glow);
+}
+
+.table,
+.table-dark,
+.table-dark > :not(caption) > * > * {
+    color: var(--mist-100) !important;
+    background-color: transparent !important;
+}
+
+.table-hover > tbody > tr:hover > * {
+    color: #ffffff !important;
+    background: rgba(212, 223, 238, 0.08) !important;
+}
+
+.form-control,
+.form-select,
+.fithub-input-sm,
+.dataTables_filter input,
+.dataTables_length select {
+    background: rgba(230, 238, 250, 0.08) !important;
+    color: var(--mist-100) !important;
+    border: 1px solid rgba(216, 225, 238, 0.28) !important;
+    border-radius: 10px !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Keep dropdown/list options readable on metallic glass theme */
+.form-select option,
+.fithub-input-sm option,
+.dataTables_length select option {
+    background: var(--ink-850) !important;
+    color: var(--mist-100) !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+.fithub-input-sm:focus,
+.dataTables_filter input:focus,
+.dataTables_length select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(166, 184, 208, 0.28) !important;
+    border-color: rgba(231, 240, 252, 0.42) !important;
+}
+
+.fithub-input-sm::placeholder,
+.form-control::placeholder {
+    color: rgba(230, 237, 247, 0.56) !important;
+    font-style: italic;
+    opacity: 1;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: var(--mist-100) !important;
+    border: none !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: rgba(179, 194, 215, 0.32) !important;
+    border-radius: 8px;
+    color: #ffffff !important;
+}
+
+.badge {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.alert {
+    background: rgba(30, 40, 56, 0.68);
+    border-color: var(--border-glow);
+    color: var(--mist-100);
+}
+
+.shadow-neon-sm {
+    box-shadow: 0 0 8px rgba(191, 205, 226, 0.24);
+    transition: transform 0.25s ease;
+}
+
+.shadow-neon-sm:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 14px rgba(210, 221, 238, 0.35);
+}
+
+.shadow-neon-hover:hover {
+    box-shadow: 0 16px 32px rgba(6, 10, 16, 0.5), 0 0 14px rgba(196, 209, 227, 0.2) !important;
+}
+
+.transform-hover {
+    transition: transform 0.25s ease;
+}
+
+.transform-hover:hover {
+    transform: translateY(-4px);
+}
+
+.bg-outline-danger {
+    background: rgba(199, 122, 137, 0.12);
+}
+
+.fithub-delete-popup {
+    border: 1px solid rgba(220, 184, 193, 0.6) !important;
+    border-radius: 15px !important;
+    box-shadow: 0 0 28px rgba(83, 40, 49, 0.45) !important;
+}
+
+.swal2-popup {
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+.swal2-styled.swal2-confirm {
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+}
+
 .animate-pulse {
     display: inline-block;
     animation: pulse 1.5s infinite;
@@ -140,7 +342,7 @@ main {
     }
 
     50% {
-        transform: scale(1.2);
+        transform: scale(1.14);
     }
 
     100% {
@@ -148,112 +350,8 @@ main {
     }
 }
 
-/* DATATABLES UI ADJUSTMENTS */
-.fw-black {
-    font-weight: 900;
-}
-
-.fithub-input-sm {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 59, 59, 0.3) !important;
-    color: white !important;
-    border-radius: 8px !important;
-    padding: 4px 10px !important;
-}
-
-/* DATATABLES PAGINATION */
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    color: white !important;
-    border: none !important;
-}
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background: var(--red-main) !important;
-        border-radius: 8px;
-        color: white !important;
-    }
-
-/* FIX FOR ENTRIES SELECTOR AND SEARCH VISIBILITY */
-.dataTables_length select {
-    background-color: #1a1a1a !important; /* Solid dark background */
-    color: #ffffff !important; /* Forced white text */
-    border: 1px solid var(--red-main) !important;
-    border-radius: 8px;
-    padding: 5px;
-    appearance: auto; /* Ensures browser default arrow */
-}
-
-    .dataTables_length select option {
-        background-color: #0b1220 !important;
-        color: white !important;
-    }
-
-.dataTables_filter input {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: #ffffff !important;
-    border: 1px solid var(--red-main) !important;
-    border-radius: 8px;
-    padding: 6px 12px;
-}
-
-/* Placeholder styling for all browsers */
-
-/* Chrome, Firefox, Opera, Safari 10.1+ */
-.fithub-input-sm::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-    font-style: italic;
-    opacity: 1; /* Firefox requires this */
-}
-
-/* Internet Explorer 10-11 */
-.fithub-input-sm:-ms-input-placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Microsoft Edge */
-.fithub-input-sm::-ms-input-placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Extra: Make the text you type also white */
-.fithub-input-sm {
-    color: white !important;
-}
-
-/* Neon glow for profile small images */
-.shadow-neon-sm {
-    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
-    transition: transform 0.3s ease;
-}
-
-    .shadow-neon-sm:hover {
-        transform: scale(1.1);
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-    }
-
-/* Glassmorphism utility for navbar components */
-.bg-glass-dark {
-    background: rgba(20, 20, 20, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-/* Brillo Neón Rojo para Alertas de Borrado */
-.fithub-delete-popup {
-    border: 2px solid #ff3b3b !important;
-    border-radius: 15px !important;
-    box-shadow: 0 0 30px rgba(255, 59, 59, 0.3) !important;
-}
-
-/* Estilo para los botones dentro de la alerta */
-.swal2-styled.swal2-confirm {
-    border-radius: 8px !important;
-    font-weight: bold !important;
-    text-transform: uppercase !important;
-}
-
-/* En site.css - Clase para elementos que NO deben moverse */
-.static-card, .static-card:hover {
+.static-card,
+.static-card:hover {
     transform: none !important;
     transition: none !important;
 }
