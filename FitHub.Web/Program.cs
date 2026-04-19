@@ -98,6 +98,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// This is mandatory to serve images from wwwroot
+app.UseStaticFiles();
+
 app.MapStaticAssets();
 
 app.MapControllerRoute(
