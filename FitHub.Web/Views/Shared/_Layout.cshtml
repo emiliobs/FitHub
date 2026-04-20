@@ -123,13 +123,19 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
    
+
     @if (TempData["Success"] != null)
     {
-        <script>showSuccess('@TempData["Success"]');</script>
+        // Notice we removed the single quotes around the Razor syntax
+        // Json.Serialize safely formats the C# string into a JavaScript string format
+        <script>showSuccess(@Html.Raw(Json.Serialize(TempData["Success"])));</script>
     }
+
     @if (TempData["Error"] != null)
     {
-        <script>showError('@TempData["Error"]');</script>
+        // Notice we removed the single quotes around the Razor syntax
+        // Json.Serialize safely formats the C# string into a JavaScript string format
+        <script>showError(@Html.Raw(Json.Serialize(TempData["Error"])));</script>
     }
 
     @await RenderSectionAsync("Scripts", required: false)

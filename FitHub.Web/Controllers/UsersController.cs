@@ -92,6 +92,7 @@ public class UsersController : Controller
                     var syncResult = await _instructorSyncService.EnsureInstructorForUserAsync(user);
                     if (!syncResult.Succeeded)
                     {
+                        //      
                         TempData["Error"] = syncResult.ErrorMessage ?? "Role updated, but instructor profile sync failed.";
                         return RedirectToAction(nameof(Index));
                     }
