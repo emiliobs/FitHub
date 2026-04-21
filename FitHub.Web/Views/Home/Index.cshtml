@@ -62,7 +62,7 @@
         {
             <div class="col-xl-3 col-lg-4 col-sm-6 animate__animated animate__zoomIn">
                 <div class="card h-100 border-0 text-white hover-up service-card overflow-hidden shadow-lg" style="border-radius: 12px;">
-                    <img src="@item.Img" class="card-img h-100" alt="@item.Name" style="object-fit: cover; min-height: 280px;">
+                    <img src="@item.Img" class="card-img w-100 h-100 fithub-gallery-img" alt="@item.Name">
 
                     <div class="card-img-overlay d-flex flex-column justify-content-end p-0">
                         <div class="p-4 gradient-overlay w-100" style="border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
@@ -120,5 +120,14 @@
     /* Text color utilities */
     .text-silver {
         color: #b7c5d9 !important;
+    }
+
+    /* Ensure all cards have the same height for a uniform grid */
+    .service-card {
+        height: 320px !important; 
+
+    .fithub-gallery-img {
+        object-fit: cover !important; /* Recorta los bordes invisibles */
+        border-radius: 12px !important;
     }
 </style>
