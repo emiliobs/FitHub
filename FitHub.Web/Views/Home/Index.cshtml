@@ -5,21 +5,21 @@
 <div class="hero-wrap d-flex align-items-center mb-5">
     <div class="container text-center text-white py-5">
         <h1 class="display-2 fw-black text-uppercase animate__animated animate__fadeInDown">
-            Push Your <span class="text-energy">Limits</span>
+            Push Your <span class="text-energy text-danger">Limits</span>
         </h1>
         <p class="lead mb-4 text-silver animate__animated animate__fadeInUp">
             Manage your fitness center, categories, and training routines in one place.
         </p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center animate__animated animate__fadeInUp">
-            <a asp-controller="Home" asp-action="GetStarted" class="btn btn-fithub btn-lg px-5 fw-bold">
+            <a asp-controller="Home" asp-action="GetStarted" class="btn btn-danger btn-lg px-5 fw-bold">
                 <i class="bi bi-play-fill"></i> GET STARTED
             </a>
-            <a asp-controller="Home" asp-action="about" class="btn btn-outline-light btn-lg px-4 fw-bold border-2">LEARN MORE</a>
+            <a asp-controller="Home" asp-action="About" class="btn btn-outline-light btn-lg px-4 fw-bold border-2">LEARN MORE</a>
         </div>
     </div>
 </div>
 
-<div class="container mb-5">
+<div class="container mb-3">
     <div class="row g-4 text-center">
         @foreach (var stat in new[] { ("20+", "Categories"), ("500+", "Exercises"), ("150+", "Trainers"), ("1k+", "Members") })
         {
@@ -34,46 +34,91 @@
 </div>
 
 <div class="container py-5">
-    <h2 class="text-center fw-bold mb-5 text-white">OUR CORE <span class="text-energy">SERVICES</span></h2>
+    <div class="text-center mb-5 animate__animated animate__fadeInUp">
+        <h2 class="text-white fw-bold mb-2">OUR CORE <span class="text-energy text-danger">SERVICES</span></h2>
+        <p class="text-silver lead max-w-700 mx-auto">Explore our wide variety of premium training programs designed to push your limits.</p>
+    </div>
+
     <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100 p-4 border-0 hover-up">
-                <div class="card-body text-center">
-                    <a asp-controller="Categories" asp-action="Index" class="text-decoration-none">
-                         <i class="bi bi-tags-fill text-danger fs-1 mb-3 d-block"></i>
-                    <h5 class="card-title fw-bold text-white">Category Management</h5>
-                    <p class="card-text text-silver">Organize your gym activities by types like Cardio, HIIT, or Yoga.</p>
-                    </a>                   
+        @{
+            // Define the 12 services/disciplines using a Tuple array
+            var disciplines = new[] {
+                (Name: "CrossFit", Desc: "High-intensity functional movements.", Img: "images/index/crossfit.jpg"),
+                (Name: "Pilates", Desc: "Core strength, flexibility, and mindful movement.", Img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80"),
+                (Name: "Yoga", Desc: "Balance your mind, body, and soul.", Img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80"),
+                (Name: "HIIT", Desc: "Burn calories fast with interval training.", Img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80"),
+                (Name: "Boxing", Desc: "Learn striking and improve endurance.", Img: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=600&q=80"),
+                (Name: "Weightlifting", Desc: "Build muscle and pure physical strength.", Img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&q=80"),
+                (Name: "Spinning", Desc: "High-energy indoor cycling sessions.", Img: "images/index/spinning.png"),
+                (Name: "Calisthenics", Desc: "Master your own bodyweight.", Img: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&q=80"),
+                (Name: "Recovery", Desc: "Active stretching and mobility work.", Img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80"),
+                (Name: "Swimming", Desc: "Low-impact water resistance training.", Img: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&q=80"),
+                (Name: "Zumba", Desc: "Dance your way to cardiovascular fitness.", Img: "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?w=600&q=80"),
+                (Name: "Personal Training", Desc: "1-on-1 customized professional coaching.", Img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80")
+            };
+        }
+        
+        @foreach (var item in disciplines)
+        {
+            <div class="col-xl-3 col-lg-4 col-sm-6 animate__animated animate__zoomIn">
+                <div class="card h-100 border-0 text-white hover-up service-card overflow-hidden shadow-lg" style="border-radius: 12px;">
+                    <img src="@item.Img" class="card-img h-100" alt="@item.Name" style="object-fit: cover; min-height: 280px;">
+
+                    <div class="card-img-overlay d-flex flex-column justify-content-end p-0">
+                        <div class="p-4 gradient-overlay w-100" style="border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+                            <h5 class="card-title fw-bold mb-1 border-start border-danger border-3 ps-2">@item.Name</h5>
+                            <p class="card-text text-silver small mb-3">@item.Desc</p>
+                            <a asp-controller="FitnessClasses" asp-action="Index" class="btn btn-sm btn-outline-light rounded-pill px-4 fw-bold">
+                                JOIN CLASS
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 p-4 border-0 hover-up">
-                <div class="card-body text-center">
-                    <a asp-controller="FitnessClasses" asp-action="Index" class="text-decoration-none">
-                     <i class="bi bi-person-badge-fill text-danger fs-1 mb-3 d-block"></i>
-                    <h5 class="card-title fw-bold text-white">Trainer Access</h5>
-                    <p class="card-text text-silver">Dedicated dashboard for trainers to manage their class schedules.</p>
-                    </a>                  
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 p-4 border-0 hover-up">
-                <div class="card-body text-center">
-                    <i class="bi bi-graph-up-arrow text-danger fs-1 mb-3 d-block"></i>
-                    <h5 class="card-title fw-bold text-white">Progress Tracking</h5>
-                    <p class="card-text text-silver">Monitor members' growth and performance with detailed analytics.</p>
-                </div>
-            </div>
-        </div>
+        }
     </div>
 </div>
 
 <style>
+    /* Glassmorphism for stats */
     .bg-glass-dark {
-        background: rgba(0, 0, 0, 0.4) !important;
-        backdrop-filter: blur(10px);
+        background: rgba(17, 24, 36, 0.6) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
-    .letter-spacing-1 { letter-spacing: 1px; }
+
+    .letter-spacing-1 {
+        letter-spacing: 1px;
+    }
+
+    /* Card Hover Animation */
+    .hover-up {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    }
+
+        .hover-up:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 1.5rem 3rem rgba(220, 53, 69, 0.25) !important; /* FitHub red glow */
+            z-index: 2;
+        }
+
+    /* Dark gradient so text is always readable over images */
+    .gradient-overlay {
+        background: linear-gradient(to top, rgba(17, 24, 36, 1) 0%, rgba(17, 24, 36, 0.8) 50%, rgba(17, 24, 36, 0) 100%);
+        transition: background 0.3s ease;
+    }
+
+    /* Image zoom effect on hover */
+    .service-card img {
+        transition: transform 0.6s ease;
+    }
+
+    .service-card:hover img {
+        transform: scale(1.15);
+    }
+
+    /* Text color utilities */
+    .text-silver {
+        color: #b7c5d9 !important;
+    }
 </style>

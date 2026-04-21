@@ -53,30 +53,42 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <form asp-action="UpdateRole" method="post" class="d-flex justify-content-center align-items-center">
-                                    <input type="hidden" name="userId" value="@item.Id" />
-                                    
-                                    <select name="newRole" class="form-select fw-bold bg-dark text-white border-danger w-auto me-2" style="font-size: 0.8rem;">
-                                        @if (item.AvailableRoles != null)
-                                        {
-                                            foreach (var role in item.AvailableRoles)
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+
+                                    <form asp-action="UpdateRole" method="post" class="m-0 d-flex align-items-center">
+                                        <input type="hidden" name="userId" value="@item.Id" />
+
+                                        <select name="newRole" class="form-select fw-bold bg-dark text-white border-danger w-auto me-2" style="font-size: 0.8rem;">
+                                            @if (item.AvailableRoles != null)
                                             {
-                                                @if (role == item.Role)
+                                                foreach (var role in item.AvailableRoles)
                                                 {
-                                                    <option value="@role" selected>@role</option>
-                                                }
-                                                else
-                                                {
-                                                    <option value="@role">@role</option>
+                                                    @if (role == item.Role)
+                                                    {
+                                                        <option value="@role" selected>@role</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@role">@role</option>
+                                                    }
                                                 }
                                             }
-                                        }
-                                    </select>
-                                    
-                                    <button type="submit" class="btn btn-outline-danger btn-sm border-0" title="Update">
-                                        <i class="bi bi-arrow-repeat fs-5"></i>
-                                    </button>
-                                </form>
+                                        </select>
+
+                                        <button type="submit" class="btn btn-outline-danger btn-sm border-0" title="Update Role">
+                                            <i class="bi bi-arrow-repeat fs-5"></i>
+                                        </button>
+                                    </form>
+
+                                    <form asp-action="DeleteUser" method="post" id="delete-form-@item.Id" class="m-0">
+                                        <input type="hidden" name="userId" value="@item.Id" />
+                                        <button type="button" class="btn btn-danger btn-sm border-0" title="Delete User"
+                                                onclick="confirmDelete(function() { document.getElementById('delete-form-@item.Id').submit(); })">
+                                            <i class="bi bi-trash fs-5"></i>
+                                        </button>
+                                    </form>
+
+                                </div>
                             </td>
                         </tr>
                     }
@@ -89,7 +101,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Initialization using your Categories settings
+            // Initialization using your specific settings
             $('#usersTable').DataTable({
                 "responsive": true,
                 "pageLength": 5,

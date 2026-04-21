@@ -33,6 +33,7 @@ function showError(message) {
 }
 
 // --- CONFIRM DELETE: Ultra High Impact ---
+
 function confirmDelete(callback) {
     Swal.fire({
         title: '<h2 style="color: #ffffff; font-weight: 900; letter-spacing: -1px;">DANGER ZONE</h2>',
