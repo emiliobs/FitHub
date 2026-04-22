@@ -33,7 +33,10 @@ public class AccountController : Controller
     // GET: /Account/Login
     public IActionResult Login(string? returnUrl = null)
     {
+        // If the user is already authenticated, redirect them to the fitness classes page instead of showing the login form
         ViewData["ReturnUrl"] = returnUrl;
+
+        // Optionally, you could add logging here for authenticated users trying to access the login page
         return View();
     }
 

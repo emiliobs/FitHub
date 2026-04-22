@@ -57,7 +57,10 @@ namespace FitHub.Web.Controllers
             {
                 try
                 {
+                    // Add the new category to the database
                     _context.Add(category);
+
+                    // Save changes asynchronously
                     await _context.SaveChangesAsync();
 
                     // Success message for the UI
@@ -71,22 +74,28 @@ namespace FitHub.Web.Controllers
                 }
             }
 
+            // If we got this far, something failed, redisplay form with validation errors
             return View(category);
         }
 
         // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            // Check if the id parameter is null
             if (id == null)
             {
                 return NotFound();
             }
 
+            // Find the category by id
             var category = await _context.Categories.FindAsync(id);
+
             if (category == null)
             {
                 return NotFound();
             }
+
+            // Pass the category to the view for editing
             return View(category);
         }
 
@@ -100,18 +109,25 @@ namespace FitHub.Web.Controllers
                 return NotFound();
             }
 
+            // Server-side validation
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Update the category in the database
                     _context.Update(category);
+
+                    // Save changes asynchronously
                     await _context.SaveChangesAsync();
 
                     TempData["Success"] = "Category Updating successfully!";
+
+                    // Redirect to the index action after successful update
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
+                    // Check if the category still exists in the database
                     if (!CategoryExists(category.Id))
                     {
                         return NotFound();
@@ -126,19 +142,23 @@ namespace FitHub.Web.Controllers
                     TempData["Error"] = "An eror ocurred while updating.";
                 }
             }
+
+            // If we got this far, something failed, redisplay form with validation errors
             return View(category);
         }
 
         // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            // Check if the id parameter is null
             if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+            // Find the category by id
+            var category = await _context.Categories.FirstOrDefaultAsync(m => m.Id == id);
+
             if (category == null)
             {
                 return NotFound();
@@ -172,17 +192,20 @@ namespace FitHub.Web.Controllers
         {
             try
             {
+                // Load the category along with related entities to check for dependencies
                 var category = await _context.Categories
                     .Include(c => c.Instructors) // Assumming we have these relations
-                    .Include(c => c.FitnessClasses)
-                    .FirstOrDefaultAsync(m => m.Id == id);
+                    .Include(c => c.FitnessClasses) // Assumming we have these relations
+                    .FirstOrDefaultAsync(m => m.Id == id);// Find the category by id
 
+                // If the category is not found, return an error message
                 if (category is null)
                 {
                     TempData["Error"] = "The category you are trying to delete was not found.";
                     return RedirectToAction(nameof(Index));
                 }
 
+                // Check for related entities that would prevent deletion
                 if (category.Instructors.Any())
                 {
                     TempData["Error"] = $"Cannot delete {category.Name} because it is currently assigned to {category.Instructors.Count} " +
@@ -191,9 +214,13 @@ namespace FitHub.Web.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
+                // Check for related fitness classes that would prevent deletion
                 _context.Categories.Remove(category);
+
+                // Save changes asynchronously
                 await _context.SaveChangesAsync();
 
+                // Success message for the UI
                 TempData["Success"] = $"Category {category.Name} has been removed successfully!";
             }
             catch (Exception ex)
@@ -202,9 +229,11 @@ namespace FitHub.Web.Controllers
                                     "Please contact system support.";
             }
 
+            // Redirect to the index action after attempting deletion
             return RedirectToAction(nameof(Index));
         }
 
+        // Helper method to check if a category exists in the database
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.Id == id);

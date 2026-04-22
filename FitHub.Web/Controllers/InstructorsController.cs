@@ -36,6 +36,7 @@ public class InstructorsController : Controller
                 .OrderBy(i => i.Name)
                 .ToListAsync();
 
+            // The view will iterate over the instructors and can access the Category.Name property directly
             return View(instructors);
         }
         catch (Exception ex)
@@ -55,11 +56,15 @@ public class InstructorsController : Controller
 
         // Database query with Join to Category table
         var instructor = await _context.Instructors
-            .Include(i => i.Category)
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .Include(i => i.Category)// Eager loading to fetch related category data in the same query
+            .FirstOrDefaultAsync(m => m.Id == id);// Fetches the instructor with the specified ID along with its category
 
-        if (instructor == null) return NotFound();
+        if (instructor == null)
+        {
+            return NotFound();
+        }
 
+        // The view can now display instructor details along with the category name using instructor.Category.Name
         return View(instructor);
     }
 
@@ -105,11 +110,13 @@ public class InstructorsController : Controller
             // Checking if the refined model state is now valid
             if (ModelState.IsValid)
             {
+                // Default photo assignment for instructors without an uploaded image
                 var fileName = "default-user.png";
 
                 // Handling the physical file upload to the server
                 if (instructorViewModel.PhotoFile != null)
                 {
+                    // Uploading the file and getting the unique filename to store in the database
                     fileName = await UploadFile(instructorViewModel.PhotoFile);
                 }
 
@@ -137,17 +144,17 @@ public class InstructorsController : Controller
             TempData["Error"] = $"An error occurred while creating the instructor: {ex.Message}";
         }
 
-        /**
-         * RECOVERY LOGIC: If the flow reaches here, it means validation failed.
-         * We MUST reload the categories list and the view will crash during the re-rendering.
-         */
+        // If we reach this point, something went wrong. We need to reload the categories for the dropdown.
         var categories = await _context.Categories.ToListAsync();
+
+        // Re-populating the Categories for the dropdown in case of an error to ensure the form remains functional
         instructorViewModel.Categories = categories.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),
             Text = c.Name
         });
 
+        // Returning the view with the original data and error messages for user correction
         return View(instructorViewModel);
     }
 
@@ -156,13 +163,25 @@ public class InstructorsController : Controller
 
     public async Task<IActionResult> Edit(int? id)
     {
-        if (id == null) return NotFound();
+        // Validating the presence of the ID parameter to prevent null reference errors
+        if (id == null)
+        {
+            return NotFound();
+        }
 
+        // Fetching the instructor record to be edited
         var instructor = await _context.Instructors.FindAsync(id);
-        if (instructor == null) return NotFound();
 
+        // If the record doesn't exist, return a 404 Not Found response
+        if (instructor == null)
+        {
+            return NotFound();
+        }
+
+        // Fetching categories to populate the dropdown in the edit form
         var categories = await _context.Categories.ToListAsync();
 
+        // Mapping the existing instructor data to the ViewModel for the edit form
         var instructorViewModel = new InstructorViewModel
         {
             Id = instructor.Id,
@@ -171,14 +190,14 @@ public class InstructorsController : Controller
             Email = instructor.Email,
             Phone = instructor.Phone,
             ExistingPhoto = instructor.Photo,
-            // Mapping categories for the dropdown with the current value pre-selected
-            Categories = categories.Select(c => new SelectListItem
+            Categories = categories.Select(c => new SelectListItem // Projecting Category entities into SelectListItems for the UI dropdown
             {
                 Value = c.Id.ToString(),
                 Text = c.Name,
             })
         };
 
+        // Returning the edit view with the populated ViewModel to allow the user to make changes
         return View(instructorViewModel);
     }
 
@@ -196,8 +215,13 @@ public class InstructorsController : Controller
         {
             if (ModelState.IsValid)
             {
+                // Fetching the existing instructor record from the database to update
                 var instructor = await _context.Instructors.FindAsync(instructorViewModel.Id);
-                if (instructor == null) return NotFound();
+
+                if (instructor == null)
+                {
+                    return NotFound();
+                }
 
                 // Updating textual and relational fields
                 instructor.Name = instructorViewModel.Name;
@@ -211,12 +235,18 @@ public class InstructorsController : Controller
                     // Deleting old file to save server storage space
                     if (instructor.Photo != "default-user.png")
                     {
+                        // Only delete if it's not the default image to prevent accidental removal of shared assets
                         DeleteFile(instructor.Photo);
                     }
+
+                    // Uploading the new file and updating the database record with the new filename
                     instructor.Photo = await UploadFile(instructorViewModel.PhotoFile);
                 }
 
+                // Saving the updated record to the database
                 _context.Update(instructor);
+
+                // Committing the transaction to persist changes
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = $"Instructor {instructor.Name} updated successfully!";
@@ -244,54 +274,67 @@ public class InstructorsController : Controller
     {
         try
         {
+            // Fetching the instructor record to be deleted from the database
             var instructor = await _context.Instructors.FindAsync(id);
 
+            // If the record doesn't exist, return a JSON response indicating failure
             if (instructor == null)
             {
+                // This can happen if the record was already deleted or if an invalid ID was provided
                 return Json(new { success = false, message = "Record not found in database." });
             }
 
             // Cleanup: Removing profile photo from server disk
             if (!string.IsNullOrEmpty(instructor.Photo) && instructor.Photo != "default-user.png")
             {
+                // Only delete if it's not the default image to prevent accidental removal of shared assets
                 DeleteFile(instructor.Photo);
             }
 
+            // Removing the instructor record from the database
             _context.Instructors.Remove(instructor);
+
+            // Committing the transaction to persist the deletion
             await _context.SaveChangesAsync();
 
+            // Returning a JSON response indicating successful deletion to the client-side JavaScript
             return Json(new { success = true, message = $"Instructor {instructor.Name} purged successfully!" });
         }
         catch (Exception ex)
         {
+            // Capturing any exceptions that occur during the deletion process and returning a JSON response with the error message
             return Json(new { success = false, message = "Deletion failed: " + ex.Message });
         }
     }
 
-    //HELPER: UploadFile
-    // Saves IFormFile to the server and returns the unique filename
+    //HELPER: UploadFile. Saves IFormFile to the server and returns the unique filename
 
     private async Task<string> UploadFile(IFormFile photoFile)
     {
         // Generating a unique ID to prevent filename collisions
         var fileName = Guid.NewGuid().ToString() + Path.GetExtension(photoFile.FileName);
+
+        // Constructing the full path to save the file in the wwwroot/Images/Profiles directory
         var path = Path.Combine(_webHostEnvironment.WebRootPath, "Images/Profiles", fileName);
 
+        // Saving the file to the server's local storage
         using (var stream = new FileStream(path, FileMode.Create))
         {
+            // Asynchronously copying the uploaded file's content to the new file stream on the server
             await photoFile.CopyToAsync(stream);
         }
+
+        // Returning the unique filename to be stored in the database for later retrieval
         return fileName;
     }
 
-    /**
-     * HELPER: DeleteFile
-     * Removes a specific file from the server's local storage
-     */
-
+    //DeleteFile, Removes a specific file from the server's local storage
     private void DeleteFile(string fileName)
     {
+        // Constructing the full path to the file to be deleted in the wwwroot/Images/Profiles directory
         var path = Path.Combine(_webHostEnvironment.WebRootPath, "Images/Profiles", fileName);
+
+        // Checking if the file exists before attempting deletion to prevent exceptions
         if (System.IO.File.Exists(path))
         {
             System.IO.File.Delete(path);

@@ -8,13 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FitHub.Web.Controllers;
 
+// Controller for managing users and their roles. Only accessible by Admins.
 [Authorize(Roles = "Admin")]
 public class UsersController : Controller
 {
     // Inject UserManager, RoleManager, and IInstructorSyncService through the constructor
     private readonly UserManager<ApplicationUser> _userManager;
 
+    // RoleManager is used to fetch available roles for the dropdown and to validate role changes
     private readonly RoleManager<IdentityRole> _roleManager;
+
+    // IInstructorSyncService is used to ensure that when a user is assigned the "Instructor" role, their instructor profile is created or updated accordingly.
     private readonly IInstructorSyncService _instructorSyncService;
 
     // Constructor to inject dependencies

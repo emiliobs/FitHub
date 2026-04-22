@@ -9,6 +9,7 @@ using System.Security.Claims;
 
 namespace FitHub.Web.Controllers;
 
+// Requires users to be logged in to access bookings
 [Authorize]
 public class BookingsController : Controller
 {
@@ -17,6 +18,7 @@ public class BookingsController : Controller
     private readonly IInvoiceService _invoiceService;
     private readonly ILogger<BookingsController> _logger;
 
+    // Inject required services (Database, Payments, Invoices, Logging)
     public BookingsController(
         ApplicationDbContext context,
         IPaymentService paymentService,
@@ -31,6 +33,7 @@ public class BookingsController : Controller
 
     public IActionResult Index()
     {
+        // Fallback redirect to the main classes page
         return RedirectToAction("Index", "FitnessClasses");
     }
 
@@ -39,22 +42,20 @@ public class BookingsController : Controller
     public async Task<IActionResult> MySchedule()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Challenge();
-        }
+        if (string.IsNullOrEmpty(userId)) return Challenge();
 
         var instructor = await GetCurrentInstructorAsync(userId);
 
         try
         {
+            // If user is an instructor, show the instructor dashboard
             if (instructor != null)
             {
                 var instructorSchedule = await BuildInstructorScheduleViewModelAsync(instructor);
                 return View("InstructorSchedule", instructorSchedule);
             }
 
-            // Eager Loading: Fetching Bookings + Class + Instructor in one go
+            // Otherwise, load the regular member's active and completed bookings
             var myBookings = await _context.Bookings
                 .Include(b => b.FitnessClass)
                 .ThenInclude(c => c.Instructor)
@@ -72,6 +73,7 @@ public class BookingsController : Controller
             _logger.LogError(ex, "Error loading schedule data");
             TempData["Error"] = GetFriendlyScheduleErrorMessage(ex);
 
+            // Return safe fallback views on error
             if (instructor != null)
             {
                 return View("InstructorSchedule", new InstructorScheduleViewModel
@@ -85,14 +87,12 @@ public class BookingsController : Controller
         }
     }
 
+    // GET: Show checkout/reservation page
     [HttpGet]
     public async Task<IActionResult> Reserve(int classId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Challenge();
-        }
+        if (string.IsNullOrEmpty(userId)) return Challenge();
 
         var fitnessClass = await _context.FitnessClasses
             .Include(c => c.Category)
@@ -105,6 +105,7 @@ public class BookingsController : Controller
             return RedirectToAction("Index", "FitnessClasses");
         }
 
+        // Prevent duplicate bookings
         var alreadyBooked = await _context.Bookings.AnyAsync(b =>
             b.ApplicationUserId == userId &&
             b.FitnessClassId == classId &&
@@ -116,6 +117,7 @@ public class BookingsController : Controller
             return RedirectToAction("Index", "FitnessClasses");
         }
 
+        // Prevent booking if class is full
         var activeSeats = await _context.Bookings.CountAsync(b => b.FitnessClassId == classId && b.Status == BookingStatus.Active);
         if (activeSeats >= fitnessClass.Capacity)
         {
@@ -139,14 +141,12 @@ public class BookingsController : Controller
         return View(viewModel);
     }
 
+    // POST: Process the reservation
     [HttpPost]
     public async Task<IActionResult> Reserve(ReserveCheckoutViewModel model)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Challenge();
-        }
+        if (string.IsNullOrEmpty(userId)) return Challenge();
 
         var fitnessClass = await _context.FitnessClasses
             .Include(c => c.Category)
@@ -159,11 +159,13 @@ public class BookingsController : Controller
             return RedirectToAction("Index", "FitnessClasses");
         }
 
+        // Bypass payment if the class is free or user is an instructor
         if (await CanJoinClassForFreeAsync(userId, fitnessClass))
         {
             return await CreateFreeReservationAsync(userId, fitnessClass);
         }
 
+        // Setup Stripe Checkout Gateway for paid classes
         var successPath = Url.Action(nameof(ReserveSuccess), "Bookings", new { classId = model.FitnessClassId }, Request.Scheme);
         var cancelPath = Url.Action(nameof(ReserveCancelled), "Bookings", new { classId = model.FitnessClassId }, Request.Scheme);
 
@@ -175,12 +177,7 @@ public class BookingsController : Controller
 
         var successUrl = $"{successPath}&sessionId={{CHECKOUT_SESSION_ID}}";
         var stripeSession = await _paymentService.CreateStripeCheckoutSessionAsync(
-            userId,
-            fitnessClass.Id,
-            fitnessClass.Title,
-            fitnessClass.Price,
-            successUrl,
-            cancelPath);
+            userId, fitnessClass.Id, fitnessClass.Title, fitnessClass.Price, successUrl, cancelPath);
 
         if (!stripeSession.IsSuccess || string.IsNullOrWhiteSpace(stripeSession.CheckoutUrl))
         {
@@ -188,9 +185,11 @@ public class BookingsController : Controller
             return RedirectToAction(nameof(Reserve), new { classId = model.FitnessClassId });
         }
 
+        // Redirect user to Stripe secure payment page
         return Redirect(stripeSession.CheckoutUrl);
     }
 
+    // GET: User cancelled Stripe payment
     [HttpGet]
     public IActionResult ReserveCancelled(int classId)
     {
@@ -198,14 +197,12 @@ public class BookingsController : Controller
         return RedirectToAction(nameof(Reserve), new { classId });
     }
 
+    // GET: Successful Stripe payment callback
     [HttpGet]
     public async Task<IActionResult> ReserveSuccess(int classId, string sessionId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Challenge();
-        }
+        if (string.IsNullOrEmpty(userId)) return Challenge();
 
         if (string.IsNullOrWhiteSpace(sessionId))
         {
@@ -213,6 +210,7 @@ public class BookingsController : Controller
             return RedirectToAction(nameof(Reserve), new { classId });
         }
 
+        // Verify payment is authentic
         var verification = await _paymentService.VerifyStripeCheckoutPaymentAsync(sessionId, userId, classId);
         if (!verification.IsSuccess)
         {
@@ -221,9 +219,7 @@ public class BookingsController : Controller
         }
 
         var alreadyBooked = await _context.Bookings.AnyAsync(b =>
-            b.ApplicationUserId == userId &&
-            b.FitnessClassId == classId &&
-            b.Status != BookingStatus.Cancelled);
+            b.ApplicationUserId == userId && b.FitnessClassId == classId && b.Status != BookingStatus.Cancelled);
 
         if (alreadyBooked)
         {
@@ -241,17 +237,12 @@ public class BookingsController : Controller
             return RedirectToAction("Index", "FitnessClasses");
         }
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        if (user == null)
-        {
-            TempData["Error"] = "User not found.";
-            return RedirectToAction("Index", "Home");
-        }
-
+        // Create Database Transaction to ensure all related records save together safely
         using var tx = await _context.Database.BeginTransactionAsync();
 
         try
         {
+            // 1. Create Subscription
             var classSubscription = new Subscription
             {
                 ApplicationUserId = userId,
@@ -264,10 +255,10 @@ public class BookingsController : Controller
                 PriceAtPurchase = fitnessClass.Price,
                 CreatedDate = DateTime.UtcNow
             };
-
             _context.Subscriptions.Add(classSubscription);
             await _context.SaveChangesAsync();
 
+            // 2. Create Payment Record
             var payment = new Payment
             {
                 SubscriptionId = classSubscription.Id,
@@ -278,12 +269,13 @@ public class BookingsController : Controller
                 PaymentDate = DateTime.UtcNow,
                 Notes = $"Stripe checkout session {sessionId}"
             };
-
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
 
+            // 3. Generate Invoice
             var invoice = await _invoiceService.GenerateInvoiceAsync(payment);
 
+            // 4. Create Final Booking Record
             var booking = new Booking
             {
                 ApplicationUserId = userId,
@@ -313,16 +305,15 @@ public class BookingsController : Controller
         }
     }
 
+    // POST: Cancel an active booking
     [HttpPost]
     public async Task<IActionResult> Cancel(int bookingId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Challenge();
-        }
+        if (string.IsNullOrEmpty(userId)) return Challenge();
 
         var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId && b.ApplicationUserId == userId);
+
         if (booking == null)
         {
             TempData["Error"] = "Booking not found.";
@@ -335,6 +326,7 @@ public class BookingsController : Controller
             return RedirectToAction(nameof(MySchedule));
         }
 
+        // Change status to Cancelled
         booking.Status = BookingStatus.Cancelled;
         booking.InternalNotes = "Cancelled by user";
 
@@ -345,14 +337,12 @@ public class BookingsController : Controller
         return RedirectToAction(nameof(MySchedule));
     }
 
+    // GET: Generate QR Code for Class Check-in
     [HttpGet]
     public async Task<IActionResult> CheckIn(int bookingId, string? browserTimeZone = null)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Challenge();
-        }
+        if (string.IsNullOrEmpty(userId)) return Challenge();
 
         var booking = await _context.Bookings
             .Include(b => b.FitnessClass)
@@ -376,6 +366,7 @@ public class BookingsController : Controller
             return RedirectToAction(nameof(MySchedule));
         }
 
+        // Validate if we are within the 1-hour window before class starts
         var canCheckIn = CanOpenCheckInWindow(booking.FitnessClass.ScheduleDate, browserTimeZone, out var openWindowText, out var nowText);
         if (!canCheckIn)
         {
@@ -383,8 +374,7 @@ public class BookingsController : Controller
             return RedirectToAction(nameof(MySchedule));
         }
 
-        var existingCheckIn = await _context.BookingCheckIns
-            .FirstOrDefaultAsync(ci => ci.BookingId == booking.Id);
+        var existingCheckIn = await _context.BookingCheckIns.FirstOrDefaultAsync(ci => ci.BookingId == booking.Id);
 
         if (existingCheckIn?.IsRedeemed == true)
         {
@@ -392,6 +382,7 @@ public class BookingsController : Controller
             return RedirectToAction(nameof(MySchedule));
         }
 
+        // Create new QR check-in token if it doesn't exist
         if (existingCheckIn == null)
         {
             existingCheckIn = new BookingCheckIn
@@ -409,6 +400,7 @@ public class BookingsController : Controller
             await _context.SaveChangesAsync();
         }
 
+        // Generate QR code URL
         var redeemUrl = Url.Action(nameof(RedeemCheckIn), "Bookings", new { token = existingCheckIn.QrToken }, Request.Scheme);
         if (string.IsNullOrWhiteSpace(redeemUrl))
         {
@@ -429,6 +421,7 @@ public class BookingsController : Controller
         return View(viewModel);
     }
 
+    // GET: Scan/Redeem the QR Code
     [HttpGet]
     public async Task<IActionResult> RedeemCheckIn(string token)
     {
@@ -439,10 +432,7 @@ public class BookingsController : Controller
         }
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Challenge();
-        }
+        if (string.IsNullOrEmpty(userId)) return Challenge();
 
         var checkIn = await _context.BookingCheckIns
             .Include(ci => ci.Booking)
@@ -473,6 +463,7 @@ public class BookingsController : Controller
             return RedirectToAction(nameof(MySchedule));
         }
 
+        // Mark attendance as completed
         checkIn.IsRedeemed = true;
         checkIn.RedeemedAtUtc = DateTime.UtcNow;
         checkIn.Booking.Status = BookingStatus.Completed;
@@ -484,6 +475,9 @@ public class BookingsController : Controller
         return RedirectToAction(nameof(MySchedule));
     }
 
+    // --- Helper Methods Below ---
+
+    // Helper: Validates if the current time is within 1 hour before the class starts
     private static bool CanOpenCheckInWindow(DateTime classScheduleUtc, string? browserTimeZone, out string openWindowText, out string currentWindowText)
     {
         var currentUtc = DateTime.UtcNow;
@@ -502,7 +496,7 @@ public class BookingsController : Controller
             }
             catch
             {
-                // fall back to UTC below
+                // Fall back to UTC formatting on error
             }
         }
 
@@ -511,27 +505,22 @@ public class BookingsController : Controller
         return currentUtc >= openUtc;
     }
 
+    // Helper: Gets the instructor profile linked to the logged-in user
     private async Task<Instructor?> GetCurrentInstructorAsync(string userId)
     {
-        var user = await _context.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == userId);
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
+        if (user?.Email == null) return null;
 
-        if (user?.Email == null)
-        {
-            return null;
-        }
-
-        return await _context.Instructors
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Email == user.Email);
+        return await _context.Instructors.AsNoTracking().FirstOrDefaultAsync(i => i.Email == user.Email);
     }
 
+    // Helper: Checks if the user skips payment (price is 0 or user is staff)
     private async Task<bool> CanJoinClassForFreeAsync(string userId, FitnessClass fitnessClass)
     {
         return fitnessClass.Price <= 0m || await GetCurrentInstructorAsync(userId) != null;
     }
 
+    // Helper: Processes a free booking without contacting Stripe
     private async Task<IActionResult> CreateFreeReservationAsync(string userId, FitnessClass fitnessClass)
     {
         using var tx = await _context.Database.BeginTransactionAsync();
@@ -545,9 +534,7 @@ public class BookingsController : Controller
                 BookingDate = DateTime.UtcNow,
                 PaidPrice = 0m,
                 Status = BookingStatus.Active,
-                InternalNotes = fitnessClass.Price <= 0m
-                    ? "Joined free class"
-                    : "Joined free as instructor participant"
+                InternalNotes = fitnessClass.Price <= 0m ? "Joined free class" : "Joined free as instructor participant"
             };
 
             _context.Bookings.Add(booking);
@@ -566,14 +553,13 @@ public class BookingsController : Controller
         }
     }
 
+    // Helper: Gathers data for the Instructor's dashboard view
     private async Task<InstructorScheduleViewModel> BuildInstructorScheduleViewModelAsync(Instructor instructor)
     {
         var classes = await _context.FitnessClasses
             .Include(c => c.Category)
-            .Include(c => c.Bookings)
-            .ThenInclude(b => b.ApplicationUser)
-            .Include(c => c.Bookings)
-            .ThenInclude(b => b.BookingCheckIn)
+            .Include(c => c.Bookings).ThenInclude(b => b.ApplicationUser)
+            .Include(c => c.Bookings).ThenInclude(b => b.BookingCheckIn)
             .Where(c => c.InstructorId == instructor.Id)
             .OrderBy(c => c.ScheduleDate)
             .ToListAsync();
@@ -604,12 +590,12 @@ public class BookingsController : Controller
                         PaidPrice = b.PaidPrice,
                         IsCheckedIn = b.BookingCheckIn?.IsRedeemed == true,
                         EnrollmentReference = b.EnrollmentReference
-                    })
-                    .ToList()
+                    }).ToList()
             }).ToList()
         };
     }
 
+    // Helper: Formats user-friendly error messages based on exception types
     private static string GetFriendlyScheduleErrorMessage(Exception ex)
     {
         var message = ex.GetBaseException().Message;
@@ -622,7 +608,3 @@ public class BookingsController : Controller
         return "We couldn't load your training schedule right now. Please try again in a moment.";
     }
 }
-
-
-
-

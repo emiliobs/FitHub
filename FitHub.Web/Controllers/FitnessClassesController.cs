@@ -8,32 +8,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FitHub.Web.Controllers;
 
+// Requires authentication by default for all actions
 [Authorize]
 public class FitnessClassesController : Controller
 {
     private readonly ApplicationDbContext _context;
 
+    // Inject the database context
     public FitnessClassesController(ApplicationDbContext context)
     {
         this._context = context;
     }
 
-    // GET: FitnessClasses
-    [AllowAnonymous]
+    // GET: Show all fitness classes and active seat counts
+    [AllowAnonymous] // Publicly visible to guests
     public async Task<IActionResult> Index()
     {
+        // Fetch all classes with related data
         var classes = await _context.FitnessClasses
             .Include(f => f.Category)
             .Include(f => f.Instructor)
             .OrderByDescending(f => f.ScheduleDate)
             .ToListAsync();
 
+        // Calculate active bookings per class
         var bookingCounts = await _context.Bookings
             .Where(b => b.Status == BookingStatus.Active)
             .GroupBy(b => b.FitnessClassId)
             .Select(g => new { FitnessClassId = g.Key, Count = g.Count() })
             .ToListAsync();
 
+        // Assign active counts to the view model
         foreach (var fitnessClass in classes)
         {
             fitnessClass.ActiveBookingsCount = bookingCounts
@@ -43,11 +48,13 @@ public class FitnessClassesController : Controller
         return View(classes);
     }
 
-    [Authorize(Policy = "CanManageClasses")]
+    // GET: Show create form with dropdowns
+    [Authorize(Policy = "CanManageClasses")] // Restricted access
     public async Task<IActionResult> Create()
     {
         var viewModel = new FitnessClassViewModel
         {
+            // Populate dropdown lists for UI
             Categories = await _context.Categories.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
@@ -64,6 +71,7 @@ public class FitnessClassesController : Controller
         return View(viewModel);
     }
 
+    // POST: Save new fitness class to database
     [HttpPost]
     [Authorize(Policy = "CanManageClasses")]
     [ValidateAntiForgeryToken]
@@ -73,11 +81,13 @@ public class FitnessClassesController : Controller
         {
             if (ModelState.IsValid)
             {
+                // Map view model data to domain model for database storage
                 var newClass = new FitnessClass
                 {
                     Title = fitnessClassViewModel.Title,
                     Description = fitnessClassViewModel.Description,
                     Capacity = fitnessClassViewModel.Capacity,
+                    // Convert local browser time to UTC for secure database storage
                     ScheduleDate = ConvertBrowserLocalToUtc(fitnessClassViewModel.ScheduleDate, fitnessClassViewModel.BrowserTimeZone, fitnessClassViewModel.BrowserUtcOffsetMinutes),
                     Price = fitnessClassViewModel.Price,
                     CategoryId = fitnessClassViewModel.CategoryId,
@@ -96,6 +106,7 @@ public class FitnessClassesController : Controller
             TempData["Error"] = $"An error occurred while creating the fitness class: {ex.Message}";
         }
 
+        // Reload dropdowns if validation fails
         fitnessClassViewModel.Categories = await _context.Categories.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),
@@ -111,10 +122,12 @@ public class FitnessClassesController : Controller
         return View(fitnessClassViewModel);
     }
 
+    // GET: Show edit form with existing data
     [HttpGet]
     [Authorize(Policy = "CanManageClasses")]
     public async Task<IActionResult> Edit(int id)
     {
+        // Load the existing class data for editing
         var fitnessClass = await _context.FitnessClasses.FindAsync(id);
 
         if (fitnessClass is null)
@@ -122,6 +135,7 @@ public class FitnessClassesController : Controller
             return NotFound();
         }
 
+        // Map existing class data to the view model for editing
         var viewModel = new FitnessClassViewModel
         {
             Id = fitnessClass.Id,
@@ -144,9 +158,11 @@ public class FitnessClassesController : Controller
             }).ToListAsync()
         };
 
+        // Pass the view model to the edit view
         return View(viewModel);
     }
 
+    // POST: Update existing fitness class
     [HttpPost]
     [Authorize(Policy = "CanManageClasses")]
     [ValidateAntiForgeryToken]
@@ -157,10 +173,12 @@ public class FitnessClassesController : Controller
             return NotFound();
         }
 
+        // Validate the incoming data before attempting to update the database
         if (ModelState.IsValid)
         {
             try
             {
+                // Load the existing class from the database to update its properties
                 var fitnessClass = await _context.FitnessClasses.FindAsync(id);
 
                 if (fitnessClass is null)
@@ -168,6 +186,7 @@ public class FitnessClassesController : Controller
                     return NotFound();
                 }
 
+                // Update properties
                 fitnessClass.Title = fitnessClassViewModel.Title;
                 fitnessClass.Description = fitnessClassViewModel.Description;
                 fitnessClass.Capacity = fitnessClassViewModel.Capacity;
@@ -176,7 +195,10 @@ public class FitnessClassesController : Controller
                 fitnessClass.CategoryId = fitnessClassViewModel.CategoryId;
                 fitnessClass.InstructorId = fitnessClassViewModel.InstructorId;
 
+                // Mark the entity as modified and save changes to the database
                 _context.FitnessClasses.Update(fitnessClass);
+
+                // Save changes to the database with error handling
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Fitness session updated successfully!";
@@ -188,9 +210,11 @@ public class FitnessClassesController : Controller
             }
         }
 
+        // Reload dropdowns if validation fails
         return View(fitnessClassViewModel);
     }
 
+    // POST: Securely delete a fitness class
     [HttpPost, ActionName("Delete")]
     [Authorize(Policy = "CanManageClasses")]
     [ValidateAntiForgeryToken]
@@ -198,23 +222,29 @@ public class FitnessClassesController : Controller
     {
         try
         {
+            // Load the class along with its bookings to check for active reservations before deletion
             var fitnessClass = await _context.FitnessClasses
                 .Include(f => f.Bookings)
                 .FirstOrDefaultAsync(f => f.Id == id);
 
+            // If the class doesn't exist, show an error message and redirect to the index page
             if (fitnessClass is null)
             {
                 TempData["Error"] = "The class you are trying to delete was not found.";
                 return RedirectToAction(nameof(Index));
             }
 
+            // Block deletion if members are already enrolled
             if (fitnessClass.Bookings.Any())
             {
                 TempData["Error"] = $"Action Denied: You Cannot delete {fitnessClass.Title} because it has {fitnessClass.Bookings.Count} Active reservations. Please cancel the booking first.";
                 return RedirectToAction(nameof(Index));
             }
 
+            // If no active bookings, proceed with deletion
             _context.FitnessClasses.Remove(fitnessClass);
+
+            // Save changes to the database with error handling
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"The training session {fitnessClass.Title} has been deleted successfully from the schedule!";
@@ -227,6 +257,7 @@ public class FitnessClassesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // GET: Show list of users booked for a specific class
     [HttpGet]
     [Authorize(Policy = "CanManageClasses")]
     public async Task<IActionResult> Attendance(int? id)
@@ -238,11 +269,12 @@ public class FitnessClassesController : Controller
 
         try
         {
+            // Load class details along with enrolled participants
             var fitnessClass = await _context.FitnessClasses
-                .Include(c => c.Instructor)
-                .Include(c => c.Category)
-                .Include(c => c.Bookings)
-                .ThenInclude(b => b.ApplicationUser)
+                .Include(c => c.Instructor)// Include instructor details for better context in the attendance view
+                .Include(c => c.Category)// Include category details for better context in the attendance view
+                .Include(c => c.Bookings)// Include bookings to get the list of attendees
+                .ThenInclude(b => b.ApplicationUser)// Include user details for each booking to display attendee information
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (fitnessClass is null)
@@ -255,11 +287,11 @@ public class FitnessClassesController : Controller
         catch (Exception ex)
         {
             TempData["Error"] = $"An error occurred while retrieving attendance data: {ex.Message}";
-
             return RedirectToAction(nameof(Index));
         }
     }
 
+    // Helper: Converts client-side local time to standard UTC for database
     private static DateTime ConvertBrowserLocalToUtc(DateTime browserLocalDateTime, string? browserTimeZone, int browserUtcOffsetMinutes)
     {
         var unspecifiedLocal = DateTime.SpecifyKind(browserLocalDateTime, DateTimeKind.Unspecified);
@@ -268,7 +300,10 @@ public class FitnessClassesController : Controller
         {
             try
             {
+                // Attempt to convert using the browser's timezone ID for more accurate conversion
                 var timeZone = TimeZoneInfo.FindSystemTimeZoneById(browserTimeZone);
+
+                // Convert the unspecified local time to UTC using the identified timezone
                 return TimeZoneInfo.ConvertTimeToUtc(unspecifiedLocal, timeZone);
             }
             catch
@@ -277,8 +312,13 @@ public class FitnessClassesController : Controller
             }
         }
 
+        // If timezone ID is unavailable or invalid, use the provided UTC offset to convert to UTC
         var offset = TimeSpan.FromMinutes(-browserUtcOffsetMinutes);
+
+        // Create a DateTimeOffset with the local time and offset, then convert to UTC
         var dto = new DateTimeOffset(unspecifiedLocal, offset);
+
+        // Return the UTC DateTime for storage in the database
         return dto.UtcDateTime;
     }
 }
