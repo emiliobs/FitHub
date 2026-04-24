@@ -6,22 +6,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FitHub.Web.Data;
 
+// The DbInitializer class is responsible for seeding the database with initial data.
 public class DbInitializer
 {
     public static async Task SeedData(IServiceProvider serviceProvider)
     {
         try
         {
+            // We need RoleManager to seed roles (Admin, Manager, Instructor, Member)
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            // We need both RoleManager and UserManager to seed roles and users
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            // We also need the DbContext to seed categories, instructors, classes, and bookings
             var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
-            // 1. SEED ROLES
+            // 1. SEED ROLES: We create the 4 main roles for our application
             string[] roleNames = { "Admin", "Manager", "Instructor", "Member" };
+
+            // We loop through the role names and create them if they don't already exist
             foreach (var roleName in roleNames)
             {
+                //  Check if the role already exists to avoid duplicates
                 if (!await roleManager.RoleExistsAsync(roleName))
                 {
+                    // If the role does not exist, we create it using the RoleManager
                     await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
             }
@@ -34,11 +44,16 @@ public class DbInitializer
                 ("kaur@yopmail.com", "Mehakdeep kaur", "Admin")
             };
 
+            // We loop through the list of users to seed and create them if they don't already exist
             foreach (var userData in usersToSeed)
             {
+                // Check if a user with the same email already exists to avoid duplicates
                 var existingUser = await userManager.FindByEmailAsync(userData.Email);
+
+                // If the user does not exist, we create a new ApplicationUser and assign the specified role
                 if (existingUser == null)
                 {
+                    // We create a new ApplicationUser object with the provided email, first name, and role
                     var user = new ApplicationUser
                     {
                         UserName = userData.Email,
@@ -50,7 +65,11 @@ public class DbInitializer
                         MembershipPlan = SubscriptionType.Warrior,
                         SubscriptionEndDate = DateTime.UtcNow.AddYears(1)
                     };
+
+                    // We create the user with a default password "123" (for development purposes only) and assign the specified role
                     await userManager.CreateAsync(user, "123");
+
+                    // After creating the user, we assign them to the specified role using the UserManager
                     await userManager.AddToRoleAsync(user, userData.Role);
                 }
             }
@@ -151,7 +170,10 @@ public class DbInitializer
 
                 if (allGymClasses.Any())
                 {
+                    // We create a list of bookings to add in bulk for better performance
                     var bulkBookings = new List<Booking>();
+
+                    // Each of the 3 users will be enrolled in all classes with different booking dates for variety
                     foreach (var fClass in allGymClasses)
                     {
                         if (admin != null)
@@ -168,7 +190,10 @@ public class DbInitializer
                         }
                     }
 
+                    // Add all bookings in bulk for better performance
                     await context.Bookings.AddRangeAsync(bulkBookings);
+
+                    // Save all changes at once after adding all bookings
                     await context.SaveChangesAsync();
                 }
             }
